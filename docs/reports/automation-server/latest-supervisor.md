@@ -2,13 +2,13 @@
 
 | Item | Value |
 |---|---|
-| Started | 2026-08-05T15:10:34Z |
-| Finished | 2026-08-05T15:10:37Z |
+| Started | 2026-08-05T17:20:08Z |
+| Finished | 2026-08-05T17:20:13Z |
 | Environment | asdevserve |
 | Hostname | asdevserve |
 | Verdict | NO_GO |
-| Passed | 14 |
-| Warnings | 2 |
+| Passed | 13 |
+| Warnings | 3 |
 | Failed | 3 |
 | Auto-healed | 0 |
 | Skipped (cooldown) | 0 |
@@ -30,8 +30,8 @@
 - FAIL [SVC-asdev-health-monitor.service] Restart command failed
 - FAIL [SVC-asdev-mcp-monitor.service] Restart command failed
 - FAIL [MCP-001] MCP endpoint unhealthy (verdict=UNKNOWN failure=unknown)
-- PASS [SYS-001] Disk usage: 80%
-- PASS [SYS-002] Memory usage: 44%
+- WARN [SYS-001] Disk usage high: 83%
+- PASS [SYS-002] Memory usage: 62%
 - PASS [SYS-003] Network reachable (github.com)
 - PASS [PROV-001] OpenCode available
 
