@@ -2,12 +2,12 @@
 
 | Item | Value |
 |---|---|
-| Started | 2026-08-08T15:20:15Z |
-| Finished | 2026-08-08T15:20:15Z |
+| Started | 2026-08-13T16:20:29Z |
+| Finished | 2026-08-13T16:20:29Z |
 | Endpoint | https://mcp.alirezasafaeisystems.ir/sse/ |
 | HTTP Status | 000 |
 | Failure Class | connection_failure |
-| Latency | 270ms |
+| Latency | 179ms |
 | Verdict | FAIL |
 
 MCP endpoint is unhealthy. Reason: connection_failure. Loop must not proceed.

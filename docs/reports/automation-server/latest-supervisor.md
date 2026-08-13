@@ -2,14 +2,14 @@
 
 | Item | Value |
 |---|---|
-| Started | 2026-08-08T15:20:10Z |
-| Finished | 2026-08-08T15:20:15Z |
+| Started | 2026-08-13T16:20:25Z |
+| Finished | 2026-08-13T16:20:30Z |
 | Environment | asdevserve |
 | Hostname | asdevserve |
 | Verdict | NO_GO |
-| Passed | 14 |
+| Passed | 13 |
 | Warnings | 2 |
-| Failed | 3 |
+| Failed | 4 |
 | Auto-healed | 0 |
 | Skipped (cooldown) | 0 |
 | Skipped (not allowlisted) | 0 |
@@ -25,13 +25,13 @@
 - PASS [SVC-asdev-mcp-monitor.timer] Timer active
 - PASS [SVC-asdev-supervisor.timer] Timer active
 - WARN [SVC-asdev-bot.service] Optional service not running (state=inactive) — expected when disabled
-- PASS [SVC-asdev-github-sync.service] Service transitioning (state=activating)
+- PASS [SVC-asdev-github-sync.service] Oneshot service completed successfully (inactive, result=success)
 - PASS [SVC-asdev-agent-loop.service] Oneshot service completed successfully (inactive, result=success)
 - FAIL [SVC-asdev-health-monitor.service] Restart command failed
 - FAIL [SVC-asdev-mcp-monitor.service] Restart command failed
 - FAIL [MCP-001] MCP endpoint unhealthy (verdict=UNKNOWN failure=unknown)
-- PASS [SYS-001] Disk usage: 51%
-- PASS [SYS-002] Memory usage: 57%
+- PASS [SYS-001] Disk usage: 57%
+- FAIL [SYS-002] Memory usage critical: 91%
 - PASS [SYS-003] Network reachable (github.com)
 - PASS [PROV-001] OpenCode available
 
