@@ -17,8 +17,9 @@ describe('trackEvent', () => {
   })
 
   afterEach(() => {
+    vi.unstubAllGlobals()
     vi.restoreAllMocks()
-    localStorage.removeItem(CONSENT_KEY)
+    globalThis.localStorage?.removeItem(CONSENT_KEY)
   })
 
   it('sends event via sendBeacon when available', async () => {
