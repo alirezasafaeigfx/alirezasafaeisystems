@@ -1,7 +1,7 @@
 'use client'
 
-import { FormEvent, useEffect, useState } from 'react'
-import { Pencil, Plus, Save, Trash2, X } from 'lucide-react'
+import { FormEvent, useCallback, useEffect, useState } from 'react'
+import { Pencil, Save, Trash2, X } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -67,7 +67,7 @@ export function ProjectManager() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
-  async function loadProjects() {
+  const loadProjects = useCallback(async () => {
     setLoading(true)
     setError('')
     try {
@@ -81,9 +81,12 @@ export function ProjectManager() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
-  useEffect(() => { void loadProjects() }, [])
+  useEffect(() => {
+    const timer = window.setTimeout(() => { void loadProjects() }, 0)
+    return () => window.clearTimeout(timer)
+  }, [loadProjects])
 
   function updateForm<K extends keyof ProjectForm>(key: K, value: ProjectForm[K]) {
     setForm((current) => ({ ...current, [key]: value }))
