@@ -78,6 +78,9 @@ jobs:
       VPS_HOST: ${{ secrets.VPS_HOST }}
       VPS_USER: ${{ secrets.VPS_USER }}
       VPS_PORT: ${{ secrets.VPS_PORT }}
+      VPS_JUMP_HOST: ${{ secrets.VPS_JUMP_HOST }}
+      VPS_JUMP_USER: ${{ secrets.VPS_JUMP_USER }}
+      VPS_JUMP_PORT: ${{ secrets.VPS_JUMP_PORT }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -97,8 +100,27 @@ jobs:
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
           printf '%s\n' "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/id_ed25519
+          printf '%s\n' "${{ secrets.VPS_JUMP_SSH_KEY }}" > ~/.ssh/id_jump_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -p "${VPS_PORT:-22}" -H "$VPS_HOST" >> ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/id_jump_ed25519
+          ssh-keyscan -p "${VPS_JUMP_PORT:-22}" -H "$VPS_JUMP_HOST" >> ~/.ssh/known_hosts
+          cat > ~/.ssh/config <<EOF
+          Host deploy-jump
+            HostName $VPS_JUMP_HOST
+            User $VPS_JUMP_USER
+            Port ${VPS_JUMP_PORT:-22}
+            IdentityFile ~/.ssh/id_jump_ed25519
+            IdentitiesOnly yes
+          Host deploy-target
+            HostName $VPS_HOST
+            User $VPS_USER
+            Port ${VPS_PORT:-22}
+            IdentityFile ~/.ssh/id_ed25519
+            IdentitiesOnly yes
+            ProxyJump deploy-jump
+          EOF
+          chmod 600 ~/.ssh/config
+          ssh -F ~/.ssh/config -o StrictHostKeyChecking=accept-new deploy-target true
 
       - name: Upload release source
         run: |
@@ -108,10 +130,10 @@ jobs:
           echo "RELEASE_ID=$RELEASE_ID" >> "$GITHUB_ENV"
           echo "REMOTE_TMP=$REMOTE_TMP" >> "$GITHUB_ENV"
 
-          ssh -i ~/.ssh/id_ed25519 -o IdentitiesOnly=yes -p "${VPS_PORT:-22}" "$VPS_USER@$VPS_HOST" "mkdir -p '$REMOTE_TMP'"
+          ssh -F ~/.ssh/config deploy-target "mkdir -p '$REMOTE_TMP'"
 
           rsync -az --delete \
-            -e "ssh -i ~/.ssh/id_ed25519 -o IdentitiesOnly=yes -p ${VPS_PORT:-22}" \
+            -e "ssh -F ~/.ssh/config deploy-target" \
             --exclude '.git' \
             --exclude '.github' \
             --exclude 'node_modules' \
@@ -119,12 +141,12 @@ jobs:
             --exclude 'coverage' \
             --exclude 'playwright-report' \
             --exclude 'test-results' \
-            ./ "$VPS_USER@$VPS_HOST:$REMOTE_TMP/"
+            ./ "deploy-target:$REMOTE_TMP/"
 
       - name: Execute remote deploy
         run: |
           set -euo pipefail
-          ssh -i ~/.ssh/id_ed25519 -o IdentitiesOnly=yes -p "${VPS_PORT:-22}" "$VPS_USER@$VPS_HOST" \
+          ssh -F ~/.ssh/config deploy-target \
             "cd '$REMOTE_TMP' && bash ops/deploy/deploy.sh --env '$TARGET_ENV' --source-dir '$REMOTE_TMP' --release-id '$RELEASE_ID' --keep-releases 3"
 
       - name: Post-deploy smoke check
@@ -139,7 +161,7 @@ jobs:
           fi
 
           # Run smoke checks from inside the VPS to avoid public-route CI network variance.
-          ssh -i ~/.ssh/id_ed25519 -o IdentitiesOnly=yes -p "${VPS_PORT:-22}" "$VPS_USER@$VPS_HOST" "\
+          ssh -F ~/.ssh/config deploy-target "\
             set -euo pipefail; \
             GET_CODE=\$(curl --connect-timeout 10 --max-time 30 -fsS -o /tmp/portfolio-ready-get.json -w '%{http_code}' http://127.0.0.1:${PORT}/api/ready); \
             HEAD_CODE=\$(curl --connect-timeout 10 --max-time 30 -sSI -o /tmp/portfolio-ready-head.txt -w '%{http_code}' -X HEAD http://127.0.0.1:${PORT}/api/ready); \
