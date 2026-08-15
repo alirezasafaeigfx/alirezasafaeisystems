@@ -12,7 +12,7 @@
 ## Backlog فعال (اولویت بالا)
 
 ### P1 — Discover داخل سایت شخصی
-- [ ] `P1-DISCOVER-1` **ادغام Portfolio-native Discover**  
+- [ ] `P1-DISCOVER-1` **ادغام Portfolio-native Discover**
   مالک: `FE + Backend + QA`
   شرح: افزودن `/discover` و `/en/discover` با layout فعلی، تکمیل CRUD تب Projects در Admin، و استفاده از همان Prisma Project با تفکیک `contentType` و `published`.
   خروجی: `docs/superpowers/specs/2026-08-15-discover-portfolio-integration-design.md`، plan، runbook، route، API، migration و تست‌ها.

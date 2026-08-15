@@ -1,7 +1,7 @@
 # Discover در سایت شخصی — سند طراحی
 
-**تاریخ:** 2026-08-15  
-**دامنه:** `alirezasafaeisystems.ir/discover`  
+**تاریخ:** 2026-08-15
+**دامنه:** `alirezasafaeisystems.ir/discover`
 **مخزن:** `alirezasafaei-dev/alirezasafaeisystems`
 
 ## هدف
