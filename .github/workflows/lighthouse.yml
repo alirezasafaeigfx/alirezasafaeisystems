@@ -24,5 +24,14 @@ jobs:
           cache: 'pnpm'
           cache-dependency-path: pnpm-lock.yaml
       - run: pnpm install --frozen-lockfile
+      - name: Install Chromium for Lighthouse
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/ms-playwright
+        run: pnpm exec playwright install chromium
       - name: Run Lighthouse CI
-        run: pnpm exec lhci autorun --config=./lighthouserc.json
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/ms-playwright
+        run: |
+          export CHROME_PATH="$(find "$PLAYWRIGHT_BROWSERS_PATH" -type f -name chrome -perm -111 -print -quit)"
+          test -x "$CHROME_PATH"
+          pnpm exec lhci autorun --config=./lighthouserc.json

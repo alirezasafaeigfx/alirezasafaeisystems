@@ -18,7 +18,7 @@
   "scripts": {
     "dev": "next dev -p 3000 2>&1 | tee dev.log",
     "prebuild": "node scripts/generate-sitemap-manifest.mjs",
-    "build": "next build && cp -r .next/static .next/standalone/.next/ && cp -r public .next/standalone/",
+    "build": "next build && node scripts/copy-next-standalone.mjs",
     "start": "NODE_ENV=production node .next/standalone/server.js 2>&1 | tee server.log",
     "postinstall": "prisma generate",
     "lint": "eslint .",

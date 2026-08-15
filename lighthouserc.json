@@ -5,6 +5,7 @@
         "http://127.0.0.1:3000/fa/",
         "http://127.0.0.1:3000/fa/services",
         "http://127.0.0.1:3000/fa/case-studies",
+        "http://127.0.0.1:3000/fa/discover",
         "http://127.0.0.1:3000/fa/services/infrastructure-localization",
         "http://127.0.0.1:3000/fa/qualification",
         "http://127.0.0.1:3000/fa/about-brand"

@@ -57,8 +57,12 @@ export function I18nProvider({ children, initialLanguage = 'fa' }: { children: R
   const changeLanguage = (lang: Language) => {
     setLanguage(lang)
     if (typeof window !== 'undefined') {
-      localStorage.setItem('language', lang)
-      setLangCookie(lang)
+      try {
+        localStorage.setItem('language', lang)
+        setLangCookie(lang)
+      } catch {
+        // Storage can be unavailable in privacy-restricted browser contexts.
+      }
     }
   }
 

@@ -13,6 +13,7 @@ let scorecard: ScorecardModule
 let tempDir: string
 let previousDatabaseUrl: string | undefined
 let databaseUrl: string
+const packageManager = process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm'
 
 beforeAll(async () => {
   tempDir = mkdtempSync(join(tmpdir(), 'asdev-scorecard-'))
@@ -22,9 +23,10 @@ beforeAll(async () => {
   scorecard = await import('../../../scripts/revenue-scorecard.mjs')
 
   process.env.DATABASE_URL = databaseUrl
-  execFileSync('pnpm', ['exec', 'prisma', 'db', 'push', '--skip-generate'], {
+  execFileSync(packageManager, ['exec', 'prisma', 'db', 'push', '--skip-generate'], {
     cwd: process.cwd(),
     env: process.env,
+    shell: process.platform === 'win32',
     stdio: 'pipe',
   })
 })

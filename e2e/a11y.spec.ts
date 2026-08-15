@@ -5,6 +5,7 @@ const PAGES = [
   { name: 'Home', path: '/fa/' },
   { name: 'Services', path: '/fa/services' },
   { name: 'Case Studies', path: '/fa/case-studies' },
+  { name: 'Discover', path: '/fa/discover' },
   { name: 'Qualification', path: '/fa/qualification' },
   { name: 'About Brand', path: '/fa/about-brand' },
   { name: 'Profile', path: '/fa/profile' },

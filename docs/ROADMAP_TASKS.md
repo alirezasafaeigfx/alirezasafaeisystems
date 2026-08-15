@@ -1,6 +1,6 @@
 # نقشه راه و تسک‌بندی اولویت‌بندی‌شده
 
-**تاریخ به‌روزرسانی:** 2026-06-16
+**تاریخ به‌روزرسانی:** 2026-08-15
 **منبع:** ترکیب `docs/IMMEDIATE_EXECUTION_MAP_2026-02-20.md` + `docs/ENTERPRISE_EXECUTION_BACKLOG.md` + `docs/runtime/EXECUTION_NOW.md`
 
 ## اصول اولویت‌بندی
@@ -10,6 +10,13 @@
 - هر تسک یک مالک، خروجی قابل‌اعتبارسازی، و معیار پذیرش دارد.
 
 ## Backlog فعال (اولویت بالا)
+
+### P1 — Discover داخل سایت شخصی
+- [ ] `P1-DISCOVER-1` **ادغام Portfolio-native Discover**
+  مالک: `FE + Backend + QA`
+  شرح: افزودن `/discover` و `/en/discover` با layout فعلی، تکمیل CRUD تب Projects در Admin، و استفاده از همان Prisma Project با تفکیک `contentType` و `published`.
+  خروجی: `docs/superpowers/specs/2026-08-15-discover-portfolio-integration-design.md`، plan، runbook، route، API، migration و تست‌ها.
+  پذیرش: چرخهٔ local create/edit/publish/public/reorder/unpublish/delete بدون deploy موفق باشد؛ `pnpm lint`, `pnpm type-check`, `pnpm test`, `pnpm build` سبز باشند.
 
 ### P0 — فوری (72 تا 120 ساعت آینده)
 - [ ] `P0-1` **ثبات دسترسی VPS و Edge-Origin**  

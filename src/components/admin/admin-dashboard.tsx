@@ -8,8 +8,9 @@ import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { MessageSquare, Briefcase, BarChart3, Users, Trash2, LogOut, ClipboardList, Search, ExternalLink } from 'lucide-react'
+import { MessageSquare, Briefcase, BarChart3, Users, Trash2, LogOut, ClipboardList, Search } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
+import { ProjectManager } from '@/components/admin/project-manager'
 
 interface LeadData {
   id: string
@@ -547,31 +548,7 @@ export function AdminDashboard() {
         )}
 
         {activeTab === 'projects' && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Manage Projects</CardTitle>
-              <CardDescription>
-                Add, edit, or remove portfolio projects
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8">
-                <p className="text-muted-foreground mb-4">
-                  Project management interface — currently read-only. Manage projects via the GitHub repo.
-                </p>
-                <Button asChild variant="outline">
-                  <a
-                    href="https://github.com/alirezasafaei-dev/alirezasafaeisystems"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <ExternalLink className="h-4 w-4 mr-2" />
-                    Open Repository
-                  </a>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          <ProjectManager />
         )}
 
         {activeTab === 'stats' && (

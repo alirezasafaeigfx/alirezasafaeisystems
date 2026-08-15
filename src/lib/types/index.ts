@@ -20,6 +20,8 @@ export interface Project {
   tags: string[]
   featured?: boolean
   order?: number
+  contentType?: 'portfolio' | 'discover'
+  published?: boolean
   createdAt?: string
   updatedAt?: string
 }

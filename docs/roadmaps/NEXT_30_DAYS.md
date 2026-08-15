@@ -1,11 +1,30 @@
 # NEXT 30 DAYS — ASDEV Roadmap
 
-**Period:** 2026-07-08 to 2026-08-07
+**Period:** 2026-08-15 to 2026-09-14
 **Source of Truth:** GitHub
 
 ---
 
 ## 1. Unified Deploy Rollout
+
+## 0. Discover Portfolio Integration — P1
+
+هدف این بازه، انتقال Discover از surface مستقل به route داخلی سایت شخصی است؛ با reuse کامل Admin، Prisma، layout و release contracts موجود.
+
+### Milestones
+
+- Week 1: local schema/API contract و تست‌های failing
+- Week 2: public `/discover`، locale/SEO و Admin CRUD
+- Week 3: Windows 11 smoke/a11y، migration rehearsal و cleanup proof
+- Week 4: focused PR، CI و release readiness review
+
+### Acceptance
+
+- Discover فقط Published/Discover records را نمایش دهد.
+- Portfolio فعلی بدون regression باقی بماند.
+- CRUD و publication بدون deploy در local کار کند.
+- هیچ runtime service/database/auth جدا اضافه نشود.
+- جزئیات در `docs/superpowers/specs/2026-08-15-discover-portfolio-integration-design.md` و `docs/operations/DISCOVER_LOCAL_RUNBOOK.md` ثبت شده باشد.
 
 - Standardize deploy process across all sites
 - Create unified deploy script

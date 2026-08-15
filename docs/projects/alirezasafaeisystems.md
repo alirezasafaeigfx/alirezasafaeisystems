@@ -1,7 +1,7 @@
 # AlirezaSafaeiSystems — ASDEV Mother / Brand Site
 
 **Role:** Portfolio, trust hub, case studies, lead qualification  
-**Status:** Live / maintain  
+**Status:** Live / maintain + Discover integration in progress
 **Domain:** https://alirezasafaeisystems.ir/  
 **Repository:** https://github.com/alirezasafaei-dev/alirezasafaeisystems  
 **Local path:** `sites/live/alirezasafaeisystems`
@@ -9,6 +9,14 @@
 ---
 
 ## Case study — ASDEV brand and governance site
+
+## Discover integration
+
+Discover is being integrated as a first-class route of this portfolio site at `/discover`, using the existing site layout, Admin session, Prisma database and Project model. It is not a separate site or service. The design, implementation plan and local Windows runbook are tracked in:
+
+- `docs/superpowers/specs/2026-08-15-discover-portfolio-integration-design.md`
+- `docs/superpowers/plans/2026-08-15-discover-portfolio-integration.md`
+- `docs/operations/DISCOVER_LOCAL_RUNBOOK.md`
 
 ### Problem
 
