@@ -24,7 +24,7 @@ const config = {
   webServer: disableWebServer
     ? undefined
     : {
-        command: "bash -lc 'fuser -k 3100/tcp >/dev/null 2>&1 || true; pnpm run build && PORT=3100 pnpm run start'",
+        command: 'pnpm run build && node scripts/start-playwright-server.mjs',
         url: 'http://127.0.0.1:3100',
         reuseExistingServer: true,
         timeout: 240_000,
