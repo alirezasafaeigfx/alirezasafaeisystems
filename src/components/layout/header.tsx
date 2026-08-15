@@ -25,6 +25,7 @@ const navItems = [
   { key: 'home', name: 'nav.home', href: '/' },
   { key: 'services', name: 'nav.services', href: '/services' },
   { key: 'caseStudies', name: 'nav.caseStudies', href: '/case-studies' },
+  { key: 'discover', name: 'nav.discover', href: '/discover' },
   { key: 'auditReadiness', name: 'nav.auditReadiness', href: '/audit-readiness' },
   { key: 'contact', name: 'nav.contact', href: '/qualification' },
 ]
