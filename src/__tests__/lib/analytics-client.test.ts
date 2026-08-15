@@ -7,8 +7,14 @@ describe('trackEvent', () => {
   const CONSENT_KEY = 'asdev_analytics_consent_v1'
 
   beforeEach(() => {
+    const storage = new Map<string, string>()
     sendBeaconSpy = vi.fn().mockReturnValue(true)
     fetchSpy = vi.fn().mockResolvedValue({ ok: true })
+    vi.stubGlobal('localStorage', {
+      getItem: (key: string) => storage.get(key) ?? null,
+      setItem: (key: string, value: string) => { storage.set(key, value) },
+      removeItem: (key: string) => { storage.delete(key) },
+    })
     vi.stubGlobal('navigator', { sendBeacon: sendBeaconSpy })
     vi.stubGlobal('fetch', fetchSpy)
     vi.stubGlobal('window', { location: { pathname: '/fa/' } })
