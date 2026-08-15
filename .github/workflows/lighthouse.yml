@@ -32,6 +32,6 @@ jobs:
         env:
           PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/ms-playwright
         run: |
-          export CHROME_PATH="$(find "$PLAYWRIGHT_BROWSERS_PATH" -type f -path '*/chrome-linux/chrome' -print -quit)"
+          export CHROME_PATH="$(find "$PLAYWRIGHT_BROWSERS_PATH" -type f -name chrome -perm -111 -print -quit)"
           test -x "$CHROME_PATH"
           pnpm exec lhci autorun --config=./lighthouserc.json
