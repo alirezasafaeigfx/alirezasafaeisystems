@@ -33,6 +33,13 @@ test.describe('smoke', () => {
     await expect(page.locator('h1')).toContainText('Services')
   })
 
+  test('Discover keeps English locale after the internal rewrite', async ({ page }) => {
+    await page.goto('/en/discover')
+    await expect.poll(async () => page.evaluate(() => document.documentElement.lang)).toBe('en')
+    await expect.poll(async () => page.evaluate(() => document.documentElement.dir)).toBe('ltr')
+    await expect(page.locator('h1')).toContainText('Everything I introduce on Instagram, collected here with the real link')
+  })
+
   test('theme toggle button is removed from header', async ({ page }) => {
     await page.goto('/')
     await expect(page.locator('header button[aria-label="Toggle theme"]')).toHaveCount(0)
