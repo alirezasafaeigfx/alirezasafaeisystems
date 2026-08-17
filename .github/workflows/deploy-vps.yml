@@ -146,6 +146,13 @@ jobs:
             --exclude 'test-results' \
             ./ "deploy-target:$REMOTE_TMP/"
 
+      - name: Relocate legacy production SQLite to persistent storage
+        if: ${{ env.TARGET_ENV == 'production' }}
+        run: |
+          set -euo pipefail
+          ssh -F ~/.ssh/config deploy-target \
+            "cd '$REMOTE_TMP' && bash ops/deploy/migrate-legacy-sqlite.sh --env '$TARGET_ENV'"
+
       - name: Execute remote deploy
         run: |
           set -euo pipefail
