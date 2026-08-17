@@ -135,7 +135,7 @@ jobs:
           ssh -F ~/.ssh/config deploy-target "mkdir -p '$REMOTE_TMP'"
 
           rsync -az --delete \
-            -e "ssh -F ~/.ssh/config" \
+            -e "ssh -F $HOME/.ssh/config" \
             --exclude '.git' \
             --exclude '.github' \
             --exclude 'node_modules' \
