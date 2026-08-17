@@ -108,9 +108,16 @@ function withSecurityHeaders(response: NextResponse, pathname: string, nonce: st
   return response
 }
 
-function resolveLocale(request: NextRequest, pathnameLocale?: string): 'fa' | 'en' {
+function resolveLocale(request: NextRequest, pathnameLocale?: string, isInternalContext = false): 'fa' | 'en' {
   if (pathnameLocale === 'fa' || pathnameLocale === 'en') {
     return pathnameLocale
+  }
+
+  if (isInternalContext) {
+    const propagatedLocale = request.headers.get('x-site-locale') || request.headers.get('x-asdev-locale')
+    if (propagatedLocale === 'en' || propagatedLocale === 'fa') {
+      return propagatedLocale
+    }
   }
 
   const cookieLocale = request.cookies.get('lang')?.value
@@ -150,7 +157,7 @@ export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname
   const hasLocaleRedirectContext = request.headers.get('x-asdev-locale-context') === '1'
   const [, maybeLocale] = pathname.split('/')
-  const locale = resolveLocale(request, maybeLocale)
+  const locale = resolveLocale(request, maybeLocale, hasLocaleRedirectContext)
   const correlationId =
     request.headers.get('x-request-id') ||
     request.headers.get('x-correlation-id') ||

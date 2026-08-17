@@ -1,4 +1,5 @@
 import fs from 'node:fs'
+import { resolve } from 'node:path'
 
 const systemChromePath = '/usr/bin/google-chrome'
 const disableWebServer = process.env.PLAYWRIGHT_DISABLE_WEBSERVER === 'true'
@@ -24,10 +25,13 @@ const config = {
   webServer: disableWebServer
     ? undefined
     : {
-        command: 'pnpm run build && node scripts/start-playwright-server.mjs',
+        command: 'node -e "require(\'node:fs\').mkdirSync(\'test-results\',{recursive:true})" && pnpm prisma db push --skip-generate --accept-data-loss && pnpm run build && node scripts/start-playwright-server.mjs',
         url: 'http://127.0.0.1:3100',
         reuseExistingServer: true,
         timeout: 240_000,
+        env: {
+          DATABASE_URL: process.env.DATABASE_URL || `file:${resolve(process.cwd(), 'test-results/playwright.db')}`,
+        },
       },
 }
 

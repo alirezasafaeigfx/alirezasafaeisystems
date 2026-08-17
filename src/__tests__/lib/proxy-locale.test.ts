@@ -26,6 +26,22 @@ describe('proxy locale routing', () => {
     expect(response.headers.get('x-site-locale')).toBe('en')
   })
 
+  it('preserves the propagated English locale during the internal rewrite pass', async () => {
+    const request = new NextRequest('https://alirezasafaeisystems.ir/discover', {
+      headers: {
+        'x-asdev-locale-context': '1',
+        'x-site-locale': 'en',
+        'x-asdev-locale': 'en',
+      },
+    })
+    const response = await proxy(request)
+
+    expect(response.status).toBe(200)
+    expect(response.headers.get('location')).toBeNull()
+    expect(response.headers.get('x-site-pathname')).toBe('/discover')
+    expect(response.headers.get('x-site-locale')).toBe('en')
+  })
+
   it('serves root as the default Persian page without /fa redirect', async () => {
     const request = new NextRequest('https://alirezasafaeisystems.ir/')
     const response = await proxy(request)
