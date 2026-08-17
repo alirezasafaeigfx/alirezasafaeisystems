@@ -71,13 +71,13 @@ jobs:
 
       - name: Setup database
         env:
-          DATABASE_URL: "file:./prisma/dev.db"
+          DATABASE_URL: "file:${{ github.workspace }}/prisma/dev.db"
         run: pnpm run db:push
 
       - name: Browser smoke
         env:
           CI: "true"
-          DATABASE_URL: "file:./prisma/dev.db"
+          DATABASE_URL: "file:${{ github.workspace }}/prisma/dev.db"
           PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/ms-playwright
           PLAYWRIGHT_DISABLE_WEBSERVER: "true"
         run: |
