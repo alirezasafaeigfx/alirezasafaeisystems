@@ -9,4 +9,10 @@ describe('Deploy VPS SSH transport contract', () => {
     expect(workflow).toContain('-e "ssh -F $HOME/.ssh/config"')
     expect(workflow).not.toContain('-e "ssh -F ~/.ssh/config"')
   })
+
+  it('triggers production verification when the deploy workflow itself changes', () => {
+    const workflow = readFileSync(resolve(process.cwd(), '.github/workflows/deploy-vps.yml'), 'utf8')
+
+    expect(workflow).toContain('- ".github/workflows/deploy-vps.yml"')
+  })
 })
