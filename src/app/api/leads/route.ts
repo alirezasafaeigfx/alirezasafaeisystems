@@ -45,6 +45,34 @@ async function saveAttachment(file: File, requestId: string): Promise<string> {
   return `storage/leads/${fileName}`
 }
 
+function requestReferrer(request: NextRequest): string | undefined {
+  const headerReferrer = request.headers.get('referer')?.trim()
+  if (headerReferrer) return headerReferrer
+
+  const propertyReferrer = request.referrer?.trim()
+  if (propertyReferrer && propertyReferrer !== 'about:client') return propertyReferrer
+
+  return undefined
+}
+
+function requestAttribution(request: NextRequest, key: string): string | undefined {
+  const direct = request.nextUrl.searchParams.get(key)?.trim()
+  if (direct) return direct.slice(0, 120)
+
+  const referer = requestReferrer(request)
+  if (!referer) return undefined
+
+  try {
+    const requestOrigin = new URL(request.url).origin
+    const refererUrl = new URL(referer)
+    if (refererUrl.origin !== requestOrigin) return undefined
+    const value = refererUrl.searchParams.get(key)?.trim()
+    return value ? value.slice(0, 120) : undefined
+  } catch {
+    return undefined
+  }
+}
+
 export async function POST(request: NextRequest) {
   const requestId = createRequestId(request)
   const limit = await checkRateLimit(request, 'leads')
@@ -89,6 +117,7 @@ export async function POST(request: NextRequest) {
         utmSource: formString('utmSource'),
         utmMedium: formString('utmMedium'),
         utmCampaign: formString('utmCampaign'),
+        utmContent: formString('utmContent'),
       }
     } else {
       rawPayload = (await request.json()) as Record<string, unknown>
@@ -165,9 +194,10 @@ export async function POST(request: NextRequest) {
         preferredContact: payload.preferredContact,
         notes: payload.notes || undefined,
         attachmentPath: payload.attachmentPath || undefined,
-        utmSource: payload.utmSource || request.nextUrl.searchParams.get('utm_source') || undefined,
-        utmMedium: payload.utmMedium || request.nextUrl.searchParams.get('utm_medium') || undefined,
-        utmCampaign: payload.utmCampaign || request.nextUrl.searchParams.get('utm_campaign') || undefined,
+        utmSource: payload.utmSource || requestAttribution(request, 'utm_source'),
+        utmMedium: payload.utmMedium || requestAttribution(request, 'utm_medium'),
+        utmCampaign: payload.utmCampaign || requestAttribution(request, 'utm_campaign'),
+        utmContent: payload.utmContent || requestAttribution(request, 'utm_content'),
       },
     })
 
