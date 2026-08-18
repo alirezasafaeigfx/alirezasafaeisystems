@@ -15,6 +15,7 @@ describe('sitemap contract', () => {
     vi.stubEnv('NODE_ENV', 'test')
     process.env.NEXT_PUBLIC_SITE_URL = 'https://alirezasafaeisystems.ir'
     process.env.DATABASE_URL = 'file:./test.db'
+    delete process.env.ASDEV_BUILD_SKIP_DYNAMIC_DB
   })
 
   it('contains only indexable URLs and no hash fragments', async () => {
@@ -50,5 +51,14 @@ describe('sitemap contract', () => {
       select: { slug: true, updatedAt: true },
       orderBy: { updatedAt: 'desc' },
     })
+  })
+
+  it('skips dynamic Discover queries during a pre-migration production build', async () => {
+    process.env.ASDEV_BUILD_SKIP_DYNAMIC_DB = '1'
+    const { default: sitemap } = await import('@/app/sitemap')
+    const entries = await sitemap()
+
+    expect(entries.length).toBeGreaterThan(0)
+    expect(discoverItemMock.findMany).not.toHaveBeenCalled()
   })
 })

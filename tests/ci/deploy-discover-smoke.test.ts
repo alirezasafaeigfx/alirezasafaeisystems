@@ -42,6 +42,21 @@ describe('Discover production rollout contract', () => {
     expect(workflow).toContain('steps.live_verify.outcome')
   })
 
+  it('does not create secondary verification failures when live verification never ran', () => {
+    const workflow = readFileSync(
+      resolve(process.cwd(), '.github/workflows/deploy-vps.yml'),
+      'utf8'
+    )
+
+    const uploadIndex = workflow.indexOf('name: Upload live verification evidence')
+    const enforceIndex = workflow.indexOf('name: Enforce live verification gate')
+    expect(uploadIndex).toBeGreaterThan(-1)
+    expect(enforceIndex).toBeGreaterThan(uploadIndex)
+    expect(workflow.slice(uploadIndex, uploadIndex + 240)).toContain("if: ${{ always() && steps.live_verify.outcome != 'skipped' }}")
+    expect(workflow.slice(enforceIndex, enforceIndex + 180)).toContain("if: ${{ steps.live_verify.outcome == 'failure' }}")
+    expect(workflow).toContain('Live browser verification was not executed because deployment failed or was blocked')
+  })
+
   it('keeps deployment serialization while publishing queue observability before the deploy lock', () => {
     const workflow = readFileSync(
       resolve(process.cwd(), '.github/workflows/deploy-vps.yml'),
