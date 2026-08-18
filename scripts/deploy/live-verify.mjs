@@ -52,14 +52,16 @@ function attachDiagnostics(page, scope) {
   })
 }
 
-async function goto(page, pathname) {
+async function goto(page, pathname, { requireMain = true } = {}) {
   const url = new URL(pathname, `${normalizedBaseUrl}/`).toString()
   checkedUrls.add(url)
   const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30_000 })
   if (!response || response.status() >= 400) {
     throw new Error(`navigation failed for ${url}: HTTP ${response?.status() ?? 'no response'}`)
   }
-  await page.locator('main').first().waitFor({ state: 'visible', timeout: 15_000 })
+  if (requireMain) {
+    await page.locator('main').first().waitFor({ state: 'visible', timeout: 15_000 })
+  }
   await page.waitForTimeout(400)
   return url
 }
@@ -142,7 +144,7 @@ try {
   })
 
   await runCheck(browser, 'admin-auth', { width: 1280, height: 800 }, async (page) => {
-    await goto(page, '/admin')
+    await goto(page, '/admin', { requireMain: false })
     if (!page.url().includes('/admin/login')) {
       throw new Error(`/admin did not redirect to /admin/login; got ${page.url()}`)
     }
