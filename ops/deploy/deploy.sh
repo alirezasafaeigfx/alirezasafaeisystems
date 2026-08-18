@@ -279,8 +279,6 @@ fi
 echo "[deploy] database snapshot created for release $RELEASE_ID"
 
 # Classify SQLite state structurally before interpreting Prisma CLI status.
-# This avoids treating normal pending migrations as an unexpected preflight
-# failure and restricts baseline resolution to a legacy non-empty database.
 BASELINE_STATE=""
 if ! BASELINE_STATE="$(node scripts/deploy/prisma-baseline-state.mjs)"; then
   echo "[deploy] Prisma baseline state inspection failed; refusing rollout" >&2
@@ -289,31 +287,47 @@ if ! BASELINE_STATE="$(node scripts/deploy/prisma-baseline-state.mjs)"; then
 fi
 echo "[deploy] Prisma baseline state: $BASELINE_STATE"
 
+# A pre-migrations database may already contain effects from several historical
+# migrations. Resolve only effects that the structural planner can prove are
+# fully present; partial states fail closed before Prisma mutates anything.
+if [[ "$BASELINE_STATE" == "legacy-needs-baseline" ]]; then
+  LEGACY_PLAN_OUTPUT=""
+  if ! LEGACY_PLAN_OUTPUT="$(node scripts/deploy/prisma-baseline-state.mjs --legacy-resolve-plan)"; then
+    echo "[deploy] legacy migration resolution plan failed; refusing rollout" >&2
+    restart_previous_app || true
+    exit 1
+  fi
+  mapfile -t LEGACY_RESOLVE_MIGRATIONS <<< "$LEGACY_PLAN_OUTPUT"
+  if (( ${#LEGACY_RESOLVE_MIGRATIONS[@]} == 0 )); then
+    echo "[deploy] legacy migration resolution plan was empty; refusing rollout" >&2
+    restart_previous_app || true
+    exit 1
+  fi
+
+  for LEGACY_MIGRATION in "${LEGACY_RESOLVE_MIGRATIONS[@]}"; do
+    [[ -n "$LEGACY_MIGRATION" ]] || continue
+    echo "[deploy] recording structurally verified legacy migration: $LEGACY_MIGRATION"
+    if ! pnpm exec prisma migrate resolve --applied "$LEGACY_MIGRATION"; then
+      echo "[deploy] legacy migration resolution failed; restoring pre-migration snapshot" >&2
+      if ! restore_database_snapshot; then
+        echo "[deploy] CRITICAL: database snapshot restore failed after legacy resolution error" >&2
+      fi
+      restart_previous_app || true
+      exit 1
+    fi
+  done
+fi
+
 MIGRATE_STATUS_OUTPUT=""
 if MIGRATE_STATUS_OUTPUT="$(pnpm exec prisma migrate status 2>&1)"; then
   :
 elif printf '%s\n' "$MIGRATE_STATUS_OUTPUT" | grep -q 'Following migrations have not yet been applied'; then
-  printf '%s\n' "$MIGRATE_STATUS_OUTPUT"
-elif [[ "$BASELINE_STATE" == "legacy-needs-baseline" ]] \
-  && printf '%s\n' "$MIGRATE_STATUS_OUTPUT" | grep -q 'The database schema is not empty'; then
   printf '%s\n' "$MIGRATE_STATUS_OUTPUT"
 else
   printf '%s\n' "$MIGRATE_STATUS_OUTPUT" >&2
   echo "[deploy] Prisma migration preflight failed; refusing rollout" >&2
   restart_previous_app || true
   exit 1
-fi
-
-if [[ "$BASELINE_STATE" == "legacy-needs-baseline" ]]; then
-  echo "[deploy] legacy non-empty SQLite detected without migration metadata; applying baseline"
-  if ! pnpm exec prisma migrate resolve --applied 20260617000000_baseline_legacy_portfolio; then
-    echo "[deploy] baseline migration resolution failed; restoring pre-migration snapshot" >&2
-    if ! restore_database_snapshot; then
-      echo "[deploy] CRITICAL: database snapshot restore failed after baseline resolution error" >&2
-    fi
-    restart_previous_app || true
-    exit 1
-  fi
 fi
 
 if ! pnpm exec prisma migrate deploy; then
@@ -334,7 +348,18 @@ if ! pnpm exec prisma migrate status; then
   exit 1
 fi
 
-# Replace the stopped previous app only after migrations are verified.
+# Migration history being clean is necessary but not sufficient: verify that
+# the live SQLite schema itself matches schema.prisma before replacing the app.
+if ! pnpm exec prisma migrate diff --from-url "$DATABASE_URL" --to-schema prisma/schema.prisma --exit-code; then
+  echo "[deploy] database schema drift detected after migration; restoring pre-migration snapshot" >&2
+  if ! restore_database_snapshot; then
+    echo "[deploy] CRITICAL: database snapshot restore failed after schema drift" >&2
+  fi
+  restart_previous_app || true
+  exit 1
+fi
+
+# Replace the stopped previous app only after migrations and zero drift are verified.
 pm2 delete "$APP_NAME" >/dev/null 2>&1 || true
 if ! pm2 start ecosystem.config.cjs --only "$APP_NAME" --update-env; then
   echo "[deploy] new application failed to start; rolling back previous release" >&2
