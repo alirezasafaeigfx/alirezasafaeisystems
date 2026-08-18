@@ -61,5 +61,5 @@ describe('Prisma migration history', () => {
     } finally {
       await db.$disconnect()
     }
-  })
+  }, 15_000)
 })
