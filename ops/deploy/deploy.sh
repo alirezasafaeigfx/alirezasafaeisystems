@@ -244,16 +244,23 @@ restart_previous_app() {
 }
 
 rollback_previous_release() {
-  if [[ "$APP_WAS_RUNNING" != "true" ]]; then
-    echo "[deploy] no previously running application is available for rollback" >&2
+  # Stop any partially started replacement before restoring SQLite bytes/WAL.
+  pm2 delete "$APP_NAME" >/dev/null 2>&1 || true
+
+  if ! restore_database_snapshot; then
+    echo "[deploy] CRITICAL: database snapshot restore failed during release rollback" >&2
     return 1
+  fi
+
+  if [[ "$APP_WAS_RUNNING" != "true" ]]; then
+    echo "[deploy] database restored; no previously running application is available to restart" >&2
+    return 0
   fi
   if [[ -z "$PREVIOUS_RELEASE" || ! -f "$PREVIOUS_RELEASE/ecosystem.config.cjs" ]]; then
     echo "[deploy] previous release metadata is unavailable for rollback" >&2
     return 1
   fi
 
-  pm2 delete "$APP_NAME" >/dev/null 2>&1 || true
   (
     cd "$PREVIOUS_RELEASE"
     pm2 start ecosystem.config.cjs --only "$APP_NAME" --update-env
