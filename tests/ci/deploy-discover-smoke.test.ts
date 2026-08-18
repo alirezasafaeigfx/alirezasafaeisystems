@@ -65,6 +65,11 @@ describe('Discover production rollout contract', () => {
     expect(workflow).toContain('production/deploy')
     expect(workflow).toContain('Deployment queued; quality gate running')
     expect(workflow).toContain('https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}')
+    expect(workflow).toContain('deployment-status:')
+    expect(workflow).toContain('needs: [quality-gate, deploy]')
+    expect(workflow).toContain('QUALITY_RESULT: ${{ needs.quality-gate.result }}')
+    expect(workflow).toContain('DEPLOY_RESULT: ${{ needs.deploy.result }}')
+    expect(workflow).toContain('Deployment and live verification passed')
   })
 
   it('does not require a main landmark before validating the admin-login redirect', () => {
