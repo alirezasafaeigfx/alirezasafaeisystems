@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
 async function loadClassifier() {
-  // @ts-expect-error Deployment helper is intentionally plain ESM so Node can run it on the VPS.
   return import('../../scripts/deploy/prisma-baseline-state.mjs')
 }
 
