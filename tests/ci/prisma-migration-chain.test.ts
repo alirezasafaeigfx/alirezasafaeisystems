@@ -30,7 +30,7 @@ afterEach(() => {
 })
 
 describe('Prisma migration history', () => {
-  it('replays from an empty SQLite database and matches the runtime Prisma schema', async () => {
+  it('replays from an empty SQLite database and matches the runtime Prisma schema with zero drift', async () => {
     const databaseUrl = createDatabaseUrl()
 
     expect(() =>
@@ -38,6 +38,17 @@ describe('Prisma migration history', () => {
     ).not.toThrow()
     expect(() =>
       runPrisma(['migrate', 'status', '--schema', 'prisma/schema.prisma'], databaseUrl),
+    ).not.toThrow()
+    expect(() =>
+      runPrisma([
+        'migrate',
+        'diff',
+        '--from-url',
+        databaseUrl,
+        '--to-schema',
+        'prisma/schema.prisma',
+        '--exit-code',
+      ], databaseUrl),
     ).not.toThrow()
 
     const db = new PrismaClient({ datasourceUrl: databaseUrl })
