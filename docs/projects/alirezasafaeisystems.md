@@ -1,7 +1,7 @@
 # AlirezaSafaeiSystems — ASDEV Mother / Brand Site
 
 **Role:** Portfolio, trust hub, acquisition, case studies, lead qualification  
-**Status:** Live / maintain + Discover acquisition implementation in review  
+**Status:** Live / maintain + Discover acquisition implementation merged; production verification remains owner-gated  
 **Domain:** https://alirezasafaeisystems.ir/  
 **Repository:** https://github.com/alirezasafaei-dev/alirezasafaeisystems  
 **Local path:** `sites/live/alirezasafaeisystems`
@@ -36,6 +36,13 @@ The earlier implementation stored Discover records in `Project(contentType=disco
 ### Governance
 
 Discover is in scope only while it measurably supports acquisition, conversion, attribution, trust or lead routing for the primary ASDEV Audit business. Production deployment and production database migration remain explicit owner approval gates.
+
+### Implementation status — 2026-08-18
+
+- The approved acquisition implementation was merged in PR #133.
+- Locale, deployment-smoke and production SQLite follow-ups were merged after #133, including the legacy baseline work in PR #166.
+- PR #167 is the post-rollout readiness audit: it localizes the remaining detail-page Featured badge and hardens deploy recovery for migration preflight/baseline failures discovered during exact CI verification.
+- Production route verification is tracked separately from implementation completion and must not be inferred from merged source code alone.
 
 ### Implementation references
 
@@ -79,7 +86,7 @@ ASDEV needed a single credible surface for:
 | Strategy docs in repo | `docs/strategy/`, `docs/projects/` |
 | Qualification / inquiry route | `/qualification` |
 | Analytics client (consent-aware) | `src/lib/analytics/client.ts` |
-| Discover acquisition implementation | PR-gated; production rollout not implied |
+| Discover acquisition implementation | Merged in #133; post-rollout hardening under review in #167; live-route verification remains a separate gate |
 
 ### What was measured
 

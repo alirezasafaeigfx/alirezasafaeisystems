@@ -284,10 +284,18 @@ if MIGRATE_STATUS_OUTPUT="$(pnpm exec prisma migrate status 2>&1)"; then
   :
 elif printf '%s\n' "$MIGRATE_STATUS_OUTPUT" | grep -q 'The database schema is not empty'; then
   echo "[deploy] legacy non-empty SQLite detected without migration metadata; applying baseline"
-  pnpm exec prisma migrate resolve --applied 20260617000000_baseline_legacy_portfolio
+  if ! pnpm exec prisma migrate resolve --applied 20260617000000_baseline_legacy_portfolio; then
+    echo "[deploy] baseline migration resolution failed; restoring pre-migration snapshot" >&2
+    if ! restore_database_snapshot; then
+      echo "[deploy] CRITICAL: database snapshot restore failed after baseline resolution error" >&2
+    fi
+    restart_previous_app || true
+    exit 1
+  fi
 else
   printf '%s\n' "$MIGRATE_STATUS_OUTPUT" >&2
   echo "[deploy] Prisma migration preflight failed; refusing rollout" >&2
+  restart_previous_app || true
   exit 1
 fi
 if ! pnpm exec prisma migrate deploy; then

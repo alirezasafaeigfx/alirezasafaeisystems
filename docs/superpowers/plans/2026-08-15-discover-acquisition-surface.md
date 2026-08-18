@@ -1,5 +1,7 @@
 # Discover Acquisition Surface Implementation Plan
 
+> **Execution status (2026-08-18):** The implementation described by this plan was completed and merged in PR #133, with follow-up locale/deploy/SQLite fixes through PR #166. The checkbox list below is retained as the historical execution plan, not as an active backlog. PR #167 performs a post-rollout readiness audit; production deployment and live-route evidence remain separate owner-gated operations.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Turn `/discover` into a measurable Instagram/search acquisition surface with a dedicated content model, internal detail pages, Admin CRUD, UTM preservation, and conversion analytics.

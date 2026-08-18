@@ -3,13 +3,14 @@ import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 describe('production database migration safety', () => {
-  it('backs up persistent SQLite state and fails back to the previous app on rollout errors', () => {
+  it('backs up persistent SQLite state and verifies preflight and post-migration status in order', () => {
     const deploy = readFileSync(resolve(process.cwd(), 'ops/deploy/deploy.sh'), 'utf8')
 
     const buildIndex = deploy.indexOf('pnpm run build')
-    const migrationIndex = deploy.indexOf('pnpm exec prisma migrate deploy')
-    const migrationStatusIndex = deploy.indexOf('pnpm exec prisma migrate status')
-    const replaceAppIndex = deploy.indexOf('pm2 delete "$APP_NAME"', migrationStatusIndex)
+    const preflightStatusIndex = deploy.indexOf('pnpm exec prisma migrate status 2>&1')
+    const migrationIndex = deploy.indexOf('pnpm exec prisma migrate deploy', preflightStatusIndex)
+    const postMigrationStatusIndex = deploy.indexOf('if ! pnpm exec prisma migrate status; then', migrationIndex)
+    const replaceAppIndex = deploy.indexOf('pm2 delete "$APP_NAME"', postMigrationStatusIndex)
     const publishLinkIndex = deploy.indexOf('ln -sfn "$RELEASE_DIR" "$CURRENT_LINK"', replaceAppIndex)
 
     expect(deploy).toContain('20260617000000_baseline_legacy_portfolio')
@@ -24,9 +25,34 @@ describe('production database migration safety', () => {
     expect(deploy).toContain('rollback_previous_release')
     expect(deploy).toContain('pm2 restart "$APP_NAME" --update-env')
     expect(buildIndex).toBeGreaterThan(-1)
-    expect(migrationIndex).toBeGreaterThan(buildIndex)
-    expect(migrationStatusIndex).toBeGreaterThan(migrationIndex)
-    expect(replaceAppIndex).toBeGreaterThan(migrationStatusIndex)
+    expect(preflightStatusIndex).toBeGreaterThan(buildIndex)
+    expect(migrationIndex).toBeGreaterThan(preflightStatusIndex)
+    expect(postMigrationStatusIndex).toBeGreaterThan(migrationIndex)
+    expect(replaceAppIndex).toBeGreaterThan(postMigrationStatusIndex)
     expect(publishLinkIndex).toBeGreaterThan(replaceAppIndex)
+  })
+
+  it('restores service availability when migration preflight or baseline resolution fails', () => {
+    const deploy = readFileSync(resolve(process.cwd(), 'ops/deploy/deploy.sh'), 'utf8')
+
+    const preflightFailureIndex = deploy.indexOf('Prisma migration preflight failed; refusing rollout')
+    const preflightRestartIndex = deploy.indexOf('restart_previous_app || true', preflightFailureIndex)
+    const preflightExitIndex = deploy.indexOf('exit 1', preflightFailureIndex)
+    const baselineGuardIndex = deploy.indexOf(
+      'if ! pnpm exec prisma migrate resolve --applied 20260617000000_baseline_legacy_portfolio; then',
+    )
+    const baselineFailureIndex = deploy.indexOf('baseline migration resolution failed; restoring pre-migration snapshot')
+    const baselineRestoreIndex = deploy.indexOf('restore_database_snapshot', baselineFailureIndex)
+    const baselineRestartIndex = deploy.indexOf('restart_previous_app || true', baselineFailureIndex)
+    const baselineExitIndex = deploy.indexOf('exit 1', baselineFailureIndex)
+
+    expect(preflightFailureIndex).toBeGreaterThan(-1)
+    expect(preflightRestartIndex).toBeGreaterThan(preflightFailureIndex)
+    expect(preflightExitIndex).toBeGreaterThan(preflightRestartIndex)
+    expect(baselineGuardIndex).toBeGreaterThan(-1)
+    expect(baselineFailureIndex).toBeGreaterThan(baselineGuardIndex)
+    expect(baselineRestoreIndex).toBeGreaterThan(baselineFailureIndex)
+    expect(baselineRestartIndex).toBeGreaterThan(baselineRestoreIndex)
+    expect(baselineExitIndex).toBeGreaterThan(baselineRestartIndex)
   })
 })
