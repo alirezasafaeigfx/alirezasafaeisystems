@@ -38,6 +38,7 @@ on:
 
 permissions:
   contents: read
+  statuses: write
 
 concurrency:
   group: deploy-vps-${{ github.event_name == 'workflow_dispatch' && inputs.environment || 'production' }}
@@ -100,6 +101,11 @@ jobs:
           node-version-file: '.nvmrc'
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
+
+      - name: Prepare live verification browser
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm exec playwright install --with-deps chromium
 
       - name: Install SSH key
         run: |
@@ -172,6 +178,7 @@ jobs:
             PORT="3003"
             BASE_URL="https://staging.alirezasafaeisystems.ir"
           fi
+          echo "BASE_URL=$BASE_URL" >> "$GITHUB_ENV"
 
           # Run smoke checks from inside the VPS to avoid public-route CI network variance.
           ssh -F ~/.ssh/config deploy-target "\
@@ -189,6 +196,79 @@ jobs:
             curl --connect-timeout 10 --max-time 30 -fsS '${BASE_URL}/en/discover' | grep -q 'dir=\"ltr\"'; \
             curl --connect-timeout 10 --max-time 30 -fsS '${BASE_URL}/profile' | grep -q 'alireza_safaei_network'; \
           "
+
+      - name: Live browser production verification
+        id: live_verify
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          for PASS in 1 2; do
+            LIVE_VERIFY_BASE_URL="$BASE_URL" \
+            LIVE_VERIFY_RELEASE_SHA="$TARGET_REF" \
+            LIVE_VERIFY_REPORT_PATH="$GITHUB_WORKSPACE/live-verification-report-pass-${PASS}.md" \
+            node scripts/deploy/live-verify.mjs
+          done
+
+      - name: Preserve live verification report path
+        if: always()
+        run: |
+          set -euo pipefail
+          mkdir -p "$GITHUB_WORKSPACE/docs/reports/live-verification"
+          for REPORT in "$GITHUB_WORKSPACE"/live-verification-report-pass-*.md; do
+            [ -f "$REPORT" ] || continue
+            BASENAME="$(basename "$REPORT")"
+            cp "$REPORT" \
+              "$GITHUB_WORKSPACE/docs/reports/live-verification/${RELEASE_ID}-${TARGET_ENV}-${BASENAME}"
+          done
+
+      - name: Upload live verification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-verification-${{ github.run_id }}
+          if-no-files-found: error
+          path: |
+            live-verification-report-pass-*.md
+            docs/reports/live-verification/*.md
+            live-verification-artifacts/**
+
+      - name: Publish live verification commit status
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          LIVE_VERIFY_OUTCOME: ${{ steps.live_verify.outcome }}
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          if [ "$LIVE_VERIFY_OUTCOME" = "success" ]; then
+            STATE="success"
+            DESCRIPTION="Two consecutive live browser verification passes succeeded"
+          else
+            STATE="failure"
+            DESCRIPTION="Live browser verification failed"
+          fi
+          if [ "$TARGET_ENV" = "production" ]; then
+            CONTEXT="production/live-verification"
+          else
+            CONTEXT="staging/live-verification"
+          fi
+          PAYLOAD="$(jq -n \
+            --arg state "$STATE" \
+            --arg context "$CONTEXT" \
+            --arg description "$DESCRIPTION" \
+            --arg target_url "$RUN_URL" \
+            '{state:$state,context:$context,description:$description,target_url:$target_url}')"
+          curl -fsS \
+            -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/$TARGET_REF" \
+            -d "$PAYLOAD" >/dev/null
+
+      - name: Enforce live verification gate
+        if: ${{ steps.live_verify.outcome != 'success' }}
+        run: exit 1
 
       - name: Output deployment summary
         run: |
