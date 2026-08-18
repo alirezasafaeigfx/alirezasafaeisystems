@@ -28,7 +28,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   })
 
-  if (!process.env.DATABASE_URL) return staticEntries
+  if (!process.env.DATABASE_URL || process.env.ASDEV_BUILD_SKIP_DYNAMIC_DB === '1') {
+    return staticEntries
+  }
 
   try {
     const discoverItems = await db.discoverItem.findMany({
