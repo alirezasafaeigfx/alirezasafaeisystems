@@ -285,6 +285,28 @@ fi
 
 echo "[deploy] database snapshot created for release $RELEASE_ID"
 
+# Persist exact rollback metadata after a successful snapshot and before any
+# migration metadata/schema mutation. This state is intentionally retained
+# until outer smoke/browser verification has succeeded.
+DEPLOY_STATE_DIR="$SHARED_DIR/deploy-state/$ENVIRONMENT"
+DEPLOY_STATE_FILE="$DEPLOY_STATE_DIR/$RELEASE_ID.env"
+mkdir -p "$DEPLOY_STATE_DIR"
+chmod 700 "$DEPLOY_STATE_DIR"
+umask 077
+{
+  printf 'RELEASE_ID=%q\n' "$RELEASE_ID"
+  printf 'RELEASE_DIR=%q\n' "$RELEASE_DIR"
+  printf 'PREVIOUS_RELEASE=%q\n' "$PREVIOUS_RELEASE"
+  printf 'APP_WAS_RUNNING=%q\n' "$APP_WAS_RUNNING"
+  printf 'SNAPSHOT_DIR=%q\n' "$SNAPSHOT_DIR"
+  printf 'DB_PATH=%q\n' "$DB_PATH"
+  printf 'APP_NAME=%q\n' "$APP_NAME"
+  printf 'CURRENT_LINK=%q\n' "$CURRENT_LINK"
+  printf 'ENV_FILE=%q\n' "$ENV_FILE"
+  printf 'PORT=%q\n' "$PORT"
+} > "$DEPLOY_STATE_FILE"
+chmod 600 "$DEPLOY_STATE_FILE"
+
 # Classify SQLite state structurally before interpreting Prisma CLI status.
 BASELINE_STATE=""
 if ! BASELINE_STATE="$(node scripts/deploy/prisma-baseline-state.mjs)"; then
