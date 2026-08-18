@@ -98,6 +98,7 @@ export default async function DiscoverDetailPage({ params, searchParams }: Disco
         official: 'Open official website',
         instagram: 'View the Instagram post',
         related: 'Related Discover items',
+        featured: 'Featured',
         asdev: 'Continue inside ASDEV',
         asdevDescription: 'If this tool brought you here from social media, you can also explore the systems I build and the technical audit path I use for real websites.',
         audit: 'Website Audit readiness',
@@ -111,6 +112,7 @@ export default async function DiscoverDetailPage({ params, searchParams }: Disco
         official: 'باز کردن سایت رسمی',
         instagram: 'دیدن پست اینستاگرام',
         related: 'موارد مشابه در Discover',
+        featured: 'منتخب',
         asdev: 'ادامه در ASDEV',
         asdevDescription: 'اگر از اینستاگرام برای دیدن این ابزار وارد سایت شدی، می‌توانی پروژه‌ها، سیستم‌ها و مسیر بررسی فنی سایت در ASDEV را هم ببینی.',
         audit: 'بررسی آمادگی سایت برای Audit',
@@ -150,7 +152,7 @@ export default async function DiscoverDetailPage({ params, searchParams }: Disco
               <span className="rounded-full border px-3 py-1 text-xs text-muted-foreground">{item.category}</span>
               {item.featured ? (
                 <span className="inline-flex items-center gap-1 text-xs font-semibold text-primary">
-                  <Sparkles className="h-3.5 w-3.5" /> Featured
+                  <Sparkles className="h-3.5 w-3.5" /> {copy.featured}
                 </span>
               ) : null}
             </div>
