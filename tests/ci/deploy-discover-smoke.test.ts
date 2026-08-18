@@ -21,4 +21,19 @@ describe('Discover production rollout contract', () => {
     expect(discoverEnglishDirectionCheck).toBeGreaterThan(discoverEnglishCheck)
     expect(profileCheck).toBeGreaterThan(discoverCheck)
   })
+
+  it('runs real-browser production verification and records exact release evidence', () => {
+    const workflow = readFileSync(
+      resolve(process.cwd(), '.github/workflows/deploy-vps.yml'),
+      'utf8'
+    )
+
+    expect(workflow).toContain('pnpm exec playwright install --with-deps chromium')
+    expect(workflow).toContain('node scripts/deploy/live-verify.mjs')
+    expect(workflow).toContain('LIVE_VERIFY_BASE_URL="$BASE_URL"')
+    expect(workflow).toContain('LIVE_VERIFY_RELEASE_SHA="$TARGET_REF"')
+    expect(workflow).toContain('LIVE_VERIFY_REPORT_PATH="$GITHUB_WORKSPACE/live-verification-report.md"')
+    expect(workflow).toContain('actions/upload-artifact@v4')
+    expect(workflow).toContain('live-verification-report.md')
+  })
 })
