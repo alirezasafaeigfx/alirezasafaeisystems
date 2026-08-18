@@ -86,4 +86,31 @@ describe('production database migration safety', () => {
     expect(driftRestartIndex).toBeGreaterThan(driftRestoreIndex)
     expect(driftExitIndex).toBeGreaterThan(driftRestartIndex)
   })
+
+  it('restores the database snapshot before starting the previous release after post-migration app failure', () => {
+    const deploy = readFileSync(resolve(process.cwd(), 'ops/deploy/deploy.sh'), 'utf8')
+
+    const rollbackStart = deploy.indexOf('rollback_previous_release() {')
+    const rollbackEnd = deploy.indexOf('\n}\n\n# Quiesce', rollbackStart)
+    const rollbackBody = deploy.slice(rollbackStart, rollbackEnd)
+    const stopNewAppIndex = rollbackBody.indexOf('pm2 delete "$APP_NAME"')
+    const restoreIndex = rollbackBody.indexOf('restore_database_snapshot')
+    const startPreviousIndex = rollbackBody.indexOf('pm2 start ecosystem.config.cjs --only "$APP_NAME" --update-env')
+
+    expect(rollbackStart).toBeGreaterThan(-1)
+    expect(stopNewAppIndex).toBeGreaterThan(-1)
+    expect(restoreIndex).toBeGreaterThan(stopNewAppIndex)
+    expect(startPreviousIndex).toBeGreaterThan(restoreIndex)
+    expect(rollbackBody).toContain('CRITICAL: database snapshot restore failed during release rollback')
+
+    const startFailureIndex = deploy.indexOf('new application failed to start; rolling back previous release')
+    const startFailureRollbackIndex = deploy.indexOf('rollback_previous_release || true', startFailureIndex)
+    const healthFailureIndex = deploy.indexOf('health check failed after 20 attempts; rolling back previous release')
+    const healthFailureRollbackIndex = deploy.indexOf('rollback_previous_release || true', healthFailureIndex)
+
+    expect(startFailureIndex).toBeGreaterThan(-1)
+    expect(startFailureRollbackIndex).toBeGreaterThan(startFailureIndex)
+    expect(healthFailureIndex).toBeGreaterThan(-1)
+    expect(healthFailureRollbackIndex).toBeGreaterThan(healthFailureIndex)
+  })
 })
