@@ -326,6 +326,9 @@ elif printf '%s\n' "$MIGRATE_STATUS_OUTPUT" | grep -q 'Following migrations have
 else
   printf '%s\n' "$MIGRATE_STATUS_OUTPUT" >&2
   echo "[deploy] Prisma migration preflight failed; refusing rollout" >&2
+  if ! restore_database_snapshot; then
+    echo "[deploy] CRITICAL: database snapshot restore failed after migration preflight error" >&2
+  fi
   restart_previous_app || true
   exit 1
 fi
