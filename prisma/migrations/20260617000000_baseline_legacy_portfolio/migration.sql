@@ -1,59 +1,8 @@
--- Baseline for the pre-Prisma-migrations portfolio SQLite schema.
-CREATE TABLE "BlogPost" (
-    "id" TEXT NOT NULL PRIMARY KEY,
-    "title" TEXT NOT NULL,
-    "slug" TEXT NOT NULL,
-    "excerpt" TEXT NOT NULL,
-    "content" TEXT NOT NULL,
-    "coverImage" TEXT,
-    "published" BOOLEAN NOT NULL DEFAULT false,
-    "tags" TEXT NOT NULL,
-    "readTime" INTEGER NOT NULL,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL
-);
-CREATE TABLE "ContactMessage" (
-    "id" TEXT NOT NULL PRIMARY KEY,
-    "name" TEXT NOT NULL,
-    "email" TEXT NOT NULL,
-    "subject" TEXT,
-    "message" TEXT NOT NULL,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-CREATE TABLE "Experience" (
-    "id" TEXT NOT NULL PRIMARY KEY,
-    "title" TEXT NOT NULL,
-    "company" TEXT NOT NULL,
-    "location" TEXT,
-    "startDate" TEXT NOT NULL,
-    "endDate" TEXT,
-    "description" TEXT NOT NULL,
-    "current" BOOLEAN NOT NULL DEFAULT false,
-    "order" INTEGER NOT NULL DEFAULT 0,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL
-);
-CREATE TABLE "Project" (
-    "id" TEXT NOT NULL PRIMARY KEY,
-    "title" TEXT NOT NULL,
-    "description" TEXT NOT NULL,
-    "longDescription" TEXT,
-    "imageUrl" TEXT,
-    "githubUrl" TEXT,
-    "liveUrl" TEXT,
-    "tags" TEXT NOT NULL,
-    "featured" BOOLEAN NOT NULL DEFAULT false,
-    "order" INTEGER NOT NULL DEFAULT 0,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL
-);
-CREATE TABLE "Skill" (
-    "id" TEXT NOT NULL PRIMARY KEY,
-    "name" TEXT NOT NULL,
-    "category" TEXT NOT NULL,
-    "level" INTEGER NOT NULL,
-    "icon" TEXT,
-    "order" INTEGER NOT NULL DEFAULT 0,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL
-);
+-- Baseline marker for the pre-Prisma-migrations portfolio SQLite schema.
+--
+-- The actual first replayable schema snapshot is the historical
+-- 20260618141730_add_analytics_funnel_tracking migration. Production databases
+-- that predate Prisma migration metadata resolve this marker (and the malformed
+-- overlapping snapshot) only after structural verification in deploy tooling.
+-- Keeping this migration as a no-op marker prevents fresh databases from
+-- creating the legacy core tables twice.
