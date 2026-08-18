@@ -19,6 +19,17 @@ describe('post-cutover production rollback contract', () => {
     expect(deploy).toContain('APP_WAS_RUNNING')
   })
 
+  it('preserves and clears every SQLite sidecar that can affect exact snapshot rollback', () => {
+    const deploy = readFileSync(resolve(process.cwd(), 'ops/deploy/deploy.sh'), 'utf8')
+    const rollback = readFileSync(resolve(process.cwd(), 'ops/deploy/rollback-release.sh'), 'utf8')
+
+    for (const source of [deploy, rollback]) {
+      expect(source).toContain('-wal -shm -journal')
+      expect(source).toContain('"${DB_PATH}-journal"')
+      expect(source).toContain('database.sqlite${suffix}')
+    }
+  })
+
   it('provides an exact-release rollback command that restores DB before previous app startup', () => {
     const rollbackPath = resolve(process.cwd(), 'ops/deploy/rollback-release.sh')
     expect(existsSync(rollbackPath)).toBe(true)
