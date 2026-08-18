@@ -51,13 +51,14 @@ describe('production database migration safety', () => {
     expect(deploy).toContain('legacy migration resolution failed; restoring pre-migration snapshot')
   })
 
-  it('restores service availability when structural preflight, migration preflight, legacy resolution, or schema drift fails', () => {
+  it('restores service availability and database state when migration preflight, legacy resolution, or schema drift fails', () => {
     const deploy = readFileSync(resolve(process.cwd(), 'ops/deploy/deploy.sh'), 'utf8')
 
     const structuralFailureIndex = deploy.indexOf('Prisma baseline state inspection failed; refusing rollout')
     const structuralRestartIndex = deploy.indexOf('restart_previous_app || true', structuralFailureIndex)
     const structuralExitIndex = deploy.indexOf('exit 1', structuralFailureIndex)
     const preflightFailureIndex = deploy.indexOf('Prisma migration preflight failed; refusing rollout')
+    const preflightRestoreIndex = deploy.indexOf('restore_database_snapshot', preflightFailureIndex)
     const preflightRestartIndex = deploy.indexOf('restart_previous_app || true', preflightFailureIndex)
     const preflightExitIndex = deploy.indexOf('exit 1', preflightFailureIndex)
     const resolutionFailureIndex = deploy.indexOf('legacy migration resolution failed; restoring pre-migration snapshot')
@@ -73,7 +74,8 @@ describe('production database migration safety', () => {
     expect(structuralRestartIndex).toBeGreaterThan(structuralFailureIndex)
     expect(structuralExitIndex).toBeGreaterThan(structuralRestartIndex)
     expect(preflightFailureIndex).toBeGreaterThan(-1)
-    expect(preflightRestartIndex).toBeGreaterThan(preflightFailureIndex)
+    expect(preflightRestoreIndex).toBeGreaterThan(preflightFailureIndex)
+    expect(preflightRestartIndex).toBeGreaterThan(preflightRestoreIndex)
     expect(preflightExitIndex).toBeGreaterThan(preflightRestartIndex)
     expect(resolutionFailureIndex).toBeGreaterThan(-1)
     expect(resolutionRestoreIndex).toBeGreaterThan(resolutionFailureIndex)
