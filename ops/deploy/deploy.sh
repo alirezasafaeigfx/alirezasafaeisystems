@@ -276,13 +276,33 @@ fi
 
 echo "[deploy] database snapshot created for release $RELEASE_ID"
 
-# Existing portfolio releases predate Prisma migration metadata. Baseline only
-# a non-empty database with the legacy schema; new databases run the baseline
-# migration normally through migrate deploy.
+# Classify SQLite state structurally before interpreting Prisma CLI status.
+# This avoids treating normal pending migrations as an unexpected preflight
+# failure and restricts baseline resolution to a legacy non-empty database.
+BASELINE_STATE=""
+if ! BASELINE_STATE="$(node scripts/deploy/prisma-baseline-state.mjs)"; then
+  echo "[deploy] Prisma baseline state inspection failed; refusing rollout" >&2
+  restart_previous_app || true
+  exit 1
+fi
+echo "[deploy] Prisma baseline state: $BASELINE_STATE"
+
 MIGRATE_STATUS_OUTPUT=""
 if MIGRATE_STATUS_OUTPUT="$(pnpm exec prisma migrate status 2>&1)"; then
   :
-elif printf '%s\n' "$MIGRATE_STATUS_OUTPUT" | grep -q 'The database schema is not empty'; then
+elif printf '%s\n' "$MIGRATE_STATUS_OUTPUT" | grep -q 'Following migrations have not yet been applied'; then
+  printf '%s\n' "$MIGRATE_STATUS_OUTPUT"
+elif [[ "$BASELINE_STATE" == "legacy-needs-baseline" ]] \
+  && printf '%s\n' "$MIGRATE_STATUS_OUTPUT" | grep -q 'The database schema is not empty'; then
+  printf '%s\n' "$MIGRATE_STATUS_OUTPUT"
+else
+  printf '%s\n' "$MIGRATE_STATUS_OUTPUT" >&2
+  echo "[deploy] Prisma migration preflight failed; refusing rollout" >&2
+  restart_previous_app || true
+  exit 1
+fi
+
+if [[ "$BASELINE_STATE" == "legacy-needs-baseline" ]]; then
   echo "[deploy] legacy non-empty SQLite detected without migration metadata; applying baseline"
   if ! pnpm exec prisma migrate resolve --applied 20260617000000_baseline_legacy_portfolio; then
     echo "[deploy] baseline migration resolution failed; restoring pre-migration snapshot" >&2
@@ -292,12 +312,8 @@ elif printf '%s\n' "$MIGRATE_STATUS_OUTPUT" | grep -q 'The database schema is no
     restart_previous_app || true
     exit 1
   fi
-else
-  printf '%s\n' "$MIGRATE_STATUS_OUTPUT" >&2
-  echo "[deploy] Prisma migration preflight failed; refusing rollout" >&2
-  restart_previous_app || true
-  exit 1
 fi
+
 if ! pnpm exec prisma migrate deploy; then
   echo "[deploy] database migration failed; restoring pre-migration snapshot" >&2
   if ! restore_database_snapshot; then
