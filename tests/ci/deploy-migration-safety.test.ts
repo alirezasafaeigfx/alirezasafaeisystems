@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest'
 describe('production database migration safety', () => {
   it('backs up persistent SQLite state and verifies structural baseline state before migration', () => {
     const deploy = readFileSync(resolve(process.cwd(), 'ops/deploy/deploy.sh'), 'utf8')
+    const planner = readFileSync(resolve(process.cwd(), 'scripts/deploy/prisma-baseline-state.mjs'), 'utf8')
 
     const buildIndex = deploy.indexOf('pnpm run build')
     const baselineStateIndex = deploy.indexOf('node scripts/deploy/prisma-baseline-state.mjs')
@@ -12,11 +13,12 @@ describe('production database migration safety', () => {
     const preflightStatusIndex = deploy.indexOf('pnpm exec prisma migrate status 2>&1')
     const migrationIndex = deploy.indexOf('pnpm exec prisma migrate deploy', preflightStatusIndex)
     const postMigrationStatusIndex = deploy.indexOf('if ! pnpm exec prisma migrate status; then', migrationIndex)
-    const driftIndex = deploy.indexOf('pnpm exec prisma migrate diff --from-url "$DATABASE_URL" --to-schema prisma/schema.prisma --exit-code', postMigrationStatusIndex)
+    const driftIndex = deploy.indexOf('pnpm exec prisma migrate diff --from-url "$DATABASE_URL" --to-schema-datamodel prisma/schema.prisma --exit-code', postMigrationStatusIndex)
     const replaceAppIndex = deploy.indexOf('pm2 delete "$APP_NAME"', driftIndex)
     const publishLinkIndex = deploy.indexOf('ln -sfn "$RELEASE_DIR" "$CURRENT_LINK"', replaceAppIndex)
 
-    expect(deploy).toContain('20260617000000_baseline_legacy_portfolio')
+    expect(planner).toContain('20260617000000_baseline_legacy_portfolio')
+    expect(planner).toContain('20260618141730_add_analytics_funnel_tracking')
     expect(deploy).toContain('Following migrations have not yet been applied')
     expect(deploy).toContain('legacy-needs-baseline')
     expect(deploy).toContain('ASDEV_BUILD_SKIP_DYNAMIC_DB=1 pnpm run build')
