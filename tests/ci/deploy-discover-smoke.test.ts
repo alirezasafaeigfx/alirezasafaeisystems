@@ -22,7 +22,7 @@ describe('Discover production rollout contract', () => {
     expect(profileCheck).toBeGreaterThan(discoverCheck)
   })
 
-  it('runs real-browser production verification and records exact release evidence', () => {
+  it('runs two consecutive real-browser production verification passes and records exact release evidence', () => {
     const workflow = readFileSync(
       resolve(process.cwd(), '.github/workflows/deploy-vps.yml'),
       'utf8'
@@ -30,12 +30,13 @@ describe('Discover production rollout contract', () => {
 
     expect(workflow).toContain('statuses: write')
     expect(workflow).toContain('pnpm exec playwright install --with-deps chromium')
+    expect(workflow).toContain('for PASS in 1 2; do')
     expect(workflow).toContain('node scripts/deploy/live-verify.mjs')
     expect(workflow).toContain('LIVE_VERIFY_BASE_URL="$BASE_URL"')
     expect(workflow).toContain('LIVE_VERIFY_RELEASE_SHA="$TARGET_REF"')
-    expect(workflow).toContain('LIVE_VERIFY_REPORT_PATH="$GITHUB_WORKSPACE/live-verification-report.md"')
+    expect(workflow).toContain('LIVE_VERIFY_REPORT_PATH="$GITHUB_WORKSPACE/live-verification-report-pass-${PASS}.md"')
     expect(workflow).toContain('actions/upload-artifact@v4')
-    expect(workflow).toContain('live-verification-report.md')
+    expect(workflow).toContain('live-verification-report-pass-*.md')
     expect(workflow).toContain('/statuses/$TARGET_REF')
     expect(workflow).toContain('production/live-verification')
     expect(workflow).toContain('steps.live_verify.outcome')
