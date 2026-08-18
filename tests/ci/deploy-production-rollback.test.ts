@@ -30,6 +30,17 @@ describe('post-cutover production rollback contract', () => {
     }
   })
 
+  it('retains the previous live release until outer production verification can no longer need it', () => {
+    const deploy = readFileSync(resolve(process.cwd(), 'ops/deploy/deploy.sh'), 'utf8')
+    const cleanupIndex = deploy.indexOf('for old_release in "${releases[@]:KEEP_RELEASES}"; do')
+    const cleanupBlock = deploy.slice(cleanupIndex, cleanupIndex + 420)
+
+    expect(cleanupIndex).toBeGreaterThan(-1)
+    expect(cleanupBlock).toContain('if [[ -n "$PREVIOUS_RELEASE" && "$old_release" == "$PREVIOUS_RELEASE" ]]; then')
+    expect(cleanupBlock).toContain('continue')
+    expect(cleanupBlock.indexOf('continue')).toBeLessThan(cleanupBlock.indexOf('rm -rf "$old_release"'))
+  })
+
   it('provides an exact-release rollback command that restores DB before previous app startup', () => {
     const rollbackPath = resolve(process.cwd(), 'ops/deploy/rollback-release.sh')
     expect(existsSync(rollbackPath)).toBe(true)
