@@ -248,7 +248,7 @@ jobs:
           done
 
       - name: Upload live verification evidence
-        if: always()
+        if: ${{ always() && steps.live_verify.outcome != 'skipped' }}
         uses: actions/upload-artifact@v4
         with:
           name: live-verification-${{ github.run_id }}
@@ -269,6 +269,9 @@ jobs:
           if [ "$LIVE_VERIFY_OUTCOME" = "success" ]; then
             STATE="success"
             DESCRIPTION="Two consecutive live browser verification passes succeeded"
+          elif [ "$LIVE_VERIFY_OUTCOME" = "skipped" ]; then
+            STATE="failure"
+            DESCRIPTION="Live browser verification was not executed because deployment failed or was blocked"
           else
             STATE="failure"
             DESCRIPTION="Live browser verification failed"
@@ -293,7 +296,7 @@ jobs:
             -d "$PAYLOAD" >/dev/null
 
       - name: Enforce live verification gate
-        if: ${{ steps.live_verify.outcome != 'success' }}
+        if: ${{ steps.live_verify.outcome == 'failure' }}
         run: exit 1
 
       - name: Output deployment summary
