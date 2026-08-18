@@ -1,11 +1,27 @@
 import { describe, expect, it } from 'vitest'
 
-async function loadClassifier() {
-  return import('../../scripts/deploy/prisma-baseline-state.mjs')
+type MigrationRow = {
+  migration_name: string
+  finished_at: string | null
+  rolled_back_at: string | null
+}
+
+type LegacyShape = {
+  tableNames: string[]
+  columnsByTable: Record<string, string[]>
+}
+
+type ClassifierModule = {
+  classifyPrismaBaselineState(input: { tableNames: string[]; migrations: MigrationRow[] }): string
+  planLegacyMigrationResolution(input: LegacyShape): string[]
+}
+
+async function loadClassifier(): Promise<ClassifierModule> {
+  return (await import('../../scripts/deploy/prisma-baseline-state.mjs')) as unknown as ClassifierModule
 }
 
 const CORE_TABLES = ['Project', 'Skill', 'Experience', 'BlogPost', 'ContactMessage']
-const CORE_COLUMNS = {
+const CORE_COLUMNS: Record<string, string[]> = {
   Project: ['id', 'title', 'description', 'longDescription', 'imageUrl', 'githubUrl', 'liveUrl', 'tags', 'featured', 'order', 'createdAt', 'updatedAt'],
   Skill: ['id', 'name', 'category', 'level', 'icon', 'order', 'createdAt', 'updatedAt'],
   Experience: ['id', 'title', 'company', 'location', 'startDate', 'endDate', 'description', 'current', 'order', 'createdAt', 'updatedAt'],
@@ -17,7 +33,7 @@ const LEAD_COLUMNS = ['id', 'status', 'source', 'contactName', 'organizationName
 const ANALYTICS_CURRENT_COLUMNS = ['id', 'site', 'event', 'properties', 'sessionId', 'userId', 'timestamp', 'ip', 'userAgent', 'name', 'category', 'path', 'locale', 'variant', 'value', 'metadata', 'createdAt']
 const FUNNEL_COLUMNS = ['id', 'sessionId', 'entryPoint', 'visitedToolbox', 'visitedPortfolio', 'visitedAudit', 'contacted', 'converted', 'conversionValue', 'createdAt', 'updatedAt']
 
-function legacyShape(extra: Record<string, string[]> = {}) {
+function legacyShape(extra: Record<string, string[]> = {}): LegacyShape {
   return {
     tableNames: [...CORE_TABLES, ...Object.keys(extra)],
     columnsByTable: { ...CORE_COLUMNS, ...extra },
