@@ -157,7 +157,9 @@ mkdir -p "$(dirname "$DB_PATH")"
 
 # Build while the previous release is still serving traffic. Database mutation
 # is deliberately delayed until the replacement application is ready to start.
-pnpm run build
+# Dynamic DB-backed sitemap entries are skipped because the target schema may
+# not exist until the following migration window completes.
+ASDEV_BUILD_SKIP_DYNAMIC_DB=1 pnpm run build
 
 cat > ecosystem.config.cjs <<ECOSYSTEM
 module.exports = {
