@@ -42,6 +42,36 @@ describe('Discover production rollout contract', () => {
     expect(workflow).toContain('steps.live_verify.outcome')
   })
 
+  it('keeps deployment serialization while publishing queue observability before the deploy lock', () => {
+    const workflow = readFileSync(
+      resolve(process.cwd(), '.github/workflows/deploy-vps.yml'),
+      'utf8'
+    )
+
+    const jobsIndex = workflow.indexOf('\njobs:')
+    const deployIndex = workflow.indexOf('\n  deploy:')
+    const workflowConcurrencyIndex = workflow.indexOf('\nconcurrency:')
+    const deployConcurrencyIndex = workflow.indexOf('\n    concurrency:', deployIndex)
+    const pendingStatusIndex = workflow.indexOf('Publish deployment pending status')
+
+    expect(jobsIndex).toBeGreaterThan(-1)
+    expect(deployIndex).toBeGreaterThan(jobsIndex)
+    expect(workflowConcurrencyIndex === -1 || workflowConcurrencyIndex > jobsIndex).toBe(true)
+    expect(deployConcurrencyIndex).toBeGreaterThan(deployIndex)
+    expect(workflow).toContain('group: deploy-vps-${{ github.event_name == \'workflow_dispatch\' && inputs.environment || \'production\' }}')
+    expect(workflow).toContain('cancel-in-progress: false')
+    expect(pendingStatusIndex).toBeGreaterThan(jobsIndex)
+    expect(pendingStatusIndex).toBeLessThan(deployIndex)
+    expect(workflow).toContain('production/deploy')
+    expect(workflow).toContain('Deployment queued; quality gate running')
+    expect(workflow).toContain('https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}')
+    expect(workflow).toContain('deployment-status:')
+    expect(workflow).toContain('needs: [quality-gate, deploy]')
+    expect(workflow).toContain('QUALITY_RESULT: ${{ needs.quality-gate.result }}')
+    expect(workflow).toContain('DEPLOY_RESULT: ${{ needs.deploy.result }}')
+    expect(workflow).toContain('Deployment and live verification passed')
+  })
+
   it('does not require a main landmark before validating the admin-login redirect', () => {
     const runner = readFileSync(
       resolve(process.cwd(), 'scripts/deploy/live-verify.mjs'),
