@@ -206,7 +206,7 @@ snapshot_database() {
 
   if [[ -f "$DB_PATH" ]]; then
     cp -a -- "$DB_PATH" "$SNAPSHOT_DIR/database.sqlite" || return 1
-    for suffix in -wal -shm; do
+    for suffix in -wal -shm -journal; do
       if [[ -f "${DB_PATH}${suffix}" ]]; then
         cp -a -- "${DB_PATH}${suffix}" "$SNAPSHOT_DIR/database.sqlite${suffix}" || return 1
       fi
@@ -217,7 +217,7 @@ snapshot_database() {
 }
 
 restore_database_snapshot() {
-  rm -f -- "$DB_PATH" "${DB_PATH}-wal" "${DB_PATH}-shm" || return 1
+  rm -f -- "$DB_PATH" "${DB_PATH}-wal" "${DB_PATH}-shm" "${DB_PATH}-journal" || return 1
 
   if [[ -f "$SNAPSHOT_DIR/.database-absent" ]]; then
     return 0
@@ -229,7 +229,7 @@ restore_database_snapshot() {
   fi
 
   cp -a -- "$SNAPSHOT_DIR/database.sqlite" "$DB_PATH" || return 1
-  for suffix in -wal -shm; do
+  for suffix in -wal -shm -journal; do
     if [[ -f "$SNAPSHOT_DIR/database.sqlite${suffix}" ]]; then
       cp -a -- "$SNAPSHOT_DIR/database.sqlite${suffix}" "${DB_PATH}${suffix}" || return 1
     fi
@@ -244,7 +244,7 @@ restart_previous_app() {
 }
 
 rollback_previous_release() {
-  # Stop any partially started replacement before restoring SQLite bytes/WAL.
+  # Stop any partially started replacement before restoring SQLite bytes/WAL/journal state.
   pm2 delete "$APP_NAME" >/dev/null 2>&1 || true
 
   if ! restore_database_snapshot; then
