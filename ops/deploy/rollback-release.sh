@@ -102,7 +102,7 @@ if [[ -n "$PREVIOUS_RELEASE" && "$PREVIOUS_RELEASE" != "$BASE_DIR/"* ]]; then
 fi
 
 restore_database_snapshot() {
-  rm -f -- "$DB_PATH" "${DB_PATH}-wal" "${DB_PATH}-shm" || return 1
+  rm -f -- "$DB_PATH" "${DB_PATH}-wal" "${DB_PATH}-shm" "${DB_PATH}-journal" || return 1
 
   if [[ -f "$SNAPSHOT_DIR/.database-absent" ]]; then
     return 0
@@ -113,7 +113,7 @@ restore_database_snapshot() {
   fi
 
   cp -a -- "$SNAPSHOT_DIR/database.sqlite" "$DB_PATH" || return 1
-  for suffix in -wal -shm; do
+  for suffix in -wal -shm -journal; do
     if [[ -f "$SNAPSHOT_DIR/database.sqlite${suffix}" ]]; then
       cp -a -- "$SNAPSHOT_DIR/database.sqlite${suffix}" "${DB_PATH}${suffix}" || return 1
     fi
