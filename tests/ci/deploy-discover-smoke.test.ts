@@ -28,6 +28,7 @@ describe('Discover production rollout contract', () => {
       'utf8'
     )
 
+    expect(workflow).toContain('statuses: write')
     expect(workflow).toContain('pnpm exec playwright install --with-deps chromium')
     expect(workflow).toContain('node scripts/deploy/live-verify.mjs')
     expect(workflow).toContain('LIVE_VERIFY_BASE_URL="$BASE_URL"')
@@ -35,5 +36,8 @@ describe('Discover production rollout contract', () => {
     expect(workflow).toContain('LIVE_VERIFY_REPORT_PATH="$GITHUB_WORKSPACE/live-verification-report.md"')
     expect(workflow).toContain('actions/upload-artifact@v4')
     expect(workflow).toContain('live-verification-report.md')
+    expect(workflow).toContain('/statuses/$TARGET_REF')
+    expect(workflow).toContain('production/live-verification')
+    expect(workflow).toContain('steps.live_verify.outcome')
   })
 })
