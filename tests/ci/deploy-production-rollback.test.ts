@@ -12,7 +12,7 @@ describe('post-cutover production rollback contract', () => {
 
     expect(stateWriteIndex).toBeGreaterThan(snapshotIndex)
     expect(migrationIndex).toBeGreaterThan(stateWriteIndex)
-    expect(deploy).toContain('shared/deploy-state')
+    expect(deploy).toContain('DEPLOY_STATE_DIR="$SHARED_DIR/deploy-state/$ENVIRONMENT"')
     expect(deploy).toContain('PREVIOUS_RELEASE')
     expect(deploy).toContain('SNAPSHOT_DIR')
     expect(deploy).toContain('DB_PATH')
@@ -25,10 +25,10 @@ describe('post-cutover production rollback contract', () => {
 
     const rollback = readFileSync(rollbackPath, 'utf8')
     const deleteIndex = rollback.indexOf('pm2 delete "$APP_NAME"')
-    const restoreIndex = rollback.indexOf('restore_database_snapshot')
-    const previousStartIndex = rollback.indexOf('pm2 start ecosystem.config.cjs --only "$APP_NAME" --update-env')
-    const readyIndex = rollback.indexOf('/api/ready')
-    const linkIndex = rollback.indexOf('ln -sfn "$PREVIOUS_RELEASE" "$CURRENT_LINK"')
+    const restoreIndex = rollback.indexOf('if ! restore_database_snapshot', deleteIndex)
+    const previousStartIndex = rollback.indexOf('pm2 start ecosystem.config.cjs --only "$APP_NAME" --update-env', restoreIndex)
+    const readyIndex = rollback.indexOf('/api/ready', previousStartIndex)
+    const linkIndex = rollback.indexOf('ln -sfn "$PREVIOUS_RELEASE" "$CURRENT_LINK"', readyIndex)
 
     expect(rollback).toContain('shared/deploy-state')
     expect(deleteIndex).toBeGreaterThan(-1)
