@@ -189,12 +189,14 @@ jobs:
             "cd '$REMOTE_TMP' && BASE_DIR='$DEPLOY_BASE_DIR' APP_SLUG='$DEPLOY_APP_SLUG' PERSISTENT_DB_PATH='$DEPLOY_PERSISTENT_DB_PATH' bash ops/deploy/migrate-legacy-sqlite.sh --env '$TARGET_ENV'"
 
       - name: Execute remote deploy
+        id: remote_deploy
         run: |
           set -euo pipefail
           ssh -F ~/.ssh/config deploy-target \
             "cd '$REMOTE_TMP' && BASE_DIR='$DEPLOY_BASE_DIR' APP_SLUG='$DEPLOY_APP_SLUG' bash ops/deploy/deploy.sh --env '$TARGET_ENV' --source-dir '$REMOTE_TMP' --release-id '$RELEASE_ID' --keep-releases 3"
 
       - name: Post-deploy smoke check
+        id: post_deploy_smoke
         run: |
           set -euo pipefail
           if [ "$TARGET_ENV" = "production" ]; then
@@ -299,7 +301,15 @@ jobs:
         if: ${{ steps.live_verify.outcome == 'failure' }}
         run: exit 1
 
+      - name: Roll back failed production verification
+        if: ${{ always() && steps.remote_deploy.outcome == 'success' && (steps.post_deploy_smoke.outcome == 'failure' || steps.live_verify.outcome == 'failure') }}
+        run: |
+          set -euo pipefail
+          ssh -F ~/.ssh/config deploy-target \
+            "cd '$REMOTE_TMP' && BASE_DIR='$DEPLOY_BASE_DIR' APP_SLUG='$DEPLOY_APP_SLUG' bash ops/deploy/rollback-release.sh --env '$TARGET_ENV' --release-id '$RELEASE_ID'"
+
       - name: Output deployment summary
+        if: ${{ steps.post_deploy_smoke.outcome == 'success' && steps.live_verify.outcome == 'success' }}
         run: |
           if [ "$TARGET_ENV" = "production" ]; then
             BASE_URL="https://alirezasafaeisystems.ir"
