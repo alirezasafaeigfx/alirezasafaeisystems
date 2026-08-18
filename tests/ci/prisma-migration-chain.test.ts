@@ -45,7 +45,7 @@ describe('Prisma migration history', () => {
         'diff',
         '--from-url',
         databaseUrl,
-        '--to-schema',
+        '--to-schema-datamodel',
         'prisma/schema.prisma',
         '--exit-code',
       ], databaseUrl),
