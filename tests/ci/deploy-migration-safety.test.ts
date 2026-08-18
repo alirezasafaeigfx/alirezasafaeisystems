@@ -12,7 +12,8 @@ describe('production database migration safety', () => {
     const preflightStatusIndex = deploy.indexOf('pnpm exec prisma migrate status 2>&1')
     const migrationIndex = deploy.indexOf('pnpm exec prisma migrate deploy', preflightStatusIndex)
     const postMigrationStatusIndex = deploy.indexOf('if ! pnpm exec prisma migrate status; then', migrationIndex)
-    const replaceAppIndex = deploy.indexOf('pm2 delete "$APP_NAME"', postMigrationStatusIndex)
+    const driftIndex = deploy.indexOf('pnpm exec prisma migrate diff --from-url "$DATABASE_URL" --to-schema prisma/schema.prisma --exit-code', postMigrationStatusIndex)
+    const replaceAppIndex = deploy.indexOf('pm2 delete "$APP_NAME"', driftIndex)
     const publishLinkIndex = deploy.indexOf('ln -sfn "$RELEASE_DIR" "$CURRENT_LINK"', replaceAppIndex)
 
     expect(deploy).toContain('20260617000000_baseline_legacy_portfolio')
@@ -34,7 +35,8 @@ describe('production database migration safety', () => {
     expect(preflightStatusIndex).toBeGreaterThan(legacyPlanIndex)
     expect(migrationIndex).toBeGreaterThan(preflightStatusIndex)
     expect(postMigrationStatusIndex).toBeGreaterThan(migrationIndex)
-    expect(replaceAppIndex).toBeGreaterThan(postMigrationStatusIndex)
+    expect(driftIndex).toBeGreaterThan(postMigrationStatusIndex)
+    expect(replaceAppIndex).toBeGreaterThan(driftIndex)
     expect(publishLinkIndex).toBeGreaterThan(replaceAppIndex)
   })
 
@@ -47,7 +49,7 @@ describe('production database migration safety', () => {
     expect(deploy).toContain('legacy migration resolution failed; restoring pre-migration snapshot')
   })
 
-  it('restores service availability when structural preflight, migration preflight, or legacy resolution fails', () => {
+  it('restores service availability when structural preflight, migration preflight, legacy resolution, or schema drift fails', () => {
     const deploy = readFileSync(resolve(process.cwd(), 'ops/deploy/deploy.sh'), 'utf8')
 
     const structuralFailureIndex = deploy.indexOf('Prisma baseline state inspection failed; refusing rollout')
@@ -60,6 +62,10 @@ describe('production database migration safety', () => {
     const resolutionRestoreIndex = deploy.indexOf('restore_database_snapshot', resolutionFailureIndex)
     const resolutionRestartIndex = deploy.indexOf('restart_previous_app || true', resolutionFailureIndex)
     const resolutionExitIndex = deploy.indexOf('exit 1', resolutionFailureIndex)
+    const driftFailureIndex = deploy.indexOf('database schema drift detected after migration; restoring pre-migration snapshot')
+    const driftRestoreIndex = deploy.indexOf('restore_database_snapshot', driftFailureIndex)
+    const driftRestartIndex = deploy.indexOf('restart_previous_app || true', driftFailureIndex)
+    const driftExitIndex = deploy.indexOf('exit 1', driftFailureIndex)
 
     expect(structuralFailureIndex).toBeGreaterThan(-1)
     expect(structuralRestartIndex).toBeGreaterThan(structuralFailureIndex)
@@ -71,5 +77,9 @@ describe('production database migration safety', () => {
     expect(resolutionRestoreIndex).toBeGreaterThan(resolutionFailureIndex)
     expect(resolutionRestartIndex).toBeGreaterThan(resolutionRestoreIndex)
     expect(resolutionExitIndex).toBeGreaterThan(resolutionRestartIndex)
+    expect(driftFailureIndex).toBeGreaterThan(-1)
+    expect(driftRestoreIndex).toBeGreaterThan(driftFailureIndex)
+    expect(driftRestartIndex).toBeGreaterThan(driftRestoreIndex)
+    expect(driftExitIndex).toBeGreaterThan(driftRestartIndex)
   })
 })
