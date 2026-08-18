@@ -41,4 +41,18 @@ describe('Discover production rollout contract', () => {
     expect(workflow).toContain('production/live-verification')
     expect(workflow).toContain('steps.live_verify.outcome')
   })
+
+  it('does not require a main landmark before validating the admin-login redirect', () => {
+    const runner = readFileSync(
+      resolve(process.cwd(), 'scripts/deploy/live-verify.mjs'),
+      'utf8'
+    )
+    const adminLogin = readFileSync(
+      resolve(process.cwd(), 'src/app/admin/login/page.tsx'),
+      'utf8'
+    )
+
+    expect(adminLogin).not.toContain('<main')
+    expect(runner).toContain("await goto(page, '/admin', { requireMain: false })")
+  })
 })
