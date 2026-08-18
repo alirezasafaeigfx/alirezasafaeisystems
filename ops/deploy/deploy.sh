@@ -422,6 +422,9 @@ ln -sfn "$RELEASE_DIR" "$CURRENT_LINK"
 mapfile -t releases < <(ls -1dt "$RELEASES_DIR"/* 2>/dev/null || true)
 if (( ${#releases[@]} > KEEP_RELEASES )); then
   for old_release in "${releases[@]:KEEP_RELEASES}"; do
+    if [[ -n "$PREVIOUS_RELEASE" && "$old_release" == "$PREVIOUS_RELEASE" ]]; then
+      continue
+    fi
     rm -rf "$old_release"
   done
 fi
