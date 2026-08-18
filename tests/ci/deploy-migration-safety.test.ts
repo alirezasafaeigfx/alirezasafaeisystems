@@ -18,6 +18,7 @@ describe('production database migration safety', () => {
     expect(deploy).toContain('The database schema is not empty')
     expect(deploy).toContain('Following migrations have not yet been applied')
     expect(deploy).toContain('legacy-needs-baseline')
+    expect(deploy).toContain('ASDEV_BUILD_SKIP_DYNAMIC_DB=1 pnpm run build')
     expect(deploy).toContain('DATABASE_URL must use an absolute SQLite file URL')
     expect(deploy).toContain('DB_PATH="${DATABASE_URL#file:}"')
     expect(deploy).toContain('BACKUP_DIR="$BASE_DIR/shared/backups/$ENVIRONMENT"')
