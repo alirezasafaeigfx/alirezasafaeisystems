@@ -350,7 +350,7 @@ fi
 
 # Migration history being clean is necessary but not sufficient: verify that
 # the live SQLite schema itself matches schema.prisma before replacing the app.
-if ! pnpm exec prisma migrate diff --from-url "$DATABASE_URL" --to-schema prisma/schema.prisma --exit-code; then
+if ! pnpm exec prisma migrate diff --from-url "$DATABASE_URL" --to-schema-datamodel prisma/schema.prisma --exit-code; then
   echo "[deploy] database schema drift detected after migration; restoring pre-migration snapshot" >&2
   if ! restore_database_snapshot; then
     echo "[deploy] CRITICAL: database snapshot restore failed after schema drift" >&2
