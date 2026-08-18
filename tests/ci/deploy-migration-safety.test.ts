@@ -8,6 +8,7 @@ describe('production database migration safety', () => {
 
     const buildIndex = deploy.indexOf('pnpm run build')
     const baselineStateIndex = deploy.indexOf('node scripts/deploy/prisma-baseline-state.mjs')
+    const legacyPlanIndex = deploy.indexOf('node scripts/deploy/prisma-baseline-state.mjs --legacy-resolve-plan')
     const preflightStatusIndex = deploy.indexOf('pnpm exec prisma migrate status 2>&1')
     const migrationIndex = deploy.indexOf('pnpm exec prisma migrate deploy', preflightStatusIndex)
     const postMigrationStatusIndex = deploy.indexOf('if ! pnpm exec prisma migrate status; then', migrationIndex)
@@ -15,7 +16,6 @@ describe('production database migration safety', () => {
     const publishLinkIndex = deploy.indexOf('ln -sfn "$RELEASE_DIR" "$CURRENT_LINK"', replaceAppIndex)
 
     expect(deploy).toContain('20260617000000_baseline_legacy_portfolio')
-    expect(deploy).toContain('The database schema is not empty')
     expect(deploy).toContain('Following migrations have not yet been applied')
     expect(deploy).toContain('legacy-needs-baseline')
     expect(deploy).toContain('ASDEV_BUILD_SKIP_DYNAMIC_DB=1 pnpm run build')
@@ -30,14 +30,24 @@ describe('production database migration safety', () => {
     expect(deploy).toContain('pm2 restart "$APP_NAME" --update-env')
     expect(buildIndex).toBeGreaterThan(-1)
     expect(baselineStateIndex).toBeGreaterThan(buildIndex)
-    expect(preflightStatusIndex).toBeGreaterThan(baselineStateIndex)
+    expect(legacyPlanIndex).toBeGreaterThan(baselineStateIndex)
+    expect(preflightStatusIndex).toBeGreaterThan(legacyPlanIndex)
     expect(migrationIndex).toBeGreaterThan(preflightStatusIndex)
     expect(postMigrationStatusIndex).toBeGreaterThan(migrationIndex)
     expect(replaceAppIndex).toBeGreaterThan(postMigrationStatusIndex)
     expect(publishLinkIndex).toBeGreaterThan(replaceAppIndex)
   })
 
-  it('restores service availability when structural preflight, migration preflight, or baseline resolution fails', () => {
+  it('resolves only structurally verified legacy effects and restores the snapshot if any resolution fails', () => {
+    const deploy = readFileSync(resolve(process.cwd(), 'ops/deploy/deploy.sh'), 'utf8')
+
+    expect(deploy).toContain('mapfile -t LEGACY_RESOLVE_MIGRATIONS')
+    expect(deploy).toContain('for LEGACY_MIGRATION in "${LEGACY_RESOLVE_MIGRATIONS[@]}"; do')
+    expect(deploy).toContain('pnpm exec prisma migrate resolve --applied "$LEGACY_MIGRATION"')
+    expect(deploy).toContain('legacy migration resolution failed; restoring pre-migration snapshot')
+  })
+
+  it('restores service availability when structural preflight, migration preflight, or legacy resolution fails', () => {
     const deploy = readFileSync(resolve(process.cwd(), 'ops/deploy/deploy.sh'), 'utf8')
 
     const structuralFailureIndex = deploy.indexOf('Prisma baseline state inspection failed; refusing rollout')
@@ -46,13 +56,10 @@ describe('production database migration safety', () => {
     const preflightFailureIndex = deploy.indexOf('Prisma migration preflight failed; refusing rollout')
     const preflightRestartIndex = deploy.indexOf('restart_previous_app || true', preflightFailureIndex)
     const preflightExitIndex = deploy.indexOf('exit 1', preflightFailureIndex)
-    const baselineGuardIndex = deploy.indexOf(
-      'if ! pnpm exec prisma migrate resolve --applied 20260617000000_baseline_legacy_portfolio; then',
-    )
-    const baselineFailureIndex = deploy.indexOf('baseline migration resolution failed; restoring pre-migration snapshot')
-    const baselineRestoreIndex = deploy.indexOf('restore_database_snapshot', baselineFailureIndex)
-    const baselineRestartIndex = deploy.indexOf('restart_previous_app || true', baselineFailureIndex)
-    const baselineExitIndex = deploy.indexOf('exit 1', baselineFailureIndex)
+    const resolutionFailureIndex = deploy.indexOf('legacy migration resolution failed; restoring pre-migration snapshot')
+    const resolutionRestoreIndex = deploy.indexOf('restore_database_snapshot', resolutionFailureIndex)
+    const resolutionRestartIndex = deploy.indexOf('restart_previous_app || true', resolutionFailureIndex)
+    const resolutionExitIndex = deploy.indexOf('exit 1', resolutionFailureIndex)
 
     expect(structuralFailureIndex).toBeGreaterThan(-1)
     expect(structuralRestartIndex).toBeGreaterThan(structuralFailureIndex)
@@ -60,10 +67,9 @@ describe('production database migration safety', () => {
     expect(preflightFailureIndex).toBeGreaterThan(-1)
     expect(preflightRestartIndex).toBeGreaterThan(preflightFailureIndex)
     expect(preflightExitIndex).toBeGreaterThan(preflightRestartIndex)
-    expect(baselineGuardIndex).toBeGreaterThan(-1)
-    expect(baselineFailureIndex).toBeGreaterThan(baselineGuardIndex)
-    expect(baselineRestoreIndex).toBeGreaterThan(baselineFailureIndex)
-    expect(baselineRestartIndex).toBeGreaterThan(baselineRestoreIndex)
-    expect(baselineExitIndex).toBeGreaterThan(baselineRestartIndex)
+    expect(resolutionFailureIndex).toBeGreaterThan(-1)
+    expect(resolutionRestoreIndex).toBeGreaterThan(resolutionFailureIndex)
+    expect(resolutionRestartIndex).toBeGreaterThan(resolutionRestoreIndex)
+    expect(resolutionExitIndex).toBeGreaterThan(resolutionRestartIndex)
   })
 })
