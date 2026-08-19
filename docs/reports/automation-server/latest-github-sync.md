@@ -2,27 +2,26 @@
 
 | Item | Value |
 |---|---|
-| Started | 2026-08-18T22:07:17Z |
-| Finished | 2026-08-18T22:07:18Z |
+| Started | 2026-08-19T00:10:52Z |
+| Finished | 2026-08-19T00:10:54Z |
 | Environment | AUTOMATION_SERVER |
 | Hostname | asdevserve |
 | User | asdev |
 | Repo | /home/asdev/repos/alirezasafaeisystems |
 | Branch | main |
-| Local HEAD | 69ad955 |
-| Origin HEAD | 69ad955 |
+| Local HEAD | 698160b |
+| Origin HEAD | ed8bcec |
 | Dirty count | 3 |
 | Ahead | 0 |
-| Behind | 0 |
+| Behind | 30 |
 | Diverged | no |
 | Prompt files | 9 |
 | Queue JSON valid | yes |
-| Status | ok |
+| Status | blocked |
 
 ## Actions
 - Auto-commit skipped: no semantic change
 - Fetched origin/main
-- Up to date with origin/main
 - Found: docs/governance/ENVIRONMENT_ROLES_AND_SYNC_POLICY.md
 - Found: docs/ops/GITHUB_LOCAL_SERVER_SYNC.md
 - Found: docs/governance/POST_DEPLOY_LIVE_VERIFICATION_POLICY.md
@@ -34,4 +33,4 @@
 - none
 
 ## Blockers
-- none
+- Remote ahead by 30 but repo dirty — pull skipped
