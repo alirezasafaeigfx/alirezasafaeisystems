@@ -55,7 +55,7 @@ function attachDiagnostics(page, scope) {
 async function goto(page, pathname, { requireMain = true } = {}) {
   const url = new URL(pathname, `${normalizedBaseUrl}/`).toString()
   checkedUrls.add(url)
-  const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30_000 })
+  const response = await page.goto(url, { waitUntil: 'networkidle', timeout: 30_000 })
   if (!response || response.status() >= 400) {
     throw new Error(`navigation failed for ${url}: HTTP ${response?.status() ?? 'no response'}`)
   }
@@ -116,7 +116,7 @@ async function verifyDiscover(page, prefix = '') {
   const detailUrl = page.url()
   checkedUrls.add(detailUrl)
 
-  const reload = await page.reload({ waitUntil: 'domcontentloaded', timeout: 30_000 })
+  const reload = await page.reload({ waitUntil: 'networkidle', timeout: 30_000 })
   if (!reload || reload.status() >= 400) {
     throw new Error(`hard refresh failed for ${detailUrl}: HTTP ${reload?.status() ?? 'no response'}`)
   }
