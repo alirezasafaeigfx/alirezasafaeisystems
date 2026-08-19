@@ -217,12 +217,15 @@ jobs:
             test \"\${HEAD_CODE}\" = \"\${GET_CODE}\"; \
             grep -q '\"status\":\"ready\"' /tmp/portfolio-ready-get.json; \
             curl --connect-timeout 10 --max-time 30 -fsS '${BASE_URL}/api/ready' >/dev/null; \
-            curl --connect-timeout 10 --max-time 30 -fsS '${BASE_URL}/' | grep -Eq 'lang=\"fa\"|dir=\"rtl\"'; \
+            curl --connect-timeout 10 --max-time 30 -fsS -o /tmp/portfolio-home.html '${BASE_URL}/'; \
+            grep -Eq 'lang=\"fa\"|dir=\"rtl\"' /tmp/portfolio-home.html; \
             curl --connect-timeout 10 --max-time 30 -fsS '${BASE_URL}/services' >/dev/null; \
             curl --connect-timeout 10 --max-time 30 -fsS '${BASE_URL}/discover' >/dev/null; \
-            curl --connect-timeout 10 --max-time 30 -fsS '${BASE_URL}/en/discover' | grep -q 'lang=\"en\"'; \
-            curl --connect-timeout 10 --max-time 30 -fsS '${BASE_URL}/en/discover' | grep -q 'dir=\"ltr\"'; \
-            curl --connect-timeout 10 --max-time 30 -fsS '${BASE_URL}/profile' | grep -q 'alireza_safaei_network'; \
+            curl --connect-timeout 10 --max-time 30 -fsS -o /tmp/portfolio-discover-en.html '${BASE_URL}/en/discover'; \
+            grep -q 'lang=\"en\"' /tmp/portfolio-discover-en.html; \
+            grep -q 'dir=\"ltr\"' /tmp/portfolio-discover-en.html; \
+            curl --connect-timeout 10 --max-time 30 -fsS -o /tmp/portfolio-profile.html '${BASE_URL}/profile'; \
+            grep -q 'alireza_safaei_network' /tmp/portfolio-profile.html; \
           "
 
       - name: Live browser production verification
