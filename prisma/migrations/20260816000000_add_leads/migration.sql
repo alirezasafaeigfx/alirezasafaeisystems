@@ -1,5 +1,9 @@
--- Add the lead table before the UTM content extension migration.
-CREATE TABLE "Lead" (
+-- Add the Lead table before the UTM content extension migration.
+-- The older 20260618141730 snapshot also created Lead on fresh databases, so
+-- this migration must be idempotent. Legacy production databases that do not
+-- yet contain Lead still create it here after the overlapping snapshot is
+-- structurally resolved as applied.
+CREATE TABLE IF NOT EXISTS "Lead" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "status" TEXT NOT NULL DEFAULT 'new',
     "source" TEXT NOT NULL DEFAULT 'qualification_form',
