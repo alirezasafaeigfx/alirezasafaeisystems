@@ -18,10 +18,9 @@ describe('Discover production verification hotfix contracts', () => {
     expect(layout).toContain('nonce={nonce}')
   })
 
-  it('clips decorative aurora pseudo-elements so they cannot expand the mobile document width', () => {
-    const styles = readFileSync(resolve(process.cwd(), 'src/app/globals.css'), 'utf8')
-    const auroraBlock = styles.match(/\.aurora-shell\s*\{[^}]*\}/)?.[0] ?? ''
+  it('clips the Discover aurora decoration so it cannot expand the mobile document width', () => {
+    const page = readFileSync(resolve(process.cwd(), 'src/app/discover/page.tsx'), 'utf8')
 
-    expect(auroraBlock).toContain('overflow: clip;')
+    expect(page).toContain('section-surface aurora-shell overflow-hidden')
   })
 })
