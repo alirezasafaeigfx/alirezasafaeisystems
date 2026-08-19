@@ -87,6 +87,7 @@ model DiscoverItem {
   tags         String
   imageUrl     String?
   instagramUrl String?
+  telegramGuideUrl String?
   featured     Boolean   @default(false)
   published    Boolean   @default(false)
   order        Int       @default(0)

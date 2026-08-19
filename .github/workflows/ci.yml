@@ -58,32 +58,38 @@ jobs:
       - name: Unit and integration tests
         run: pnpm run test
 
-      - name: Production build
-        run: pnpm run build
-
       - name: Enterprise gate
         run: pnpm run enterprise:gate
+
+      - name: Setup browser database and deterministic Discover fixture
+        env:
+          DATABASE_URL: "file:${{ github.workspace }}/test-results/playwright.db"
+        run: |
+          mkdir -p test-results
+          pnpm run db:push
+          node scripts/test/seed-playwright-discover.mjs
+
+      - name: Production build
+        env:
+          DATABASE_URL: "file:${{ github.workspace }}/test-results/playwright.db"
+          ASDEV_BUILD_SKIP_DYNAMIC_DB: "1"
+        run: pnpm run build
 
       - name: Install Playwright Chromium
         env:
           PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/ms-playwright
         run: pnpm exec playwright install chromium
 
-      - name: Setup database
-        env:
-          DATABASE_URL: "file:${{ github.workspace }}/prisma/dev.db"
-        run: pnpm run db:push
-
       - name: Browser smoke
         env:
           CI: "true"
-          DATABASE_URL: "file:${{ github.workspace }}/prisma/dev.db"
+          DATABASE_URL: "file:${{ github.workspace }}/test-results/playwright.db"
           PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/ms-playwright
           PLAYWRIGHT_DISABLE_WEBSERVER: "true"
         run: |
           fuser -k 3100/tcp 2>/dev/null || true
           sleep 2
-          PORT=3100 pnpm run start &
+          HOSTNAME=127.0.0.1 PORT=3100 node scripts/start-playwright-server.mjs &
           npx wait-on http://127.0.0.1:3100 --timeout 120000
           pnpm exec playwright test e2e/smoke.spec.mjs --config=playwright.config.mjs --reporter=list --workers=1 --retries=1
 

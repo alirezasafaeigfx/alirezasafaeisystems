@@ -20,6 +20,7 @@ type DiscoverItem = {
   tags: string
   imageUrl: string | null
   instagramUrl: string | null
+  telegramGuideUrl: string | null
   featured: boolean
   published: boolean
   order: number
@@ -39,6 +40,7 @@ type DiscoverForm = {
   tags: string
   imageUrl: string
   instagramUrl: string
+  telegramGuideUrl: string
   featured: boolean
   published: boolean
   order: number
@@ -54,6 +56,7 @@ const emptyForm: DiscoverForm = {
   tags: '',
   imageUrl: '',
   instagramUrl: '',
+  telegramGuideUrl: '',
   featured: false,
   published: false,
   order: 0,
@@ -71,6 +74,7 @@ function toForm(item: DiscoverItem): DiscoverForm {
     tags: item.tags,
     imageUrl: item.imageUrl || '',
     instagramUrl: item.instagramUrl || '',
+    telegramGuideUrl: item.telegramGuideUrl || '',
     featured: item.featured,
     published: item.published,
     order: item.order,
@@ -223,6 +227,22 @@ export function DiscoverManager() {
               Image HTTPS URL
               <Input type="url" placeholder="https://..." value={form.imageUrl} onChange={(event) => updateForm('imageUrl', event.target.value)} />
             </label>
+            <div className="space-y-1 md:col-span-2">
+              <label htmlFor="discover-telegram-guide-url" className="block text-sm font-medium">
+                Telegram full guide / file URL
+              </label>
+              <Input
+                id="discover-telegram-guide-url"
+                type="url"
+                placeholder="https://t.me/asdev/123"
+                value={form.telegramGuideUrl}
+                onChange={(event) => updateForm('telegramGuideUrl', event.target.value)}
+                aria-describedby="discover-telegram-guide-help"
+              />
+              <p id="discover-telegram-guide-help" className="text-xs text-muted-foreground">
+                Prefer the exact t.me message link for the tutorial or file, not the channel homepage.
+              </p>
+            </div>
             <label className="space-y-1 text-sm font-medium">
               Sort order
               <Input type="number" min={0} value={form.order} onChange={(event) => updateForm('order', Number(event.target.value))} />
