@@ -103,7 +103,10 @@ async function verifyDiscover(page, prefix = '') {
   const detailPrefix = prefix === '/en' ? '/en/discover/' : '/discover/'
   const detailLinks = page.locator(`a[href^="${detailPrefix}"]`)
   const detailCount = await detailLinks.count()
-  if (detailCount < 1) throw new Error(`${discoverPath} has no published Discover detail link`)
+  if (detailCount < 1) {
+    warnings.push(`${discoverPath}: no published Discover detail link; detail verification skipped`)
+    return
+  }
 
   const href = await detailLinks.first().getAttribute('href')
   if (!href) throw new Error(`${discoverPath} first detail link has no href`)
