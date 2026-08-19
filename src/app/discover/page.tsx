@@ -96,7 +96,7 @@ export default async function DiscoverPage({ searchParams }: DiscoverPageProps) 
       />
 
       <section className="mx-auto max-w-6xl space-y-8">
-        <header className="section-surface aurora-shell space-y-4 p-6 md:p-10">
+        <header className="section-surface aurora-shell overflow-hidden space-y-4 p-6 md:p-10">
           <p className="text-sm font-semibold text-primary">{copy.eyebrow}</p>
           <h1 className="headline-tight max-w-4xl text-3xl font-bold md:text-5xl">{copy.title}</h1>
           <p className="max-w-4xl text-base leading-8 text-muted-foreground md:text-lg">{copy.description}</p>
