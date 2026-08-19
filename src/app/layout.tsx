@@ -152,6 +152,7 @@ export default async function RootLayout({
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
+          nonce={nonce}
         >
           <I18nProvider initialLanguage={lang as 'fa' | 'en'}>
           {/* Skip to main content link for accessibility */}
