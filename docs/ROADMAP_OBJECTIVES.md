@@ -1,25 +1,27 @@
 # Roadmap & Objectives — AlirezaSafaeiSystems
 
 **Last Updated:** 2026-08-27  
-**Status:** Live / Personal Brand V3 in implementation planning  
-**Priority:** P0 — Revenue, positioning, conversion, SEO  
-**Primary Spec:** `docs/product/PERSONAL_BRAND_HOMEPAGE_V3.md`
+**Status:** Active — Personal Brand + Content Platform V3  
+**Priority:** P0/P1 — positioning, conversion, content operations, SEO, reliability  
+**Homepage Spec:** `docs/product/PERSONAL_BRAND_HOMEPAGE_V3.md`  
+**Discover Spec:** `docs/superpowers/specs/2026-08-27-discover-hub-v3-design.md`  
+**Admin Spec:** `docs/superpowers/specs/2026-08-27-admin-control-center-v3-design.md`  
+**Blog Spec:** `docs/superpowers/specs/2026-08-27-blog-insights-v1-design.md`
 
 ---
 
 ## 1. Strategic Direction
 
-AlirezaSafaeiSystems is moving from a dense multi-offer systems/agency-style homepage to a **personal-brand-first software engineering portfolio and conversion surface**.
+AlirezaSafaeiSystems is evolving from a dense multi-offer portfolio into a **personal-brand-first software engineering platform with an owned content and resource ecosystem**.
 
-The homepage must establish, in the first viewport:
+The platform has four coordinated surfaces:
 
-1. **Identity:** علیرضا صفایی / Alireza Safaei
-2. **Role:** مهندس نرم‌افزار / Software Engineer
-3. **Specialization:** Web Systems, Software Architecture & Production Reliability
-4. **Proof:** real projects and evidence-backed outcomes
-5. **Action:** Start collaboration or view projects
+1. **Homepage / Personal Brand** — establish Alireza Safaei as a Software Engineer, show proof and start collaboration.
+2. **Discover Hub** — a public, searchable, scalable resource hub for tools, apps, AI products, services and practical guides; also the primary Instagram-bio destination.
+3. **Admin Control Center** — a secure route-based internal operating surface for Leads, Messages, Projects, Discover, Blog and bounded first-party Analytics.
+4. **Blog / Insights** — a high-signal engineering publication for topical authority, education, internal linking and organic acquisition.
 
-The product is not being rebuilt from scratch. This roadmap prioritizes focused UX, IA, copy, proof, SEO architecture, accessibility, performance, and conversion improvements on top of the existing production-safe platform.
+The project is not being rebuilt from scratch. Next.js App Router, React, Prisma/SQLite, current auth/security, deployment and rollback mechanisms remain the baseline unless a verified defect requires targeted change.
 
 ---
 
@@ -27,143 +29,285 @@ The product is not being rebuilt from scratch. This roadmap prioritizes focused 
 
 ### O1 — Personal brand clarity
 
-**Goal:** A new visitor understands who Alireza is and what he does within the first viewport.
+A new visitor must understand within the first viewport:
 
-**Success criteria:**
-- real approved portrait in the hero, or only a clearly documented final asset swap remains
-- one H1: `مهندس نرم‌افزار` / `Software Engineer`
-- canonical name/title consistent across UI, metadata, schema, docs, and brand configuration
-- exactly two dominant hero actions
+- `علیرضا صفایی / Alireza Safaei`;
+- `مهندس نرم‌افزار / Software Engineer`;
+- specialization in Web Systems, Software Architecture and Production Reliability;
+- one concise value proposition;
+- exactly two dominant hero actions.
 
-### O2 — Reduce decision friction
+**Success:** identity/title are consistent across UI, metadata, Person schema, docs and brand configuration.
 
-**Goal:** Reduce homepage cognitive load and competing conversion paths.
+### O2 — Reduce homepage decision friction
 
-**Success criteria:**
-- homepage content is materially shorter, target 30–40% reduction versus current composition
-- obsolete hero intent router/page-roadmap/duplicated CTA surfaces removed from primary prominence
-- qualification becomes a second-stage funnel rather than the conceptual first step
-- core homepage IA follows the approved V3 spec
+**Success:**
 
-### O3 — Stronger proof and trust
+- materially shorter homepage, target 30–40% reduction from the previous composition;
+- no intent-router/page-roadmap competing in first viewport;
+- exactly 3 core service surfaces and maximum 3 selected projects;
+- qualification is a second-stage funnel;
+- products such as Audit/Discover/PersianToolbox support proof/ecosystem rather than competing with the personal identity.
 
-**Goal:** Move from capability claims to evidence-oriented professional credibility.
+### O3 — Evidence-oriented trust
 
-**Success criteria:**
-- maximum three strongest selected projects on homepage
-- external/live/product proof prioritized over the self-referential portfolio case study
-- no unsupported public metrics
-- measurable outcomes include source/methodology where available
-- real testimonials may be added only when attributable or NDA-approved
+**Success:**
 
-### O4 — Search intent architecture
+- strongest live/external proof prioritized;
+- no unsupported metric/testimonial/client claim;
+- measurable claims include source/methodology when available;
+- self-referential portfolio case study is not the flagship proof.
 
-**Goal:** Separate personal/entity SEO from service-demand SEO.
+### O4 — Discover as a durable public hub
 
-**Success criteria:**
-- homepage metadata centered on Alireza Safaei + Software Engineer + core specialization
-- Person schema uses canonical software-engineer role
-- service landing pages target distinct commercial intents
-- canonical/hreflang/inLanguage remain correct for FA/EN
-- internal linking forms a clear path: homepage → services → case studies → collaboration
+Transform `/discover` into a search-first Resource Hub while preserving social acquisition.
 
-### O5 — Production-quality UX
+**Success:**
 
-**Goal:** Improve presentation without regressing reliability, accessibility, or performance.
+- server-backed search/filter/pagination;
+- URL-backed state;
+- scalable resource taxonomy;
+- FA/EN publication integrity;
+- featured/latest discovery without fake popularity;
+- internal resource profile pages with official links, practical guide and related content;
+- Admin can manage all Discover content without deployment.
 
-**Success criteria:**
-- responsive parity at desktop/mobile
-- WCAG AA visual contrast and no Critical/Serious Axe issues
-- portrait introduces no measurable layout shift
-- no unnecessary heavyweight dependency added
-- Lighthouse targets remain: Performance >=95 where environment is stable, Accessibility >=95, Best Practices >=95, SEO target 100
+### O5 — Admin as a real Control Center
 
-### O6 — Measurable conversion
+Replace tab-local monolithic Admin architecture with route-based modules.
 
-**Goal:** Simplify analytics around meaningful user actions and establish a usable CRO baseline.
+**Success:**
 
-**Primary conversion:** collaboration start  
-**Secondary conversion:** selected-project engagement
+- `/admin`, `/admin/leads`, `/admin/messages`, `/admin/projects`, `/admin/discover`, `/admin/blog`, `/admin/analytics`;
+- each module loads only its own data/code;
+- server-first initial reads where practical;
+- existing session protection, no-store/noindex and secure mutation boundary preserved or strengthened;
+- old `admin-dashboard.tsx` removed only after full parity verification.
 
-Minimum event set:
-- `hero_impression`
-- `hero_primary_cta_click`
-- `hero_projects_cta_click`
-- `project_card_click`
-- `contact_cta_click`
-- `qualification_start`
-- `qualification_submit_success`
+### O6 — First-party Blog / Insights
 
----
+Build an owned engineering publication using the existing `BlogPost` domain.
 
-## 3. Execution Roadmap
+**Success:**
 
-### Phase A — Baseline & simplification — P0
+- `/blog` and locale-aware article routes;
+- safe Markdown rendering with raw HTML disabled;
+- Admin draft/publish workflow;
+- BlogPosting/Breadcrumb structured data;
+- sitemap/canonical/hreflang correctness;
+- contextual internal links to Discover, services and case studies;
+- no thin/mass AI content.
 
-- inspect current homepage composition, analytics, routes, and experiments
-- capture baseline screenshots and available performance/A11y evidence
-- identify obsolete duplicated hero paths
-- align brand source of truth with `Software Engineer`
+### O7 — Search intent architecture
 
-**Exit gate:** current behavior and rollback path are documented before UI changes.
+Separate personal/entity SEO, resource discovery SEO and service-demand SEO.
 
-### Phase B — Personal Hero — P0
+**Success:**
 
-- implement portrait-first personal identity
-- name + Software Engineer title
-- concise value proposition
-- exactly two primary CTA choices
-- remove first-viewport intent routing and competing product offers
-- preserve FA/EN and RTL/LTR parity
+- Home: Alireza Safaei + Software Engineer + core specialization;
+- service pages: distinct commercial intents;
+- Discover: resource/tool discovery intent;
+- Blog: informational/engineering intent;
+- canonical/hreflang/inLanguage are correct;
+- filtered/faceted search states do not create index bloat;
+- sitemap includes only valid canonical public pages.
 
-**Exit gate:** desktop/mobile hero passes targeted E2E and accessibility checks.
+### O8 — Production-quality UX and accessibility
 
-### Phase C — Homepage IA & Proof — P0
+Target **WCAG 2.2 AA** and preserve performance.
 
-- reduce homepage length/density by approximately 30–40%
-- exactly three core service cards
-- exactly three selected project/proof cards
-- compact engineering-principles/trust section
-- short personal/about section
-- simple contact CTA
-- reposition qualification as second stage
+**Success:**
 
-**Exit gate:** primary homepage journey can be understood without domain/product architecture knowledge.
+- representative public/Admin pages have no Critical/Serious Axe violations;
+- 375/768/1024/1440 layouts are practical;
+- keyboard/focus/reduced-motion behavior is correct;
+- fixed media dimensions avoid layout shift;
+- no unnecessary heavyweight UI/search/chart dependency;
+- public Lighthouse targets remain Performance >=95 where environment is stable, Accessibility >=95, Best Practices >=95 and SEO target 100.
 
-### Phase D — SEO & Analytics — P1
+### O9 — Measurable growth
 
-- update page title/description and Person schema
-- validate canonical/hreflang/inLanguage
-- rationalize internal linking and commercial service intents
-- remove obsolete hero experiment/intent-router events
-- update event taxonomy documentation
+Simplify analytics around useful product decisions.
 
-**Exit gate:** SEO and analytics contracts match the new IA.
+Primary outcomes:
 
-### Phase E — Service Search Surfaces — P1
+- collaboration start/completion;
+- selected project engagement;
+- Discover search/resource/external-link engagement;
+- Blog article/related-content/service-assisted engagement;
+- non-brand organic clicks and indexed canonical growth.
 
-Strengthen/create dedicated landing intent for:
-
-1. web/software system development
-2. project rescue and completion
-3. website/system stabilization
-4. technical SEO/audit where commercially relevant
-5. infrastructure/localization only if it remains a real sellable service
-
-**Exit gate:** homepage is no longer expected to rank for every service query.
-
-### Phase F — Evidence & Content Growth — P2
-
-- enrich case studies with traceable measurement methodology
-- add real testimonials when available
-- create/strengthen first-party Insights content around software/web-system expertise
-- use Search Console/analytics evidence for subsequent CRO/SEO iterations
-
-**Exit gate:** growth work is evidence-driven, not cosmetic iteration.
+No metric is treated as valid unless its collection and denominator are understood.
 
 ---
 
-## 4. Quality & Release Gates
+## 3. Architecture Baseline
+
+Current technology is already modern and remains preferred:
+
+- Next.js 16 App Router;
+- React 19;
+- TypeScript;
+- Tailwind CSS 4;
+- Prisma 6 with SQLite;
+- Zod validation;
+- Playwright + Axe + Vitest;
+- current deployment, rollback and live-verification tooling.
+
+### Engineering direction
+
+- React Server Components by default for public pages and Admin initial reads;
+- Client Components only for actual interactivity;
+- existing secure Route Handlers remain mutation boundaries during incremental migration;
+- additive database migrations;
+- no framework/database/CMS migration without demonstrated need;
+- no dependency upgrade solely to be “latest”; upgrade only when compatibility/security/value is verified.
+
+---
+
+## 4. Execution Roadmap
+
+### Phase A — Governance & baseline — P0
+
+- lock canonical brand identity;
+- merge/approve specs and implementation plans;
+- capture baseline screenshots, routes, SEO/A11y/performance and existing CRUD behavior;
+- verify database backup/rollback before schema changes;
+- audit current Admin mutation security/CSRF posture.
+
+**Exit:** rollback path and current behavior are documented before implementation.
+
+### Phase B — Personal Homepage V3 — P0
+
+Implement:
+
+- personal portrait contract;
+- Software Engineer H1;
+- two dominant CTAs;
+- reduced IA;
+- three services;
+- three selected projects;
+- simplified contact/qualification flow;
+- aligned metadata/entity analytics.
+
+**Plan source:** existing Homepage V3 spec/backlog.
+
+### Phase C — Admin Control Center foundation — P0/P1
+
+Implement route shell and independently migrate:
+
+1. Overview;
+2. Leads;
+3. Messages;
+4. Projects;
+5. Discover;
+6. Blog;
+7. Analytics.
+
+**Plan:** `docs/superpowers/plans/2026-08-27-admin-control-center-v3.md`
+
+### Phase D — Discover Hub V3 — P1
+
+Implement:
+
+- additive schema migration;
+- bilingual/taxonomy content contract;
+- secure Admin editing;
+- server query/filter/pagination;
+- landing/detail redesign;
+- SEO/sitemap/analytics/A11y integration.
+
+**Plan:** `docs/superpowers/plans/2026-08-27-discover-hub-v3.md`
+
+### Phase E — Blog / Insights V1 — P1
+
+Implement:
+
+- additive BlogPost schema;
+- safe Markdown layer;
+- secure Blog Admin CRUD;
+- public landing/article pages;
+- structured data and sitemap;
+- Discover/Home/service/case-study integration.
+
+**Plan:** `docs/superpowers/plans/2026-08-27-blog-insights-v1.md`
+
+### Phase F — Service Search Surfaces — P1
+
+Strengthen/create only real commercial-intent surfaces:
+
+1. software/web-system development;
+2. project rescue/completion;
+3. system stabilization/performance;
+4. technical SEO/audit where commercially relevant;
+5. infrastructure/localization only if it remains a sellable service.
+
+### Phase G — Evidence & Content Growth — P2
+
+- enrich case studies with traceable evidence;
+- add real testimonials only with permission/evidence;
+- publish 3–5 high-signal seed Blog articles;
+- grow Discover editorial quality;
+- use Search Console and first-party analytics for subsequent iteration.
+
+### Phase H — CRO & operational refinement — P2
+
+Only after a valid V3 baseline:
+
+- measure hero/project/contact funnel;
+- measure Discover search-to-resource-to-outbound journeys;
+- measure Blog-to-related/service/case-study journeys;
+- introduce experiments only with explicit hypothesis and success metric.
+
+---
+
+## 5. Data Evolution Policy
+
+### Discover
+
+Add optional EN fields, resource taxonomy, pricing/platform metadata, SEO overrides and `lastReviewedAt` without deleting existing fields/data.
+
+### Blog
+
+Extend existing `BlogPost` with EN content, category, featured, publish/review timestamps and SEO overrides.
+
+### Translation rule
+
+EN detail pages are indexable only when all required EN body fields are complete. Do not publish an English shell around Persian primary content.
+
+### Taxonomy rule
+
+Use application-level Zod controlled values and existing comma-separated persistence conventions initially. Do not create normalized taxonomy relation tables until actual editorial scale demonstrates the need.
+
+---
+
+## 6. Security Requirements
+
+- preserve session-protected `/admin/*` boundary;
+- keep Admin no-store/noindex;
+- every mutation remains authenticated and rate-limited;
+- validate Origin/CSRF posture centrally if a real gap is found;
+- validate media server-side, reject SVG in this scope;
+- no raw database Markdown HTML execution;
+- drafts never leak through public routes;
+- secrets, DB files and unapproved personal media never enter Git.
+
+---
+
+## 7. SEO & Content Quality Policy
+
+- use Next Metadata API and route-specific canonical/hreflang;
+- use visible-content-backed structured data only;
+- no schema spam;
+- filter/search URLs are not index targets;
+- sitemap uses content timestamps, not build time;
+- no bulk auto-generated pages/posts;
+- Blog and Discover content must satisfy real user/search intent;
+- internal links are contextual, not keyword-stuffed.
+
+---
+
+## 8. Quality & Release Gates
 
 Minimum pre-merge verification:
 
@@ -175,85 +319,107 @@ pnpm run lighthouse:ci
 pnpm run scan:secrets
 ```
 
-Also required:
-- targeted desktop/mobile homepage Playwright verification
-- no console errors in primary flow
-- visual evidence/screenshots attached to implementation report/PR where supported
-- no secret, private credential, database, archive, or unapproved personal image committed
+Additional targeted suites:
 
-### Release rules
+- Homepage V3 desktop/mobile;
+- `e2e/discover-v3.spec.ts`;
+- `e2e/admin-v3.spec.ts`;
+- `e2e/blog-v1.spec.ts`.
 
-- use established branch/PR workflow
-- do not bypass quality gates
-- do not mutate public edge/Nginx/TLS as part of this initiative unless a separate production-edge change is actually required and approved
-- use existing deployment workflow and rollback mechanism
-- production verification must include apex + www HTTPS, homepage, key inner routes, sitemap, robots, and `/api/ready`
+Rules:
 
----
-
-## 5. KPI Framework
-
-### UX / Conversion
-
-- hero primary CTA click-through rate
-- projects CTA click-through rate
-- project-card engagement
-- qualification start rate
-- qualification completion rate
-- contact CTA conversion
-
-### SEO
-
-- branded and non-branded impressions
-- non-brand clicks to service landing pages
-- average ranking for priority service intents
-- indexed canonical pages
-- CTR by landing page/query cluster
-
-### Performance / Quality
-
-- LCP / INP / CLS
-- Lighthouse scores
-- Axe violations
-- JS/client footprint of first viewport
-- deployment/live-verification pass rate
-
-### Reliability
-
-- uptime target remains >=99.95%
-- public error rate target <0.05%
-- `/api/ready` remains a release verification gate
+- timeout/not-run is never green;
+- database backup exists before production migration;
+- production changes use existing release/deploy pipeline;
+- exact SHA is recorded;
+- live verification covers apex/www plus affected routes;
+- rollback reference is recorded.
 
 ---
 
-## 6. Explicit Non-goals
+## 9. KPI Framework
+
+### Personal brand / conversion
+
+- hero primary CTA CTR;
+- project CTA/card engagement;
+- qualification start/completion;
+- contact conversion.
+
+### Discover
+
+- landing views;
+- search/filter usage;
+- item opens;
+- official/Telegram/Instagram outbound engagement;
+- organic landing clicks;
+- published/translated resource count and freshness.
+
+### Blog
+
+- valid indexed articles;
+- organic impressions/clicks;
+- article views;
+- related-content navigation;
+- assisted service/case-study clicks;
+- last-reviewed coverage.
+
+### Admin
+
+- module load correctness;
+- CRUD success/error rates from logs where available;
+- no unauthorized access regression;
+- no unnecessary cross-module fetches.
+
+### Quality
+
+- LCP/INP/CLS;
+- Lighthouse;
+- Axe violations;
+- JS/client footprint;
+- deployment/live-verification pass rate.
+
+---
+
+## 10. Explicit Non-goals
 
 This roadmap does not authorize:
 
-- a framework migration
-- a database rewrite
-- a new CMS
-- a full visual identity replacement
-- fabricated testimonials, metrics, clients, credentials, or portrait imagery
-- bypassing the existing deployment/release controls
+- framework migration;
+- database engine rewrite;
+- external/headless CMS;
+- generic page builder;
+- search SaaS at current scale;
+- comments/user ratings;
+- multi-user Admin RBAC;
+- mass AI publishing;
+- fake popularity metrics;
+- fabricated testimonials/metrics/clients/credentials/portrait imagery.
 
 ---
 
-## 7. Immediate Priority Order
+## 11. Immediate Priority Order
 
-1. Canonical identity and source-of-truth cleanup
-2. Personal hero + portrait contract + two CTAs
-3. Homepage IA reduction and selected work
-4. Contact/qualification simplification
-5. SEO metadata/schema/internal-link alignment
-6. Analytics event cleanup
-7. Accessibility/performance verification
-8. Dedicated service intent pages
-9. Evidence/testimonial enrichment
-10. Insights/content moat and CRO iteration
+1. Homepage canonical identity + Hero V3.
+2. Admin route shell/foundation.
+3. Discover additive data/validation/API migration.
+4. Discover public Hub V3.
+5. Blog additive data + safe Markdown/API.
+6. Blog public/Admin V1.
+7. Admin legacy-monolith retirement after parity.
+8. SEO/sitemap/analytics integration across all surfaces.
+9. Full A11y/performance/security/release verification.
+10. Service SEO, evidence enrichment, seed content and CRO.
 
 ---
 
-## 8. Definition of Strategic Success
+## 12. Definition of Strategic Success
 
-The redesign is successful when the site stops feeling like a collection of technical capabilities and starts functioning as a clear, credible, search-friendly personal portfolio for a software engineer: **identity first, proof second, action third, technical depth available when the visitor asks for it.**
+V3 is strategically successful when the site functions as one coherent system:
+
+- **identity first** on Home;
+- **proof and services** for commercial trust;
+- **Discover** for resource acquisition and owned utility;
+- **Blog** for deep expertise and organic authority;
+- **Admin** as a maintainable control plane for zero-deploy content operations;
+- all of it production-safe, measurable, accessible and search-correct.
