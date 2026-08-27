@@ -83,6 +83,64 @@ describe('DiscoverManager', () => {
     expect(fetchMock).toHaveBeenCalledWith('/api/admin/discover?published=all', { cache: 'no-store' })
   })
 
+  it('uploads a selected image, fills the URL, previews it, and blocks save while uploading', async () => {
+    let resolveUpload: ((response: Response) => void) | undefined
+    const uploadResponse = new Promise<Response>((resolve) => { resolveUpload = resolve })
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(jsonResponse({ items: [] }))
+      .mockReturnValueOnce(uploadResponse)
+    vi.stubGlobal('fetch', fetchMock)
+
+    render(<DiscoverManager />)
+    await screen.findByText('0 item(s)')
+
+    const file = new File(['jpeg bytes'], 'ignored-name.jpg', { type: 'image/jpeg' })
+    fireEvent.change(screen.getByLabelText('Upload image'), { target: { files: [file] } })
+
+    expect(await screen.findByText('در حال آپلود...')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Save Discover item/i })).toBeDisabled()
+
+    resolveUpload?.(jsonResponse({ url: '/media/discover/generated.webp' }, 201))
+    await waitFor(() => expect(screen.getByLabelText('Image URL')).toHaveValue('/media/discover/generated.webp'))
+    expect(screen.getByRole('img', { name: 'Discover image preview' })).toHaveAttribute('src', '/media/discover/generated.webp')
+    expect(fetchMock.mock.calls[1]?.[0]).toBe('/api/admin/discover/upload')
+    const request = fetchMock.mock.calls[1]?.[1] as RequestInit
+    expect(request.method).toBe('POST')
+    expect(request.body).toBeInstanceOf(FormData)
+    expect((request.body as FormData).get('file')).toBe(file)
+  })
+
+  it('saves an internally hosted uploaded image URL without native URL validation blocking the form', async () => {
+    const saved = { ...draftItem, id: 'discover-item-uploaded', imageUrl: '/media/discover/generated.webp' }
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(jsonResponse({ items: [] }))
+      .mockResolvedValueOnce(jsonResponse({ url: '/media/discover/generated.webp' }, 201))
+      .mockResolvedValueOnce(jsonResponse({ item: saved }, 201))
+    vi.stubGlobal('fetch', fetchMock)
+
+    render(<DiscoverManager />)
+    await screen.findByText('0 item(s)')
+
+    fireEvent.change(screen.getByLabelText('Title'), { target: { value: 'Uploaded Tool' } })
+    fireEvent.change(screen.getByLabelText('Slug'), { target: { value: 'uploaded-tool' } })
+    fireEvent.change(screen.getByLabelText('Category'), { target: { value: 'Productivity' } })
+    fireEvent.change(screen.getByLabelText('Short description'), { target: { value: 'Uploaded image test' } })
+    fireEvent.change(screen.getByLabelText('Short practical guide'), { target: { value: 'Uploaded image guide' } })
+    fireEvent.change(screen.getByLabelText('Official HTTPS URL'), { target: { value: 'https://example.com/uploaded-tool' } })
+
+    const file = new File(['jpeg bytes'], 'uploaded.jpg', { type: 'image/jpeg' })
+    fireEvent.change(screen.getByLabelText('Upload image'), { target: { files: [file] } })
+    await waitFor(() => expect(screen.getByLabelText('Image URL')).toHaveValue('/media/discover/generated.webp'))
+
+    fireEvent.click(screen.getByRole('button', { name: /Save Discover item/i }))
+
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(3))
+    expect(fetchMock.mock.calls[2]?.[0]).toBe('/api/admin/discover')
+    expect(JSON.parse(String((fetchMock.mock.calls[2]?.[1] as RequestInit).body))).toMatchObject({
+      imageUrl: '/media/discover/generated.webp',
+    })
+  })
+
   it('creates a Discover item as JSON through the dedicated admin endpoint', async () => {
     const saved = {
       ...draftItem,

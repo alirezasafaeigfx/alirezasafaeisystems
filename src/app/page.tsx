@@ -11,11 +11,11 @@ export async function generateMetadata(): Promise<Metadata> {
   const lang = await getRequestLanguage()
   return {
     title: lang === 'fa'
-      ? `${brand.ownerName} | مهندس سیستم‌های وب - بومی‌سازی زیرساخت و تاب‌آوری عملیاتی`
+      ? `${brand.ownerName} | ساخت و پایدارسازی سایت و محصول دیجیتال`
       : `${brand.ownerName} | Web Systems Engineer - Infrastructure Localization & Operational Resilience`,
     description:
       lang === 'fa'
-        ? `${brand.ownerName}، مهندس سیستم‌های وب. بومی‌سازی زیرساخت، پایداری عملیاتی، سخت‌سازی CI/CD و حکمرانی انتشار. از معماری تا تحویل آماده تولید.`
+        ? `${brand.ownerName} به کسب‌وکارها کمک می‌کند سایت و محصول دیجیتال خود را سریع‌تر، امن‌تر و آماده رشد کنند؛ از ارزیابی فنی و رفع ایراد تا معماری و تحویل آماده تولید.`
         : `${brand.ownerName}, Web Systems Engineer. Infrastructure localization, operational resilience, CI/CD hardening, and release governance. From architecture to production-ready delivery.`,
     keywords: lang === 'fa'
       ? ['مهندس سیستم وب', 'بومی‌سازی زیرساخت', 'پایداری عملیاتی', 'CI/CD', 'معماری نرم‌افزار', 'تاب‌آوری']

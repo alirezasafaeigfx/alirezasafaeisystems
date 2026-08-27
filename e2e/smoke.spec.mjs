@@ -27,6 +27,23 @@ test.describe('smoke', () => {
     await expect(page.locator('section#contact')).toBeVisible()
   })
 
+  test('home page explains its value to business and technical audiences on mobile', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 })
+    const pageErrors = []
+    const failedRequests = []
+    page.on('pageerror', (error) => pageErrors.push(error.message))
+    page.on('requestfailed', (request) => failedRequests.push(request.url()))
+
+    await page.goto('/')
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('سایت و محصول دیجیتال شما')
+    await expect(page.getByRole('heading', { name: 'برای صاحب سایت و کسب‌وکار' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'برای کارفرما و سرمایه‌گذار' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'برای تیم فنی' })).toBeVisible()
+    await expect(page.getByRole('button', { name: /درخواست ارزیابی رایگان/ })).toBeVisible()
+    expect(pageErrors).toEqual([])
+    expect(failedRequests).toEqual([])
+  })
+
   test('language switch sets english direction', async ({ page }) => {
     await page.goto('/en/services')
     await expect.poll(async () => page.evaluate(() => document.documentElement.dir)).toBe('ltr')

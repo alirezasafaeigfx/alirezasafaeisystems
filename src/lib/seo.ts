@@ -119,6 +119,29 @@ export function generateWebSiteSchema(locale?: 'fa-IR' | 'en-US') {
   }
 }
 
+export function generateServiceSchema(locale: 'fa-IR' | 'en-US') {
+  const siteUrl = getSiteUrl()
+  const isPersian = locale === 'fa-IR'
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: isPersian ? 'ارزیابی فنی و بهبود سایت و محصول دیجیتال' : 'Website Assessment and Digital Product Improvement',
+    description: isPersian
+      ? 'ارزیابی عملکرد، سئو فنی، امنیت، معماری و کیفیت تحویل با یافته‌های اولویت‌بندی‌شده و مسیر اصلاح قابل اجرا.'
+      : 'Assessment of performance, technical SEO, security, architecture, and delivery quality with prioritized findings and an actionable improvement path.',
+    provider: {
+      '@type': 'Organization',
+      name: brand.brandName,
+      url: siteUrl,
+    },
+    areaServed: 'IR',
+    serviceType: 'Website audit and digital product engineering',
+    inLanguage: locale,
+    url: `${siteUrl}/audit-readiness`,
+  }
+}
+
 export function generateArticleSchema({
   title,
   description,

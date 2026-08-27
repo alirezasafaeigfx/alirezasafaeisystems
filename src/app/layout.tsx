@@ -10,7 +10,7 @@ import { I18nProvider } from "@/lib/i18n-context";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { FontCdnLoader } from "@/components/layout/font-cdn-loader";
 import { WebVitals } from "@/components/analytics/web-vitals";
-import { generatePersonSchema, generateWebSiteSchema, generateBreadcrumbSchema, generateOrganizationSchema } from "@/lib/seo";
+import { generatePersonSchema, generateWebSiteSchema, generateBreadcrumbSchema, generateOrganizationSchema, generateServiceSchema } from "@/lib/seo";
 import { getSiteUrl } from "@/lib/site-config";
 import { brand } from "@/lib/brand";
 import { env } from "@/lib/env";
@@ -181,33 +181,10 @@ export default async function RootLayout({
                   name: 'PersianToolbox',
                   url: 'https://persiantoolbox.ir/',
                 },
-                {
-                  '@type': 'Service',
-                  name: lang === 'fa' ? 'برنامه بومی‌سازی زیرساخت و تاب‌آوری عملیاتی' : 'Infrastructure Localization & Operational Resilience',
-                  provider: {
-                    '@type': 'Person',
-                    name: ownerName,
-                    url: siteUrl,
-                  },
-                  areaServed: 'IR',
-                  serviceType: 'Infrastructure risk audit, architecture hardening, governance and DR planning',
-                  offers: {
-                    '@type': 'Offer',
-                    priceCurrency: 'IRR',
-                    priceSpecification: {
-                      '@type': 'PriceSpecification',
-                      minPrice: 60000000,
-                      maxPrice: 120000000,
-                      priceCurrency: 'IRR',
-                    },
-                  },
-                },
-                ...generateBreadcrumbSchema([
+                generateServiceSchema(lang === 'fa' ? 'fa-IR' : 'en-US'),
+                generateBreadcrumbSchema([
                   { name: lang === 'fa' ? 'خانه' : 'Home', url: siteUrl },
-                ]).itemListElement.map((item) => ({
-                  ...item,
-                  '@context': 'https://schema.org',
-                })),
+                ]),
               ],
             }}
             nonce={nonce}

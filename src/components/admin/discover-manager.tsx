@@ -87,6 +87,8 @@ export function DiscoverManager() {
   const [query, setQuery] = useState('')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const [uploadError, setUploadError] = useState('')
   const [error, setError] = useState('')
 
   const loadItems = useCallback(async () => {
@@ -128,7 +130,25 @@ export function DiscoverManager() {
 
   function startEdit(item: DiscoverItem) {
     setForm(toForm(item))
+    setUploadError('')
     window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  async function uploadImage(file: File) {
+    setUploading(true)
+    setUploadError('')
+    try {
+      const body = new FormData()
+      body.set('file', file)
+      const response = await fetch('/api/admin/discover/upload', { method: 'POST', body })
+      const data = await response.json() as { url?: string }
+      if (!response.ok || !data.url) throw new Error('upload failed')
+      updateForm('imageUrl', data.url)
+    } catch {
+      setUploadError('آپلود تصویر انجام نشد. دوباره تلاش کنید.')
+    } finally {
+      setUploading(false)
+    }
   }
 
   async function saveItem(event: FormEvent<HTMLFormElement>) {
@@ -223,10 +243,29 @@ export function DiscoverManager() {
               Instagram post/reel URL
               <Input type="url" placeholder="https://www.instagram.com/reel/..." value={form.instagramUrl} onChange={(event) => updateForm('instagramUrl', event.target.value)} />
             </label>
-            <label className="space-y-1 text-sm font-medium">
-              Image HTTPS URL
-              <Input type="url" placeholder="https://..." value={form.imageUrl} onChange={(event) => updateForm('imageUrl', event.target.value)} />
-            </label>
+            <div className="space-y-2 text-sm font-medium">
+              <label htmlFor="discover-image-url">Image URL</label>
+              <Input id="discover-image-url" type="text" inputMode="url" placeholder="https://... or /media/discover/..." value={form.imageUrl} onChange={(event) => updateForm('imageUrl', event.target.value)} />
+              <label htmlFor="discover-image-upload" className="block">آپلود تصویر</label>
+              <Input
+                id="discover-image-upload"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                aria-label="Upload image"
+                disabled={uploading}
+                onChange={(event) => {
+                  const file = event.target.files?.[0]
+                  if (file) void uploadImage(file)
+                  event.target.value = ''
+                }}
+              />
+              {uploading ? <p role="status" className="text-xs text-muted-foreground">در حال آپلود...</p> : null}
+              {uploadError ? <p role="alert" className="text-xs text-destructive">{uploadError}</p> : null}
+              {form.imageUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={form.imageUrl} alt="Discover image preview" className="h-20 w-32 rounded-md border object-cover" />
+              ) : null}
+            </div>
             <div className="space-y-1 md:col-span-2">
               <label htmlFor="discover-telegram-guide-url" className="block text-sm font-medium">
                 Telegram full guide / file URL
@@ -258,7 +297,7 @@ export function DiscoverManager() {
               </label>
             </div>
             <div className="flex flex-wrap gap-2 md:col-span-2">
-              <Button type="submit" disabled={saving}>
+              <Button type="submit" disabled={saving || uploading}>
                 <Save className="me-2 h-4 w-4" />
                 {saving ? 'Saving…' : 'Save Discover item'}
               </Button>

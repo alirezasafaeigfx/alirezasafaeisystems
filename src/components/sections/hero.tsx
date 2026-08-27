@@ -9,6 +9,7 @@ import { ArrowRight, Github, Linkedin, Twitter, Instagram, Send, ShieldCheck, Wr
 import { useRouter } from 'next/navigation'
 import { trackEvent } from '@/lib/analytics/client'
 import { pickDeterministicBucket, pickHeroVariant, type HeroVariant } from '@/lib/analytics/experiments'
+import { getHomeContent } from '@/lib/home-content'
 
 type IntentRoute = {
   key: 'audit' | 'toolbox' | 'execution'
@@ -21,6 +22,7 @@ type IntentRoute = {
 
 export function Hero() {
   const { t, language } = useI18n()
+  const homeContent = useMemo(() => getHomeContent(language), [language])
   const router = useRouter()
   const variant = useSyncExternalStore(
     () => () => undefined,
@@ -56,40 +58,7 @@ export function Hero() {
     { href: brand.twitterUrl, icon: Twitter, label: 'X' },
   ].filter((item) => Boolean(item.href))
 
-  const variantCopy = useMemo(() => {
-    if (language === 'en') {
-      if (variant === 'risk') {
-        return {
-          title: 'Stabilize your web system before the next incident',
-          description:
-            'I review architecture, release flow, and production dependencies to reduce operational risk and improve delivery confidence.',
-          primaryCta: 'Request Audit Assessment',
-        }
-      }
-      return {
-        title: 'Alireza Safaei | Web Systems Engineer',
-        description:
-          'From system design to production delivery. I help teams build stable, independent, and measurable web systems.',
-        primaryCta: 'Request Audit Assessment',
-      }
-    }
-
-    if (variant === 'risk') {
-      return {
-        title: 'قبل از بحران بعدی، سیستم وب را پایدار کنید',
-        description:
-          'معماری، جریان انتشار و وابستگی های تولید را بازبینی می کنم تا ریسک عملیاتی کاهش پیدا کند و تحویل قابل اتکا بماند.',
-        primaryCta: 'درخواست ارزیابی Audit',
-      }
-    }
-
-    return {
-      title: 'علیرضا صفایی | مهندس سیستم های وب',
-      description:
-        'بررسی فنی سایت + رفع مهم‌ترین ایرادهایی که روی اعتماد، سرعت، لید یا لانچ اثر می‌گذارند — در اسپرینت ثابت و کوتاه. از معماری و بومی‌سازی زیرساخت تا تحویل آماده تولید با شواهد قبل/بعد و گیت‌های کیفیت واقعی.',
-      primaryCta: 'درخواست ارزیابی Audit',
-    }
-  }, [language, variant])
+  const variantCopy = homeContent.hero
 
   const capabilities =
     language === 'en'
@@ -222,7 +191,7 @@ export function Hero() {
             <p className="max-w-3xl text-sm text-muted-foreground/80 text-copy italic">
               {language === 'en'
                 ? 'I build web systems that stay stable during crises, outages, sanctions, and user growth spikes.'
-                : 'سایت و نرم‌افزار شما را طوری پایدار، امن و آماده رشد می‌کنم که در بحران، قطعی، تحریم یا افزایش کاربر از کار نیفتد.'}
+                : 'از زبان ساده برای تصمیم‌گیری شروع می‌کنیم و با معماری، تست و شواهد فنی به تحویل حرفه‌ای می‌رسیم؛ تا سایت شما در رشد، قطعی و تغییرات بازار قابل اتکا بماند.'}
             </p>
           </div>
 
@@ -253,6 +222,23 @@ export function Hero() {
             ))}
           </div>
 
+          <div aria-labelledby="audience-title" className="rounded-2xl border border-primary/20 bg-primary/[0.04] p-5 md:p-6">
+            <h2 id="audience-title" className="text-xl font-bold md:text-2xl">
+              {homeContent.audienceTitle}
+            </h2>
+            <div className="mt-4 grid gap-3 md:grid-cols-3">
+              {homeContent.audiences.map((audience, index) => (
+                <article key={audience.key} className="rounded-xl border border-border/70 bg-background/85 p-4 shadow-sm">
+                  <div className="mb-3 inline-flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-sm font-bold text-primary">
+                    {index + 1}
+                  </div>
+                  <h3 className="font-semibold">{audience.title}</h3>
+                  <p className="mt-2 text-base leading-7 text-muted-foreground">{audience.description}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+
           <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 text-sm text-muted-foreground text-copy">
             {language === 'en'
               ? 'Focused on infrastructure localization, production reliability, and practical resilience against external sanctions constraints.'
@@ -270,7 +256,7 @@ export function Hero() {
           {/* User Path Cards */}
           <div className="rounded-xl border border-border/70 bg-card/60 p-4 md:p-5 space-y-3">
             <p className="text-sm font-semibold">
-              {language === 'en' ? 'What do you need?' : 'دقیقاً چه کمکی نیاز دارید؟'}
+              {language === 'en' ? 'Choose the shortest path to your goal' : 'کوتاه‌ترین مسیر مناسب شما'}
             </p>
             <div className="grid gap-3 md:grid-cols-3">
               <article className="rounded-lg border border-border/60 bg-background/75 p-4 text-sm">

@@ -50,7 +50,11 @@ export const discoverUrlSchema = z
   .refine(isSafeHttpsUrl, 'A credential-free HTTPS URL is required')
 
 export const optionalDiscoverUrlSchema = z
-  .union([z.literal(''), discoverUrlSchema])
+  .union([
+    z.literal(''),
+    discoverUrlSchema,
+    z.string().regex(/^\/media\/discover\/[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\.webp$/i, 'Discover media URL is invalid'),
+  ])
   .optional()
   .transform((value) => (value === '' ? null : value))
 

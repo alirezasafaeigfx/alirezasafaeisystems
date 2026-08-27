@@ -34,6 +34,17 @@ describe('Discover content contracts', () => {
     expect(discoverUrlSchema.safeParse('https://user:password@example.com/tool').success).toBe(false)
   })
 
+  it('accepts the internal Discover media URL returned by the upload API', () => {
+    expect(discoverUpdateSchema.parse({
+      id: 'discover_12345',
+      imageUrl: '/media/discover/123e4567-e89b-42d3-a456-426614174000.webp',
+    }).imageUrl).toBe('/media/discover/123e4567-e89b-42d3-a456-426614174000.webp')
+    expect(discoverUpdateSchema.safeParse({
+      id: 'discover_12345',
+      imageUrl: '/uploads/unsafe.webp',
+    }).success).toBe(false)
+  })
+
   it('accepts only Instagram HTTPS URLs for the optional source post', () => {
     expect(discoverInstagramUrlSchema.parse('https://www.instagram.com/reel/abc/')).toBe(
       'https://www.instagram.com/reel/abc/'

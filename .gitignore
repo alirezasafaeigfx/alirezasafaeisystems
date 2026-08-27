@@ -90,3 +90,13 @@ reports/postgres-audit/
 .state/asdev-agent-loop/
 worktrees/
 .state/
+
+# Local release archives and inspection workspaces
+*.tar.gz
+*.zip
+.backups/
+.consolidated/
+.deploy-staging/
+.production-inspect/
+live-verification-artifacts/
+.superpowers/
