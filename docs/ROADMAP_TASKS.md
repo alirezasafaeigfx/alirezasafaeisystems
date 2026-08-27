@@ -1,179 +1,243 @@
 # نقشه راه و تسک‌بندی اولویت‌بندی‌شده
 
-**تاریخ به‌روزرسانی:** 2026-08-15
-**منبع:** ترکیب `docs/IMMEDIATE_EXECUTION_MAP_2026-02-20.md` + `docs/ENTERPRISE_EXECUTION_BACKLOG.md` + `docs/runtime/EXECUTION_NOW.md`
+**تاریخ به‌روزرسانی:** 2026-08-27  
+**وضعیت:** Active — Personal Brand Homepage V3  
+**Spec مرجع:** `docs/product/PERSONAL_BRAND_HOMEPAGE_V3.md`  
+**اهداف مرجع:** `docs/ROADMAP_OBJECTIVES.md`
 
-## اصول اولویت‌بندی
-- **P0**: خط تولید و عملکرد اولیه سایت / ریسک بالا
-- **P1**: تاثیر مستقیم روی SEO/مسیریابی/تحلیل و پایداری محصول
-- **P2**: بهبود مداوم کیفیت مهندسی و رشد تبدیل
-- هر تسک یک مالک، خروجی قابل‌اعتبارسازی، و معیار پذیرش دارد.
+> این فایل از این تاریخ backlog فعال پروژه را نشان می‌دهد. جزئیات تسک‌های تکمیل‌شده قبلی در تاریخچه Git محفوظ است و نباید دوباره به‌عنوان اولویت فعال اجرا شود.
 
-## Backlog فعال (اولویت بالا)
+## اصول اجرا
 
-### P1 — Discover داخل سایت شخصی
-- [ ] `P1-DISCOVER-1` **ادغام Portfolio-native Discover**
-  مالک: `FE + Backend + QA`
-  شرح: افزودن `/discover` و `/en/discover` با layout فعلی، تکمیل CRUD تب Projects در Admin، و استفاده از همان Prisma Project با تفکیک `contentType` و `published`.
-  خروجی: `docs/superpowers/specs/2026-08-15-discover-portfolio-integration-design.md`، plan، runbook، route، API، migration و تست‌ها.
-  پذیرش: چرخهٔ local create/edit/publish/public/reorder/unpublish/delete بدون deploy موفق باشد؛ `pnpm lint`, `pnpm type-check`, `pnpm test`, `pnpm build` سبز باشند.
+- **P0:** تغییرات ضروری برای positioning، UX و conversion صفحه اصلی.
+- **P1:** SEO، analytics، service IA، accessibility و performance مرتبط با V3.
+- **P2:** رشد مبتنی بر داده، proof enrichment و content moat.
+- هر تسک باید evidence، acceptance criteria و نتیجه تست داشته باشد.
+- هیچ metric، testimonial، client claim یا portrait جعلی ساخته نشود.
+- production فقط از مسیر release/deploy موجود پروژه تغییر کند.
 
-### P0 — فوری (72 تا 120 ساعت آینده)
-- [ ] `P0-1` **ثبات دسترسی VPS و Edge-Origin**  
-  مالک: `DevOps`  
-  شرح: رفع timeoutهای دستیابی خارجی و تثبیت مسیر edge→origin (فایروال/نگه‌داری IP allowlist + تست‌های چندمکانی).  
-  خروجی: گزارش جدید در `docs/runtime/VPS_ACCESS_CHECK_*.md`.  
-  پذیرش: `https://alirezasafaeisystems.ir/` و `/api/ready` پایدار `200`.
+---
 
-- [x] `P0-2` **مهاجرت ناوبری به مسیر واقعی (Route-first)** ✅  
-  مالک: `FE`  
-  شرح: اصلاح `src/components/layout/header.tsx` برای لینک‌های واقعی صفحه‌ها.  
-  خروجی: فایل‌های تغییر یافته و Evidence route-refresh سالم.  
-  پذیرش: هر لینک منو روی Refresh پاسخ می‌دهد و مسیر ثابت می‌ماند.  
-  **تاریخ اتمام:** 2026-06-15 — هدر از مسیرهای واقعی `/services`, `/case-studies`, `/qualification` استفاده می‌کند.
+# P0 — Personal Brand & Homepage Conversion
 
-- [x] `P0-3` **بازنویسی Hero و پیام برند سازمانی** ✅  
-  مالک: `FE + Product`  
-  شرح: حذف آمار غیرمستند، افزودن پیام outcome-driven و proof chips.  
-  خروجی: به‌روزرسانی `src/components/sections/hero.tsx` و ترجمه‌ها.  
-  پذیرش: پیام ۳ ثانیه اول صفحه، authority + local stability + trust را منتقل کند.  
-  **تاریخ اتمام:** 2026-06-15 — Hero شامل intent router، capabilities و collaboration flow است.
+## [ ] `P0-PBH-1` — Canonical identity alignment
 
-- [x] `P0-4` **هم‌راستاسازی بخش تماس و microcopy اعتماد** ✅  
-  مالک: `FE`  
-  شرح: حذف `Remote / Global`، جایگزینی با `تهران / ریموت (سراسر ایران)` و افزودن microcopyهای اعتماد.  
-  خروجی: `src/components/sections/contact.tsx`.  
-  پذیرش: متن `Remote / Global` حذف شده و microcopyها روی صفحه قابل مشاهده باشند.  
-  **تاریخ اتمام:** 2026-06-15 — microcopy NDA/SLA اضافه شد.
+**مالک:** Product + FE + SEO  
+**وابستگی:** ندارد  
+**شرح:** تمام source-of-truthهای مرتبط را با هویت جدید همسو کن: «علیرضا صفایی / Alireza Safaei — مهندس نرم‌افزار / Software Engineer». عنوان قدیمی `Web Systems Engineer` فقط به‌عنوان specialization قابل استفاده است، نه primary public title.
 
-- [x] `P0-5` **اصلاح فوری Sitemap** ✅  
-  مالک: `FE`  
-  شرح: جایگزینی `lastModified=now` با تاریخ واقعی به‌روزرسانی مسیرها.  
-  خروجی: `src/app/sitemap.ts` و تایید تست ساختار sitemap.  
-  پذیرش: `pnpm run test`/`build` بدون regression در sitemap.  
-  **تاریخ اتمام:** 2026-06-15 — Sitemap از `sitemap-manifest.json` با تاریخ واقعی git استفاده می‌کند.
+**خروجی:**
+- brand config/code
+- metadata/schema copy
+- UI strings
+- repo/docs references مرتبط
+- audit mismatch report
 
-### P1 — کوتاه‌مدت (هفته اول تا دوم)
-- [x] `P1-1` **مهاجرت مسیریابی locale-centered (`/fa`)** ✅  
-  مالک: `FE`  
-  شرح: پیاده‌سازی `src/proxy.ts` (middleware) و مسیریابی locale-aware.  
-  خروجی: routeهای locale-first در production-safe.  
-  پذیرش: canonical/hreflang قابل تولید براساس locale باشد.  
-  **تاریخ اتمام:** 2026-06-15 — proxy.ts شامل language detection، admin protection، security headers.
+**پذیرش:** نام و primary title در hero، metadata، Person JSON-LD، FA/EN و brand source of truth یکسان باشند؛ لینک repo قدیمی باقی نماند.
 
-- [x] `P1-2` **بازطراحی Metadata و canonical per-locale** ✅  
-  مالک: `FE + SEO`  
-  شرح: تنظیم `generateMetadata` پویا در تمام صفحات و مدیریت self-reference/alternate.  
-  خروجی: بهبود schema متا برای فارسی و انگلیسی.  
-  پذیرش: canonical، `fa-IR` و `en-US` در مسیرهای مرتبط صحیح.  
-  **تاریخ اتمام:** 2026-06-15 — تمام ۱۲ صفحه متادیتای پویا و دوزبانه دارند.
+---
 
-- [x] `P1-3` **اصلاح inLanguage در Schema** ✅  
-  مالک: `FE`  
-  شرح: پارامتری‌سازی `inLanguage` در `src/lib/seo.ts`.  
-  خروجی: `src/lib/seo.ts` و تست اعتبار خروجی JSON-LD.  
-  پذیرش: محتوای فارسی به‌درستی با `fa-IR` خروجی شود.  
-  **تاریخ اتمام:** 2026-06-15 — `inLanguage` پویا در Person, WebSite, Organization schemas.
+## [ ] `P0-PBH-2` — Personal hero + portrait contract
 
-- [x] `P1-4` **به‌روزرسانی مسیرهای LHCI مطابق مسیر نهایی** ✅  
-  مالک: `FE`  
-  شرح: هم‌سو سازی `lighthouserc.json` با مسیرهای جدید و اصلی سایت.  
-  خروجی: تنظیمات بهینه‌شده Lighthouse budget/route set.  
-  پذیرش: اجرای `pnpm run lighthouse:ci` بدون false-fail مرتبط با مسیر.  
-  **تاریخ اتمام:** 2026-06-15 — مسیرهای qualification و about-brand اضافه شد، آستانه‌ها افزایش یافت.
+**مالک:** FE + Product + QA  
+**وابستگی:** `P0-PBH-1`  
+**شرح:** Hero فعلی متراکم را به personal-brand hero تبدیل کن: portrait واقعی مالک، نام، H1 «مهندس نرم‌افزار»، value proposition کوتاه و فقط دو CTA اصلی.
 
-### P2 — میانه‌مدت (هفته دوم تا چهارم)
-- [x] `P2-1` **حاکمیت Design Token** ✅
-  مالک: `FE Lead`
-  شرح: Freeze tokenها برای رنگ/typography/spacing/radius/elevation و رفع hard-codeهای UI.
-  خروجی: `docs/DESIGN_TOKEN_REGISTRY.md` + به‌روزرسانی `src/app/globals.css` و کامپوننت‌ها.
-  پذیرش: رفرنس‌گذاری استاندارد در قالب tokenهای رسمی.
-  **تاریخ اتمام:** 2026-06-16 — audit کامل انجام شد، 0 hard-coded color در کامپوننت‌ها.
+**CTAها:**
+1. `شروع همکاری` → collaboration/qualification canonical route
+2. `مشاهده پروژه‌ها` → `/case-studies`
 
-- [x] `P2-2` **افزودن A11y gate به Playwright** ✅  
-  مالک: `QA + FE`  
-  شرح: افزودن تست‌های accessibility برای مسیرهای اصلی با Axe.  
-  خروجی: `e2e/a11y.spec.ts` و اسکریپت اجرا در CI.  
-  پذیرش: عدم وجود critical violations در صفحه اصلی و Qualification.  
-  **تاریخ اتمام:** 2026-06-15 — ۹ صفحه تست می‌شوند، شامل heading hierarchy، skip-link، lang/dir attrs، form labels.
+**محدودیت:** اگر portrait واقعی تاییدشده در repo/ورودی موجود نیست، layout را با placeholder خنثی کامل کن و فقط asset swap را باز بگذار؛ چهره AI تولید نکن.
 
-- [x] `P2-3` **فرم دو مرحله‌ای Qualification** ✅  
-  مالک: `FE + Product`  
-  شرح: دو مرحله‌ای‌سازی فرم با ذخیره‌ی پیش‌نویس.  
-  خروجی: فرم step1/step2 و رفتار بازگشت‌پذیر در خطای submit.  
-  پذیرش: بهبود completion نسبت به baseline فعلی + تست e2e مسیر فرم.  
-  **تاریخ اتمام:** 2026-06-15 — فرم شامل ۲ مرحله، draft saving با localStorage، progress bar ARIA.
+**خروجی:** hero responsive برای FA/EN + تست targeted desktop/mobile.
 
-## تسک‌های راهبردی باز از بک‌لاگ (P1/P2)
-- [x] `STRAT-1` Freeze نقش/هدف هر دامنه + KPI اصلی + ۳ KPI پشتیبان. ✅
-- [x] `STRAT-2` تعریف taxonomy مشترک eventها (`source`, `stage`, `intent`, `outcome`). ✅
-- [x] `STRAT-3` تعریف acceptance criteria برای `qualified lead`. ✅
-- [x] `STRAT-4` اجرای baseline فنی/UX/SEO (network readiness, metadata, link integrity) و گزارش `critical/high/medium`. ✅
-- [x] `STRAT-5` حذف مسیرهای intent تکراری و dead-end در IA. ✅
-- [x] `STRAT-6` استانداردسازی microcopy فرم/خطا/موفقیت و glossary اصطلاحات فنی فارسی. ✅
-- [x] `STRAT-7` اجرای segment و consistency های SEO (canonical/hreflang/meta/schema) و بهینه‌سازی internal linking. ✅
-- [x] `STRAT-8` Define SLO/availability budget + اعتبارسنجی incident rollback readiness. ✅
+**پذیرش:**
+- یک H1
+- دقیقاً دو CTA dominant
+- no CLS from portrait
+- RTL/LTR صحیح
+- keyboard/focus/reduced-motion صحیح
+- hero بدون intent-router/page-roadmap/competing product CTA
 
-## بهبودهای فنی انجام شده (این جلسه - 2026-06-16)
+---
 
-### حاکمیت و مستندات
-- [x] حاکمیت Design Token اجرا و freeze شد (P2-1)
-- [x] Domain KPIs برای تمام دامنه‌ها تعریف شد (STRAT-1)
-- [x] Event taxonomy مشترک تعریف شد (STRAT-2)
-- [x] Lead qualification criteria تعریف شد (STRAT-3)
-- [x] SLO و availability budget تعریف شد (STRAT-8)
-- [x] Baseline گزارش کامل فنی/UX/SEO ایجاد شد (STRAT-4)
+## [ ] `P0-PBH-3` — Homepage IA simplification
 
-### مستندات جدید
-- `docs/DOMAIN_KPIS.md` - KPIهای هر دامنه
-- `docs/EVENT_TAXONOMY.md` - taxonomy مشترک eventها
-- `docs/LEAD_QUALIFICATION_CRITERIA.md` - معیارهای qualified lead
-- `docs/SLO_AVAILABILITY_BUDGET.md` - SLO و availability budget
-- `docs/runtime/BASELINE_REPORT_2026-06-16.md` - گزارش baseline
+**مالک:** Product + FE  
+**وابستگی:** `P0-PBH-2`  
+**شرح:** Home را تقریباً 30–40٪ کوتاه‌تر و تصمیم‌پذیرتر کن؛ بخش‌های تکراری capability/workflow/trust را ادغام یا حذف کن.
 
-### کیفیت کد
-- [x] حذف `withLocale` تکراری → `locale-utils.ts` مشترک
-- [x] `api-schemas.ts` مشترک برای Zod validation
-- [x] حذف ۴۸ کامپوننت بی‌استفاده (۳۹ UI + ۹ section)
-- [x] حذف ۳۳ پکیج بی‌استفاده (framer-motion, Radix unused, recharts, cmdk, ...)
-- [x] `prisma` به devDependencies منتقل شد
-- [x] `console.*` در service-worker با logger جایگزین شد
+**IA هدف:**
+1. Header
+2. Personal Hero
+3. سه Core Service
+4. سه Selected Project
+5. Proof/Outcomes
+6. Engineering Principles
+7. Short About
+8. Simple Contact CTA
+9. Footer
 
-### SEO
-- [x] متادیتای تمام ۱۲ صفحه دوزبانه شد
-- [x] Schema.org تکراری حذف شد → single @graph
-- [x] OG Image مabsolute شد
-- [x] x-default hreflang اضافه شد
-- [x] proficiencyLevel Expert شد
-- [x] inLanguage پویا در schemas
+**پذیرش:** کاربر برای فهم پیشنهاد اصلی مجبور به فهم Audit Systems/PersianToolbox/Qualification architecture نباشد؛ هیچ dead-end CTA ایجاد نشود.
 
-### UI/UX
-- [x] `scroll-padding-top` برای رفع overlap هدر
-- [x] Redirect فرم تماس به `/thank-you`
-- [x] خطای فرم تماس به کاربر نمایش داده می‌شود
-- [x] RTL ArrowRight اصلاح شد
-- [x] `loading.tsx` و `not-found.tsx` اضافه شد
-- [x] progress bar ARIA attributes
+---
 
-### امنیت
-- [x] `dangerouslyAllowSVG: false`
-- [x] `.env.example` پاکسازی شده
-- [x] Rate limiting روی تمام API endpoints
+## [ ] `P0-PBH-4` — Selected work & evidence-first proof
 
-### عملکرد
-- [x] حذف Turbopack (نابالغ)
-- [x] حذف `tailwindcss-animate` plugin (tw-animate-css جایگزین)
-- [x] CSS self-referencing variable حذف شد
-- [x] Comment گمراه‌کننده اصلاح شد
+**مالک:** Product + FE + QA  
+**وابستگی:** `P0-PBH-3`  
+**شرح:** حداکثر سه پروژه قوی را روی Home نشان بده؛ اولویت با proof واقعی بیرونی/محصول زنده است. گزینه‌های پایه: PersianToolbox، Novax، Audit Systems. self-case-study سایت flagship نباشد.
 
-## تعریف Done (برای هر تسک)
-- [ ] PR اتمیک و دامنه‌بندی‌شده (یک هدف)
-- [ ] مدارک شواهد قبل/بعد اگر UI یا UX تغییر کرده
-- [ ] اجرای کامل در CI: `pnpm run verify`
-- [ ] اگر مسیر/UX: `pnpm run lighthouse:ci`
-- [ ] آپدیت مستندات مرتبط در همان PR
+**پذیرش:**
+- حداکثر 3 کارت
+- context + role + evidence-backed outcome
+- metric بدون source/methodology نمایش داده نشود
+- هر کارت به case study یا proof route معتبر متصل باشد
 
-## روش اجرای پیشنهادی روزانه
-1. اجرای تسک‌های `P0` به شکل PRهای کوچک (حداکثر ۱-۲ فایل/تغییر مرکزی در هر PR)
-2. ثبت خروجی پس از هر PR در `docs/runtime/` یا فایل اثبات اجرایی مربوط
-3. بازنگری ۲ روز یک‌بار روی `STRAT-*` و اولویت‌بندی مجدد طبق impact/effort
+---
+
+# P1 — Funnel, SEO, Analytics, Quality
+
+## [ ] `P1-PBH-1` — Contact & qualification repositioning
+
+**مالک:** Product + FE  
+**وابستگی:** P0 complete  
+**شرح:** Qualification حفظ شود اما مرحله دوم funnel باشد. Home ابتدا trust و intent ایجاد کند و سپس collaboration را شروع کند.
+
+**پذیرش:** مسیر تماس کوتاه و واضح باشد؛ qualification functionality/regression نداشته باشد؛ CTAهای تکراری حذف شوند.
+
+---
+
+## [ ] `P1-PBH-2` — SEO metadata + entity/schema alignment
+
+**مالک:** SEO + FE  
+**وابستگی:** `P0-PBH-1`, `P0-PBH-3`  
+**شرح:** homepage metadata، Person schema، canonical/hreflang/inLanguage و internal linking را با personal-brand/software-engineer positioning همسو کن.
+
+**عنوان جهت‌گیری:**
+- FA: `علیرضا صفایی | مهندس نرم‌افزار و سیستم‌های وب`
+- EN: `Alireza Safaei | Software Engineer — Web Systems & Production`
+
+**پذیرش:** یک canonical صحیح، hreflang FA/EN/x-default صحیح، Person jobTitle صحیح، structured data معتبر، sitemap/robots بدون regression.
+
+---
+
+## [ ] `P1-PBH-3` — Commercial service landing IA
+
+**مالک:** Product + SEO + FE  
+**وابستگی:** `P1-PBH-2`  
+**شرح:** intentهای تجاری را از Home جدا کن و routeهای dedicated را ایجاد/تقویت کن.
+
+**intentهای اولویت‌دار:**
+1. توسعه سیستم/محصول وب
+2. نجات و تکمیل پروژه نیمه‌کاره
+3. پایدارسازی/بهینه‌سازی سیستم وب
+4. technical SEO/audit در صورت fit تجاری
+5. infrastructure/localization فقط اگر service واقعی و قابل فروش است
+
+**پذیرش:** هر landing یک intent، H1، metadata، proof، CTA و internal link مشخص داشته باشد؛ thin/duplicate page تولید نشود.
+
+---
+
+## [ ] `P1-PBH-4` — Analytics contract simplification
+
+**مالک:** FE + Analytics  
+**وابستگی:** `P0-PBH-2`, `P0-PBH-3`  
+**شرح:** eventهای obsolete مرتبط با hero intent-router/A-B path قدیمی را بازنشسته کن و event set اصلی را تثبیت کن.
+
+**Minimum events:**
+- `hero_impression`
+- `hero_primary_cta_click`
+- `hero_projects_cta_click`
+- `project_card_click`
+- `contact_cta_click`
+- `qualification_start`
+- `qualification_submit_success`
+
+**خروجی:** code + `docs/EVENT_TAXONOMY.md` update.
+
+**پذیرش:** event duplicate/ambiguous وجود نداشته باشد و CTAهای اصلی قابل اندازه‌گیری باشند.
+
+---
+
+## [ ] `P1-PBH-5` — Responsive, A11y & performance gate
+
+**مالک:** QA + FE  
+**وابستگی:** P0/P1 implementation  
+**شرح:** V3 را روی mobile/desktop، FA/EN، keyboard و performance verify کن.
+
+**حداقل فرمان‌ها:**
+```bash
+pnpm run verify
+pnpm run test:e2e:smoke
+pnpm run test:e2e:a11y
+pnpm run lighthouse:ci
+pnpm run scan:secrets
+```
+
+**پذیرش:**
+- هیچ Critical/Serious Axe violation
+- هیچ console error در flow اصلی
+- Lighthouse Performance >=95 در محیط پایدار
+- Accessibility >=95
+- Best Practices >=95
+- SEO target 100
+- portrait بدون CLS محسوس
+- no secret/private asset committed
+
+---
+
+# P2 — Evidence, Content & CRO
+
+## [ ] `P2-PBH-1` — Case-study evidence enrichment
+
+**مالک:** Product + Analytics  
+**وابستگی:** V3 live  
+**شرح:** metricهای case study را با Before/After، measurement window و source/methodology قابل ردیابی کن. testimonial فقط در صورت واقعی/مجاز بودن اضافه شود.
+
+**پذیرش:** claim بدون evidence حذف یا qualitative شود.
+
+---
+
+## [ ] `P2-PBH-2` — First-party Insights / topical authority
+
+**مالک:** SEO + Content  
+**وابستگی:** service IA stable  
+**شرح:** topical authority دامنه اصلی را حول software engineering/web systems بساز؛ محتوا باید به service/case-study funnel داخلی لینک شود.
+
+**موضوعات پایه:** production readiness، پروژه نیمه‌کاره، performance/reliability، web architecture، operational constraints ایران.
+
+**پذیرش:** هر محتوا search intent روشن، author/entity connection، internal links و CTA مرتبط داشته باشد؛ mass/thin AI content ممنوع.
+
+---
+
+## [ ] `P2-PBH-3` — CRO baseline and iteration
+
+**مالک:** Product + Analytics  
+**وابستگی:** analytics V3 stable  
+**شرح:** baseline پس از انتشار V3 ثبت و بعد فقط بر اساس داده iteration انجام شود.
+
+**KPIها:** hero CTA CTR، projects CTR، project engagement، qualification start/completion، contact conversion، non-brand landing clicks.
+
+**پذیرش:** قبل از A/B test جدید baseline معتبر وجود داشته باشد و هر experiment یک hypothesis و success metric مشخص داشته باشد.
+
+---
+
+# Release / Completion Gate
+
+V3 فقط زمانی Done است که:
+
+- identity/title جدید در UI + SEO + schema یکسان باشد
+- Hero شخصی با portrait approved یا یک asset-swap مستندشده آماده باشد
+- Home materially کوتاه‌تر و دو CTA اصلی داشته باشد
+- سه service + سه selected project مشخص باشند
+- qualification second-stage باشد
+- FA/EN و responsive/a11y سالم باشند
+- quality gates واقعاً اجرا و نتیجه‌شان ثبت شده باشد؛ timeout/not-run هرگز green گزارش نشود
+- PR شامل evidence و exact SHA باشد
+- deployment فقط از pipeline موجود انجام شود
+- live verification و rollback readiness ثبت شوند
+
+## Historical note
+
+تسک‌های قبلی مانند route-first navigation، metadata locale، sitemap manifest، design-token governance، A11y gate و qualification form قبلاً اجرا شده‌اند و باید به‌عنوان baseline حفظ شوند. V3 مجوز regress کردن آن‌ها نیست.
