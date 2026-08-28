@@ -6,7 +6,7 @@ describe('Deploy VPS SSH transport contract', () => {
   it('uses an explicitly expanded SSH config path for rsync transport', () => {
     const workflow = readFileSync(resolve(process.cwd(), '.github/workflows/deploy-vps.yml'), 'utf8')
 
-    expect(workflow).toContain('-e "ssh -F $HOME/.ssh/config"')
+    expect(workflow).toContain('-e "ssh -F $HOME/.ssh/config -o ConnectTimeout=30')
     expect(workflow).not.toContain('-e "ssh -F ~/.ssh/config"')
   })
 
