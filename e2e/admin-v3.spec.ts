@@ -11,6 +11,20 @@ test.describe('Admin Control Center V3 authentication boundary', () => {
 })
 
 test.describe('Admin Control Center V3 authenticated shell', () => {
+  test('Blog draft can be created and deleted', async ({ page }) => {
+    await page.goto('/admin/login')
+    await page.getByLabel('Username').fill(process.env.ADMIN_USERNAME ?? '')
+    await page.getByLabel('Password').fill(process.env.ADMIN_PASSWORD ?? '')
+    await page.getByRole('button', { name: 'Sign in' }).click()
+    await page.goto('/admin/blog')
+    await page.getByLabel('Title').fill('E2E Insight')
+    await page.getByLabel('Slug').fill(`e2e-insight-${Date.now()}`)
+    await page.getByLabel('Excerpt').fill('A concise engineering insight.')
+    await page.getByLabel('Content').fill('# Reliable delivery')
+    await page.getByRole('button', { name: 'Save draft' }).click()
+    await expect(page.getByText('E2E Insight')).toBeVisible()
+  })
+
   test('keeps route state and exposes every module link', async ({ page }) => {
     await page.goto('/admin/login')
     await page.getByLabel('Username').fill(process.env.ADMIN_USERNAME ?? '')
