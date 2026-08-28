@@ -1,23 +1,6 @@
 name: Deploy VPS
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - "src/**"
-      - "ops/**"
-      - "prisma/**"
-      - "public/**"
-      - "package.json"
-      - "pnpm-lock.yaml"
-      - "next.config.*"
-      - "postcss.config.*"
-      - "eslint.config.*"
-      - ".github/workflows/deploy-vps.yml"
-      - "scripts/deploy/**"
-      - "scripts/vps-preflight.sh"
-      - "scripts/verify.sh"
   workflow_dispatch:
     inputs:
       environment:
@@ -31,8 +14,16 @@ on:
         description: Git ref to deploy (branch/tag/sha)
         required: true
         default: main
-      confirmation:
-        description: Type DEPLOY to continue
+      staging_confirmation:
+        description: Type APPROVE_PHASE_2_STAGING_DEPLOY for a staging mutation
+        required: true
+        default: ""
+      production_confirmation:
+        description: Type APPROVE_CRITICAL_SITE_PRODUCTION_DEPLOY for a production deploy mutation
+        required: true
+        default: ""
+      migration_confirmation:
+        description: Type APPROVE_CRITICAL_SITE_MIGRATION for a production database migration
         required: true
         default: ""
 
@@ -45,13 +36,22 @@ jobs:
     name: Quality gate
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    if: ${{ github.event_name != 'workflow_dispatch' || inputs.confirmation == 'DEPLOY' }}
+    outputs:
+      resolved_sha: ${{ steps.resolve_ref.outputs.sha }}
     steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+
+      - id: resolve_ref
+        name: Resolve immutable deployment SHA
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
       - name: Publish deployment pending status
         env:
           GH_TOKEN: ${{ github.token }}
-          TARGET_ENV: ${{ github.event_name == 'workflow_dispatch' && inputs.environment || 'production' }}
-          TARGET_REF: ${{ github.event_name == 'workflow_dispatch' && inputs.ref || github.sha }}
+          TARGET_ENV: ${{ inputs.environment }}
+          TARGET_REF: ${{ steps.resolve_ref.outputs.sha }}
           RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           set -euo pipefail
@@ -74,9 +74,6 @@ jobs:
             "https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/$TARGET_REF" \
             -d "$PAYLOAD" >/dev/null
 
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.ref || github.sha }}
       - uses: pnpm/action-setup@v4
         with:
           version: 9.15.0
@@ -97,14 +94,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     needs: quality-gate
-    if: ${{ github.event_name != 'workflow_dispatch' || inputs.confirmation == 'DEPLOY' }}
-    environment: ${{ github.event_name == 'workflow_dispatch' && inputs.environment || 'production' }}
+    if: ${{ (inputs.environment == 'staging' && inputs.staging_confirmation == 'APPROVE_PHASE_2_STAGING_DEPLOY') || (inputs.environment == 'production' && inputs.production_confirmation == 'APPROVE_CRITICAL_SITE_PRODUCTION_DEPLOY' && inputs.migration_confirmation == 'APPROVE_CRITICAL_SITE_MIGRATION') }}
+    environment: ${{ inputs.environment }}
     concurrency:
-      group: deploy-vps-${{ github.event_name == 'workflow_dispatch' && inputs.environment || 'production' }}
+      group: deploy-vps-${{ inputs.environment }}
       cancel-in-progress: false
     env:
-      TARGET_ENV: ${{ github.event_name == 'workflow_dispatch' && inputs.environment || 'production' }}
-      TARGET_REF: ${{ github.event_name == 'workflow_dispatch' && inputs.ref || github.sha }}
+      TARGET_ENV: ${{ inputs.environment }}
+      TARGET_REF: ${{ needs.quality-gate.outputs.resolved_sha }}
       DEPLOY_BASE_DIR: /var/www/my-portfolio
       DEPLOY_APP_SLUG: my-portfolio
       DEPLOY_PERSISTENT_DB_PATH: /var/www/my-portfolio/shared/data/production.db
@@ -117,7 +114,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.ref || github.sha }}
+          ref: ${{ needs.quality-gate.outputs.resolved_sha }}
 
       - uses: pnpm/action-setup@v4
         with:
@@ -182,7 +179,7 @@ jobs:
             ./ "deploy-target:$REMOTE_TMP/"
 
       - name: Relocate legacy production SQLite to persistent storage
-        if: ${{ env.TARGET_ENV == 'production' }}
+        if: ${{ env.TARGET_ENV == 'production' && inputs.migration_confirmation == 'APPROVE_CRITICAL_SITE_MIGRATION' }}
         run: |
           set -euo pipefail
           ssh -F ~/.ssh/config deploy-target \
@@ -329,11 +326,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     needs: [quality-gate, deploy]
-    if: ${{ always() && (github.event_name != 'workflow_dispatch' || inputs.confirmation == 'DEPLOY') }}
+    if: ${{ always() }}
     env:
       GH_TOKEN: ${{ github.token }}
-      TARGET_ENV: ${{ github.event_name == 'workflow_dispatch' && inputs.environment || 'production' }}
-      TARGET_REF: ${{ github.event_name == 'workflow_dispatch' && inputs.ref || github.sha }}
+      TARGET_ENV: ${{ inputs.environment }}
+      TARGET_REF: ${{ needs.quality-gate.outputs.resolved_sha }}
       QUALITY_RESULT: ${{ needs.quality-gate.result }}
       DEPLOY_RESULT: ${{ needs.deploy.result }}
       RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}

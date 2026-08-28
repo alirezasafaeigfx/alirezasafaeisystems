@@ -41,7 +41,14 @@ const eslintConfig = [
       "examples/**",
       "skills",
       "worktrees/**",
-      "sites/**"
+      "sites/**",
+      ".backups/**",
+      ".consolidated/**",
+      ".deploy-staging/**",
+      ".mimocode/**",
+      ".production-inspect/**",
+      ".superpowers/**",
+      "live-verification-artifacts/**"
     ]
   }
 ];

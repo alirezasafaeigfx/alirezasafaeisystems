@@ -23,9 +23,23 @@ function runPrisma(args: string[], databaseUrl: string) {
   })
 }
 
-afterEach(() => {
+async function removeTemporaryDirectory(directory: string) {
+  let failure: unknown
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    try {
+      rmSync(directory, { recursive: true, force: true })
+      return
+    } catch (error) {
+      failure = error
+      await new Promise((resolveDelay) => setTimeout(resolveDelay, 100 * (attempt + 1)))
+    }
+  }
+  throw failure
+}
+
+afterEach(async () => {
   for (const directory of tempDirs.splice(0)) {
-    rmSync(directory, { recursive: true, force: true })
+    await removeTemporaryDirectory(directory)
   }
 })
 
