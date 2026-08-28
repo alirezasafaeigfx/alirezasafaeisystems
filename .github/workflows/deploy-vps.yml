@@ -181,21 +181,24 @@ jobs:
           set -euo pipefail
           RELEASE_ID="$(date -u +%Y%m%dT%H%M%SZ)"
           REMOTE_TMP="/tmp/alirezasafaeisystems-${RELEASE_ID}"
+          SOURCE_ARCHIVE="/tmp/alirezasafaeisystems-${TARGET_REF}.tar.gz"
+          REMOTE_ARCHIVE="/tmp/alirezasafaeisystems-source-${TARGET_REF}.tar.gz"
           echo "RELEASE_ID=$RELEASE_ID" >> "$GITHUB_ENV"
           echo "REMOTE_TMP=$REMOTE_TMP" >> "$GITHUB_ENV"
+          echo "SOURCE_ARCHIVE=$SOURCE_ARCHIVE" >> "$GITHUB_ENV"
+          echo "REMOTE_ARCHIVE=$REMOTE_ARCHIVE" >> "$GITHUB_ENV"
 
-          ssh -F ~/.ssh/config deploy-target "mkdir -p '$REMOTE_TMP'"
+          git archive --format=tar "$TARGET_REF" | gzip -n > "$SOURCE_ARCHIVE"
+          SOURCE_SHA256="$(sha256sum "$SOURCE_ARCHIVE" | awk '{print $1}')"
+          echo "SOURCE_SHA256=$SOURCE_SHA256" >> "$GITHUB_ENV"
 
-          rsync -az --delete \
+          ssh -F ~/.ssh/config -o ServerAliveInterval=30 -o ServerAliveCountMax=6 deploy-target "mkdir -p '$REMOTE_TMP'"
+          rsync -az --partial --append-verify --timeout=60 --contimeout=30 \
             -e "ssh -F $HOME/.ssh/config" \
-            --exclude '.git' \
-            --exclude '.github' \
-            --exclude 'node_modules' \
-            --exclude '.next' \
-            --exclude 'coverage' \
-            --exclude 'playwright-report' \
-            --exclude 'test-results' \
-            ./ "deploy-target:$REMOTE_TMP/"
+            "$SOURCE_ARCHIVE" "deploy-target:$REMOTE_ARCHIVE"
+          REMOTE_SHA256="$(ssh -F ~/.ssh/config -o ServerAliveInterval=30 -o ServerAliveCountMax=6 deploy-target "sha256sum '$REMOTE_ARCHIVE' | awk '{print \$1}'")"
+          test "$REMOTE_SHA256" = "$SOURCE_SHA256"
+          ssh -F ~/.ssh/config -o ServerAliveInterval=30 -o ServerAliveCountMax=6 deploy-target "tar -xzf '$REMOTE_ARCHIVE' -C '$REMOTE_TMP' && rm -f '$REMOTE_ARCHIVE'"
 
       - name: Relocate legacy production SQLite to persistent storage
         if: ${{ env.TARGET_ENV == 'production' && inputs.migration_confirmation == 'APPROVE_CRITICAL_SITE_MIGRATION' }}

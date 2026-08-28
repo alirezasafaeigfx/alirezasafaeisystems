@@ -16,4 +16,14 @@ describe('Deploy VPS SSH transport contract', () => {
     expect(workflow).toContain('workflow_dispatch:')
     expect(workflow).not.toMatch(/^\s*push:/m)
   })
+
+  it('transfers an immutable SHA archive with resumable checksum verification', () => {
+    const workflow = readFileSync(resolve(process.cwd(), '.github/workflows/deploy-vps.yml'), 'utf8')
+
+    expect(workflow).toContain('git archive --format=tar "$TARGET_REF"')
+    expect(workflow).toContain('--partial --append-verify')
+    expect(workflow).toContain('sha256sum "$SOURCE_ARCHIVE"')
+    expect(workflow).toContain('test "$REMOTE_SHA256" = "$SOURCE_SHA256"')
+    expect(workflow).toContain("tar -xzf '$REMOTE_ARCHIVE'")
+  })
 })
