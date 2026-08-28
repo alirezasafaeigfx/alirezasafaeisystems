@@ -188,7 +188,8 @@ jobs:
           echo "SOURCE_ARCHIVE=$SOURCE_ARCHIVE" >> "$GITHUB_ENV"
           echo "REMOTE_ARCHIVE=$REMOTE_ARCHIVE" >> "$GITHUB_ENV"
 
-          git archive --format=tar "$TARGET_REF" | gzip -n > "$SOURCE_ARCHIVE"
+          git archive --format=tar HEAD | gzip -n > "$SOURCE_ARCHIVE"
+          test -s "$SOURCE_ARCHIVE"
           SOURCE_SHA256="$(sha256sum "$SOURCE_ARCHIVE" | awk '{print $1}')"
           echo "SOURCE_SHA256=$SOURCE_SHA256" >> "$GITHUB_ENV"
 
@@ -196,7 +197,7 @@ jobs:
           rsync -az --partial --append-verify --timeout=60 --contimeout=30 \
             -e "ssh -F $HOME/.ssh/config" \
             "$SOURCE_ARCHIVE" "deploy-target:$REMOTE_ARCHIVE"
-          REMOTE_SHA256="$(ssh -F ~/.ssh/config -o ServerAliveInterval=30 -o ServerAliveCountMax=6 deploy-target "sha256sum '$REMOTE_ARCHIVE' | awk '{print \$1}'")"
+          REMOTE_SHA256="$(ssh -F ~/.ssh/config -o ServerAliveInterval=30 -o ServerAliveCountMax=6 deploy-target "sha256sum '$REMOTE_ARCHIVE'" | awk '{print $1}')"
           test "$REMOTE_SHA256" = "$SOURCE_SHA256"
           ssh -F ~/.ssh/config -o ServerAliveInterval=30 -o ServerAliveCountMax=6 deploy-target "tar -xzf '$REMOTE_ARCHIVE' -C '$REMOTE_TMP' && rm -f '$REMOTE_ARCHIVE'"
 
