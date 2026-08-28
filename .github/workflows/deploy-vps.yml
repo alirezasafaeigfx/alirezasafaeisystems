@@ -111,6 +111,7 @@ jobs:
       VPS_JUMP_HOST: ${{ secrets.VPS_JUMP_HOST }}
       VPS_JUMP_USER: ${{ secrets.VPS_JUMP_USER }}
       VPS_JUMP_PORT: ${{ secrets.VPS_JUMP_PORT }}
+      VPS_SSH_KEY_PASSPHRASE: ${{ secrets.VPS_SSH_KEY_PASSPHRASE }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -136,6 +137,19 @@ jobs:
           chmod 700 ~/.ssh
           printf '%s' "${{ secrets.VPS_SSH_KEY_B64 }}" | base64 --decode > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
+          if ! ssh-keygen -y -P '' -f ~/.ssh/id_ed25519 >/dev/null 2>&1; then
+            if [ -z "$VPS_SSH_KEY_PASSPHRASE" ]; then
+              echo "VPS_SSH_KEY_PASSPHRASE is required for the configured deploy key." >&2
+              exit 1
+            fi
+            printf '%s\n' '#!/bin/sh' 'printf "%s\\n" "$VPS_SSH_KEY_PASSPHRASE"' > /tmp/asdev-ssh-askpass
+            chmod 700 /tmp/asdev-ssh-askpass
+            eval "$(ssh-agent -s)"
+            SSH_ASKPASS=/tmp/asdev-ssh-askpass SSH_ASKPASS_REQUIRE=force DISPLAY=:0 ssh-add ~/.ssh/id_ed25519
+            rm -f /tmp/asdev-ssh-askpass
+            echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> "$GITHUB_ENV"
+            echo "SSH_AGENT_PID=$SSH_AGENT_PID" >> "$GITHUB_ENV"
+          fi
           cat > ~/.ssh/config <<EOF
           Host deploy-target
             HostName $VPS_HOST
