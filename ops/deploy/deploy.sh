@@ -347,6 +347,28 @@ if [[ "$BASELINE_STATE" == "legacy-needs-baseline" ]]; then
   done
 fi
 
+# A prior non-linear rollout may have applied V3 while its historical
+# localization migration record is absent. Reconcile only when the later V3
+# record and every historical column are structurally present; otherwise fail
+# closed and let Prisma report the pending migration normally.
+MIGRATION_RECONCILE=""
+if ! MIGRATION_RECONCILE="$(node scripts/deploy/reconcile-migration-history.mjs)"; then
+  echo "[deploy] migration history reconciliation preflight failed; refusing rollout" >&2
+  restart_previous_app || true
+  exit 1
+fi
+if [[ -n "$MIGRATION_RECONCILE" ]]; then
+  echo "[deploy] recording structurally verified historical migration: $MIGRATION_RECONCILE"
+  if ! pnpm exec prisma migrate resolve --applied "$MIGRATION_RECONCILE"; then
+    echo "[deploy] historical migration reconciliation failed; restoring pre-migration snapshot" >&2
+    if ! restore_database_snapshot; then
+      echo "[deploy] CRITICAL: database snapshot restore failed after history reconciliation error" >&2
+    fi
+    restart_previous_app || true
+    exit 1
+  fi
+fi
+
 MIGRATE_STATUS_OUTPUT=""
 if MIGRATE_STATUS_OUTPUT="$(pnpm exec prisma migrate status 2>&1)"; then
   :
