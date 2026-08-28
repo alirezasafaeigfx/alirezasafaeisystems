@@ -113,4 +113,13 @@ describe('production database migration safety', () => {
     expect(healthFailureIndex).toBeGreaterThan(-1)
     expect(healthFailureRollbackIndex).toBeGreaterThan(healthFailureIndex)
   })
+
+  it('recreates deterministic rollback metadata for legacy running releases', () => {
+    const deploy = readFileSync(resolve(process.cwd(), 'ops/deploy/deploy.sh'), 'utf8')
+
+    expect(deploy).toContain('Older governed releases may predate ecosystem metadata')
+    expect(deploy).toContain('cwd: \'$PREVIOUS_RELEASE\'')
+    expect(deploy).toContain("args: '.next/standalone/server.js'")
+    expect(deploy).toContain('chmod 600 "$PREVIOUS_RELEASE/ecosystem.config.cjs"')
+  })
 })
