@@ -181,6 +181,16 @@ export async function proxy(request: NextRequest) {
   requestHeadersWithContext.set('x-asdev-locale', locale)
   requestHeadersWithContext.set('x-asdev-pathname', normalizedLocalePath)
   requestHeadersWithContext.set('x-asdev-locale-context', '1')
+  // Ensure the locale is available to the rewritten render request as well as
+  // the response cookie. Some standalone deployments do not expose response
+  // cookies to the current render, which otherwise lets a previous `fa`
+  // cookie win and produces an RTL English document.
+  const cookieParts = (request.headers.get('cookie') || '')
+    .split(';')
+    .map((part) => part.trim())
+    .filter((part) => part && !part.toLowerCase().startsWith('lang='))
+  cookieParts.push(`lang=${locale}`)
+  requestHeadersWithContext.set('cookie', cookieParts.join('; '))
 
   const isLocaleInternalCandidate = isLocalizedCandidate && hasLocalePrefix && !isExcludedInternalPath
   const isLegacyAsdevAlias = normalizedLocalePath === '/asdev'
