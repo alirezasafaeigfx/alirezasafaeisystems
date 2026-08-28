@@ -194,6 +194,25 @@ if [[ "$APP_PID" =~ ^[1-9][0-9]*$ ]]; then
   APP_WAS_RUNNING=true
 fi
 
+# Older governed releases may predate ecosystem metadata. Recreate the exact
+# deterministic PM2 descriptor before any quiesce/migration so rollback can
+# restart that immutable code path if the rollout fails.
+if [[ "$APP_WAS_RUNNING" == "true" && -n "$PREVIOUS_RELEASE" && -d "$PREVIOUS_RELEASE" && ! -f "$PREVIOUS_RELEASE/ecosystem.config.cjs" ]]; then
+  cat > "$PREVIOUS_RELEASE/ecosystem.config.cjs" <<ECOSYSTEM
+module.exports = {
+  apps: [{
+    name: '$APP_NAME',
+    cwd: '$PREVIOUS_RELEASE',
+    script: 'node',
+    args: '.next/standalone/server.js',
+    env_file: '$ENV_FILE',
+    env: { NODE_ENV: 'production', HOSTNAME: '127.0.0.1', PORT: '$PORT' }
+  }]
+};
+ECOSYSTEM
+  chmod 600 "$PREVIOUS_RELEASE/ecosystem.config.cjs"
+fi
+
 if [[ "$APP_WAS_RUNNING" == "true" && ( -z "$PREVIOUS_RELEASE" || ! -f "$PREVIOUS_RELEASE/ecosystem.config.cjs" ) ]]; then
   echo "[deploy] previous running release cannot be resolved safely; refusing rollout" >&2
   exit 1
