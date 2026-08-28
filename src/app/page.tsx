@@ -1,9 +1,5 @@
 import type { Metadata } from 'next'
-import { Hero } from '@/components/sections/hero'
-import { Services } from '@/components/sections/services'
-import { FeaturedCaseStudies } from '@/components/sections/featured-case-studies'
-import { AboutSummary } from '@/components/sections/about-summary'
-import { Contact } from '@/components/sections/contact'
+import { HomePageV3 } from '@/components/sections/homepage-v3'
 import { getRequestLanguage } from '@/lib/i18n/server'
 import { brand } from '@/lib/brand'
 
@@ -23,14 +19,10 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 
-export default function Home() {
+export default async function Home() {
+  const language = await getRequestLanguage()
+
   return (
-    <div className="w-full min-h-screen">
-      <Hero />
-      <Services />
-      <FeaturedCaseStudies />
-      <AboutSummary />
-      <Contact />
-    </div>
+    <HomePageV3 language={language} />
   )
 }

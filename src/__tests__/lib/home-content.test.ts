@@ -2,24 +2,44 @@ import { describe, expect, it } from 'vitest'
 import { getHomeContent } from '@/lib/home-content'
 
 describe('home content', () => {
-  it('explains the service in plain Persian and keeps one primary audit action', () => {
+  it('defines the approved Persian personal-brand hero and its two conversion actions', () => {
     const content = getHomeContent('fa')
 
-    expect(content.hero.title).toContain('سایت و محصول دیجیتال')
-    expect(content.hero.description).toContain('ارزیابی')
-    expect(content.hero.primaryCta).toBe('درخواست ارزیابی رایگان')
-    expect(content.audiences).toHaveLength(3)
+    expect(content.hero).toMatchObject({
+      name: 'علیرضا صفایی',
+      title: 'مهندس نرم‌افزار',
+      primaryCta: 'شروع همکاری',
+      secondaryCta: 'مشاهده پروژه‌ها',
+    })
   })
 
-  it('provides an equivalent English acquisition message', () => {
+  it('uses the supplied English hero copy without making an English content shell', () => {
     const content = getHomeContent('en')
 
-    expect(content.hero.title).toContain('website and digital product')
-    expect(content.hero.primaryCta).toBe('Request a free assessment')
-    expect(content.audiences.map((audience) => audience.key)).toEqual([
-      'owner',
-      'employer',
-      'technical',
-    ])
+    expect(content.hero).toMatchObject({
+      name: 'Alireza Safaei',
+      title: 'Software Engineer',
+      primaryCta: 'Start collaboration',
+      secondaryCta: 'View projects',
+    })
+  })
+
+  it('limits the homepage to three linked services and three evidence-backed selected-work cards', () => {
+    const content = getHomeContent('fa')
+
+    expect(content).toMatchObject({
+      services: expect.arrayContaining([
+        expect.objectContaining({ title: 'توسعه محصول و سیستم وب', href: '/services' }),
+        expect.objectContaining({ title: 'پایدارسازی و بهینه‌سازی', href: '/services/infrastructure-localization' }),
+        expect.objectContaining({ title: 'نجات پروژه‌های نیمه‌کاره', href: '/qualification' }),
+      ]),
+      projects: expect.arrayContaining([
+        expect.objectContaining({ title: 'پلتفرم PersianToolbox' }),
+        expect.objectContaining({ title: 'هشدار قیمت Novax' }),
+        expect.objectContaining({ title: 'پلتفرم Audit Systems' }),
+      ]),
+    })
+    expect((content as { services?: unknown[] }).services).toHaveLength(3)
+    expect((content as { projects?: unknown[] }).projects).toHaveLength(3)
   })
 })

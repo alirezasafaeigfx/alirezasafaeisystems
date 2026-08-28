@@ -21,13 +21,13 @@ test.describe('smoke', () => {
 
   test('home page renders key sections', async ({ page }) => {
     await page.goto('/')
-    await expect(page.locator('main')).toBeVisible()
-    await expect(page.locator('section#services')).toBeVisible()
+    await expect(page.locator('#main-content')).toBeVisible()
+    await expect(page.getByLabel('خدمات اصلی')).toBeVisible()
     await expect(page.locator('a[href="/services/infrastructure-localization"]')).toBeVisible()
-    await expect(page.locator('section#contact')).toBeVisible()
+    await expect(page.getByLabel('پروژه‌های منتخب')).toBeVisible()
   })
 
-  test('home page explains its value to business and technical audiences on mobile', async ({ page }) => {
+  test('Homepage V3 keeps its FA mobile CTA and service contract', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 })
     const pageErrors = []
     const failedRequests = []
@@ -35,19 +35,19 @@ test.describe('smoke', () => {
     page.on('requestfailed', (request) => failedRequests.push(request.url()))
 
     await page.goto('/')
-    await expect(page.getByRole('heading', { level: 1 })).toContainText('سایت و محصول دیجیتال شما')
-    await expect(page.getByRole('heading', { name: 'برای صاحب سایت و کسب‌وکار' })).toBeVisible()
-    await expect(page.getByRole('heading', { name: 'برای کارفرما و سرمایه‌گذار' })).toBeVisible()
-    await expect(page.getByRole('heading', { name: 'برای تیم فنی' })).toBeVisible()
-    await expect(page.getByRole('button', { name: /درخواست ارزیابی رایگان/ })).toBeVisible()
+    const hero = page.getByLabel('معرفی علیرضا صفایی')
+    await expect(hero.getByRole('heading', { level: 1 })).toContainText('مهندس نرم‌افزار')
+    await expect(hero.getByRole('link')).toHaveCount(2)
+    await expect(hero.getByRole('link', { name: 'شروع همکاری' })).toBeVisible()
+    await expect(page.getByLabel('خدمات اصلی').getByRole('article')).toHaveCount(3)
     expect(pageErrors).toEqual([])
     expect(failedRequests).toEqual([])
   })
 
   test('language switch sets english direction', async ({ page }) => {
-    await page.goto('/en/services')
+    await page.goto('/en')
     await expect.poll(async () => page.evaluate(() => document.documentElement.dir)).toBe('ltr')
-    await expect(page.locator('h1')).toContainText('Services')
+    await expect(page.locator('h1')).toContainText('Software Engineer')
   })
 
   test('Discover keeps English locale and presents the Resource Hub contract', async ({ page }) => {
