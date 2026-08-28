@@ -21,9 +21,9 @@ describe('Deploy VPS SSH transport contract', () => {
     const workflow = readFileSync(resolve(process.cwd(), '.github/workflows/deploy-vps.yml'), 'utf8')
 
     expect(workflow).toContain('git archive --format=tar HEAD')
-    expect(workflow).toContain('--partial --append-verify')
+    expect(workflow).toContain('--partial --inplace')
     expect(workflow).toContain('sha256sum "$SOURCE_ARCHIVE"')
     expect(workflow).toContain('test "$REMOTE_SHA256" = "$SOURCE_SHA256"')
-    expect(workflow).toContain("tar -xzf '$REMOTE_ARCHIVE'")
+    expect(workflow).toContain("tar -xf '$REMOTE_ARCHIVE'")
   })
 })
