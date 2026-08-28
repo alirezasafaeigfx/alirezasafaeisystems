@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/alirezasafaeigfx/alirezasafaeisystems/compare/v1.0.0...v1.0.1) (2026-08-28)
+
+
+### Bug Fixes
+
+* **deploy:** preserve rollback metadata for legacy releases ([015aad6](https://github.com/alirezasafaeigfx/alirezasafaeisystems/commit/015aad6ba01d78f96c42b7f3b0653e6fdd40d004))
+
 # 1.0.0 (2026-08-28)
 
 
