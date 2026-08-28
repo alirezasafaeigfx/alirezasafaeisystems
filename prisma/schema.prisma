@@ -91,6 +91,7 @@ model DiscoverItem {
   titleEn        String?
   descriptionEn  String?
   contentEn      String?
+  publishedEn    Boolean   @default(false)
   resourceType   String    @default("tool")
   platforms      String    @default("")
   pricingModel   String    @default("unknown")

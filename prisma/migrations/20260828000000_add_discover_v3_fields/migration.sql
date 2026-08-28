@@ -1,6 +1,3 @@
-ALTER TABLE "DiscoverItem" ADD COLUMN "titleEn" TEXT;
-ALTER TABLE "DiscoverItem" ADD COLUMN "descriptionEn" TEXT;
-ALTER TABLE "DiscoverItem" ADD COLUMN "contentEn" TEXT;
 ALTER TABLE "DiscoverItem" ADD COLUMN "resourceType" TEXT NOT NULL DEFAULT 'tool';
 ALTER TABLE "DiscoverItem" ADD COLUMN "platforms" TEXT NOT NULL DEFAULT '';
 ALTER TABLE "DiscoverItem" ADD COLUMN "pricingModel" TEXT NOT NULL DEFAULT 'unknown';

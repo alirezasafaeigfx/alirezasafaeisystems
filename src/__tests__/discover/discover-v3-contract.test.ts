@@ -13,13 +13,13 @@ describe('Discover V3 contracts', () => {
   it('defines additive DiscoverItem fields in Prisma schema', () => {
     const schema = readFileSync(resolve(process.cwd(), 'prisma/schema.prisma'), 'utf8')
     for (const field of [
-      'titleEn', 'descriptionEn', 'contentEn', 'resourceType', 'platforms',
+      'titleEn', 'descriptionEn', 'contentEn', 'publishedEn', 'resourceType', 'platforms',
       'pricingModel', 'seoTitle', 'seoDescription', 'seoTitleEn',
       'seoDescriptionEn', 'lastReviewedAt',
     ]) expect(schema).toContain(field)
 
     const migration = readFileSync(resolve(process.cwd(), 'prisma/migrations/20260828000000_add_discover_v3_fields/migration.sql'), 'utf8')
-    expect(migration.match(/ALTER TABLE "DiscoverItem" ADD COLUMN/g)?.length).toBe(11)
+    expect(migration.match(/ALTER TABLE "DiscoverItem" ADD COLUMN/g)?.length).toBe(8)
     expect(migration).not.toMatch(/DROP TABLE|DELETE FROM|DROP COLUMN/)
   })
 
