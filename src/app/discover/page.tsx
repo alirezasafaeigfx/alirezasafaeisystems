@@ -96,7 +96,7 @@ export default async function DiscoverPage({ searchParams }: DiscoverPageProps) 
   const BackIcon = isEn ? ArrowLeft : ArrowRight
 
   return (
-    <main className="container mx-auto px-4 py-28 subtle-grid">
+    <section className="container mx-auto px-4 py-28 subtle-grid" aria-labelledby="discover-heading">
       <JsonLd data={generateBreadcrumbSchema([
         { name: isEn ? 'Home' : 'خانه', url: siteUrl },
         { name: 'Discover', url: `${siteUrl}${canonicalPath}` },
@@ -110,7 +110,7 @@ export default async function DiscoverPage({ searchParams }: DiscoverPageProps) 
       <section className="mx-auto max-w-6xl space-y-8">
         <header className="section-surface aurora-shell overflow-hidden space-y-4 p-6 md:p-10">
           <p className="text-sm font-semibold text-primary">{copy.eyebrow}</p>
-          <h1 className="headline-tight max-w-4xl text-3xl font-bold md:text-5xl">{copy.title}</h1>
+          <h1 id="discover-heading" className="headline-tight max-w-4xl text-3xl font-bold md:text-5xl">{copy.title}</h1>
           <p className="max-w-4xl text-base leading-8 text-muted-foreground md:text-lg">{copy.description}</p>
           <p className="max-w-4xl text-xs leading-6 text-muted-foreground">{copy.note}</p>
         </header>
@@ -125,6 +125,6 @@ export default async function DiscoverPage({ searchParams }: DiscoverPageProps) 
           {copy.home}
         </Link>
       </section>
-    </main>
+    </section>
   )
 }

@@ -137,7 +137,7 @@ export default async function DiscoverDetailPage({ params, searchParams }: Disco
   })
 
   return (
-    <main className="container mx-auto px-4 py-28 subtle-grid">
+    <section className="container mx-auto px-4 py-28 subtle-grid" aria-labelledby="discover-heading">
       <JsonLd data={generateBreadcrumbSchema([
         { name: isEn ? 'Home' : 'خانه', url: siteUrl },
         { name: 'Discover', url: `${siteUrl}${isEn ? '/en/discover' : '/discover'}` },
@@ -165,7 +165,7 @@ export default async function DiscoverDetailPage({ params, searchParams }: Disco
                 </span>
               ) : null}
             </div>
-            <h1 className="headline-tight text-3xl font-bold md:text-5xl">{item.title}</h1>
+            <h1 id="discover-heading" className="headline-tight text-3xl font-bold md:text-5xl">{item.title}</h1>
             <p className="text-base leading-8 text-muted-foreground md:text-lg">{item.description}</p>
             <div className="flex flex-wrap gap-2">
               {tags.map((tag) => (
@@ -309,6 +309,6 @@ export default async function DiscoverDetailPage({ params, searchParams }: Disco
           </div>
         </section>
       </article>
-    </main>
+    </section>
   )
 }
