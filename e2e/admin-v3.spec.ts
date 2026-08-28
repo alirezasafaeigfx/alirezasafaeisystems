@@ -11,11 +11,16 @@ test.describe('Admin Control Center V3 authentication boundary', () => {
 })
 
 test.describe('Admin Control Center V3 authenticated shell', () => {
-  test('Blog draft can be created and deleted', async ({ page }) => {
+  async function signIn(page: import('@playwright/test').Page) {
     await page.goto('/admin/login')
     await page.getByLabel('Username').fill(process.env.ADMIN_USERNAME ?? '')
     await page.getByLabel('Password').fill(process.env.ADMIN_PASSWORD ?? '')
     await page.getByRole('button', { name: 'Sign in' }).click()
+    await expect(page).toHaveURL(/\/admin$/)
+  }
+
+  test('Blog draft can be created and deleted', async ({ page }) => {
+    await signIn(page)
     await page.goto('/admin/blog')
     await page.getByLabel('Title').fill('E2E Insight')
     await page.getByLabel('Slug').fill(`e2e-insight-${Date.now()}`)
@@ -23,6 +28,10 @@ test.describe('Admin Control Center V3 authenticated shell', () => {
     await page.getByLabel('Content').fill('# Reliable delivery')
     await page.getByRole('button', { name: 'Save draft' }).click()
     await expect(page.getByText('E2E Insight')).toBeVisible()
+    const draft = page.getByRole('article').filter({ hasText: 'E2E Insight' })
+    page.once('dialog', (dialog) => dialog.accept())
+    await draft.getByRole('button', { name: 'Delete' }).click()
+    await expect(page.getByText('E2E Insight', { exact: true })).toHaveCount(0)
   })
 
   test('keeps route state and exposes every module link', async ({ page }) => {
@@ -85,5 +94,51 @@ test.describe('Admin Control Center V3 authenticated shell', () => {
     await expect(page.getByRole('dialog')).toContainText(savedTitle)
     await page.getByRole('button', { name: 'Delete permanently' }).click()
     await expect(page.getByRole('heading', { name: savedTitle })).toHaveCount(0)
+  })
+
+  test('Discover item can be published, previewed, edited, and deleted', async ({ page }) => {
+    const slug = `e2e-discover-${Date.now()}`
+    const title = `E2E Discover Resource ${Date.now()}`
+    await signIn(page)
+    await page.goto('/admin/discover')
+    await page.getByLabel('Title').fill(title)
+    await page.getByLabel('Slug').fill(slug)
+    await page.getByLabel('Category').fill('Engineering')
+    await page.getByLabel('Short description').fill('A real browser lifecycle check for the Discover authoring flow.')
+    await page.getByLabel('Short practical guide').fill('Open the official destination and follow the documented setup steps.')
+    await page.getByLabel('Official HTTPS URL').fill('https://example.com/e2e-discover')
+    await page.getByLabel('Published').check()
+    await page.getByRole('button', { name: 'Save Discover item' }).click()
+    const item = page.getByText(title, { exact: true }).locator('xpath=ancestor::div[contains(@class,"rounded-xl")][1]')
+    await expect(item).toBeVisible()
+    await expect(item.getByText('Published', { exact: true })).toBeVisible()
+    const preview = page.locator(`a[href="/discover/${slug}"]`)
+    await expect(preview).toHaveAttribute('href', `/discover/${slug}`)
+    await page.goto(`/discover/${slug}`)
+    await expect(page.locator('h1')).toHaveText(title)
+    await page.goto('/admin/discover')
+    await item.getByRole('button', { name: 'Edit' }).click()
+    await page.getByLabel('Title').fill(`${title} Updated`)
+    await page.getByRole('button', { name: 'Save Discover item' }).click()
+    await expect(page.getByText(`${title} Updated`, { exact: true })).toBeVisible()
+    page.once('dialog', (dialog) => dialog.accept())
+    await page.getByRole('button', { name: `Delete ${title} Updated` }).click()
+    await expect(page.getByText(`${title} Updated`, { exact: true })).toHaveCount(0)
+  })
+
+  test('Blog post can be published and read through its public route', async ({ page }) => {
+    const slug = `e2e-blog-${Date.now()}`
+    const title = `E2E Published Insight ${Date.now()}`
+    await signIn(page)
+    await page.goto('/admin/blog')
+    await page.getByLabel('Title').fill(title)
+    await page.getByLabel('Slug').fill(slug)
+    await page.getByLabel('Excerpt').fill('A published article used only to verify the authoring and public route contract.')
+    await page.getByLabel('Content').fill('# Evidence-backed release verification')
+    await page.getByRole('button', { name: 'Publish', exact: true }).click()
+    await expect(page.getByText(title, { exact: true })).toBeVisible()
+    await expect(page.getByText(`Published · ${slug}`, { exact: true })).toBeVisible()
+    await page.goto(`/blog/${slug}`)
+    await expect(page.getByRole('heading', { name: title })).toBeVisible()
   })
 })

@@ -1,7 +1,7 @@
 # نقشه راه و تسک‌بندی اولویت‌بندی‌شده
 
-**تاریخ به‌روزرسانی:** 2026-08-27  
-**وضعیت:** Active — Personal Brand + Content Platform V3  
+**تاریخ به‌روزرسانی:** 2026-08-28  
+**وضعیت:** Release closure — staging TLS gate pending  
 **Objectives:** `docs/ROADMAP_OBJECTIVES.md`
 
 **Spec/Planهای مرجع:**
@@ -14,6 +14,15 @@
 - Blog Plan: `docs/superpowers/plans/2026-08-27-blog-insights-v1.md`
 
 > این فایل backlog فعال را نشان می‌دهد. جزئیات قدیمی تکمیل‌شده در Git history باقی می‌ماند و نباید دوباره به‌عنوان کار فعال اجرا شود.
+
+## وضعیت واقعی Release Closure — 2026-08-28
+
+- Homepage V3، route-based Admin، Discover V3 و Blog V1 در شاخهٔ PR #12 پیاده‌سازی شده‌اند؛ برای این closure هیچ scope جدیدی باز نمی‌شود.
+- E2E parity تکمیلی: Admin auth/route-state، Projects lifecycle، Discover create/publish/preview/edit/delete و Blog create/publish/public-route در `e2e/admin-v3.spec.ts` پوشش داده شده‌اند.
+- `src/generated/sitemap-manifest.json` خروجی deterministic HEAD است؛ دو regeneration مستقل hash یکسان دادند و باید tracked بماند.
+- runtime staging روی `IRAN_PROD_SERVER` از `current/staging -> releases/staging/20260828T101500Z-a753577` اجرا می‌شود؛ rollback target آن `20260828T095500Z-d288727` است.
+- TLS staging هنوز PASS نیست: DNS `staging.alirezasafaeisystems.ir -> 193.93.169.32`، HTTP vhost به `127.0.0.1:3003` سالم است، اما HTTPS vhost/certificate برای همان hostname وجود ندارد و SNI گواهی `ir.llm.persiantoolbox.ir` را می‌گیرد. مسیر مستقل و امن: certificate اختصاصی certbot + vhost 443 همان upstream + redirect 80→443 + `nginx -t` پیش از reload.
+- این edge/deploy mutation فقط با عبارت `APPROVE_PHASE_2_STAGING_DEPLOY` اجرا می‌شود. هیچ production hostname، certificate، deploy یا migration در این closure تغییر نکرده است.
 
 ## اصول اجرا
 
