@@ -4,11 +4,11 @@
   "private": true,
   "repository": {
     "type": "git",
-    "url": "https://github.com/parsairaniiidev/alirezasafaeisystems.git"
+      "url": "https://github.com/alirezasafaeigfx/alirezasafaeisystems.git"
   },
-  "homepage": "https://github.com/parsairaniiidev/alirezasafaeisystems",
+  "homepage": "https://alirezasafaeisystems.ir",
   "bugs": {
-    "url": "https://github.com/parsairaniiidev/alirezasafaeisystems/issues"
+      "url": "https://github.com/alirezasafaeigfx/alirezasafaeisystems/issues"
   },
   "packageManager": "pnpm@9.15.0",
   "engines": {
