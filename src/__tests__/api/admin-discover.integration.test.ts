@@ -27,6 +27,17 @@ const validItem = {
   featured: true,
   published: false,
   order: 1,
+  titleEn: 'NotebookLM',
+  descriptionEn: 'Grounded research assistant',
+  contentEn: 'Use your sources in a focused workspace.',
+  resourceType: 'ai-tool',
+  platforms: ['web'],
+  pricingModel: 'freemium',
+  seoTitle: 'NotebookLM guide',
+  seoDescription: 'A practical guide to NotebookLM.',
+  seoTitleEn: 'NotebookLM guide',
+  seoDescriptionEn: 'A practical guide to NotebookLM.',
+  lastReviewedAt: '2026-08-28T00:00:00.000Z',
 }
 
 type NextRequestInit = NonNullable<ConstructorParameters<typeof NextRequest>[1]>
@@ -67,6 +78,17 @@ describe('Discover admin API', () => {
         telegramGuideUrl: 'https://t.me/asdev/123',
         published: false,
         publishedAt: null,
+        titleEn: 'NotebookLM',
+        descriptionEn: 'Grounded research assistant',
+        contentEn: 'Use your sources in a focused workspace.',
+        resourceType: 'ai-tool',
+        platforms: 'web',
+        pricingModel: 'freemium',
+        seoTitle: 'NotebookLM guide',
+        seoDescription: 'A practical guide to NotebookLM.',
+        seoTitleEn: 'NotebookLM guide',
+        seoDescriptionEn: 'A practical guide to NotebookLM.',
+        lastReviewedAt: new Date('2026-08-28T00:00:00.000Z'),
       }),
     })
   })
