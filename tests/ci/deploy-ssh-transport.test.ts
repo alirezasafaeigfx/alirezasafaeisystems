@@ -21,7 +21,11 @@ describe('Deploy VPS SSH transport contract', () => {
     const workflow = readFileSync(resolve(process.cwd(), '.github/workflows/deploy-vps.yml'), 'utf8')
 
     expect(workflow).toContain('git archive --format=tar HEAD')
-    expect(workflow).toContain('--partial --inplace')
+    expect(workflow).toContain('--partial --inplace --timeout=60 --info=progress2')
+    expect(workflow).not.toContain('--contimeout=30')
+    expect(workflow).toContain('-o ConnectTimeout=30')
+    expect(workflow).toContain('-o ServerAliveInterval=30')
+    expect(workflow).toContain('-o ServerAliveCountMax=6')
     expect(workflow).toContain('sha256sum "$SOURCE_ARCHIVE"')
     expect(workflow).toContain('test "$REMOTE_SHA256" = "$SOURCE_SHA256"')
     expect(workflow).toContain("tar -xf '$REMOTE_ARCHIVE'")

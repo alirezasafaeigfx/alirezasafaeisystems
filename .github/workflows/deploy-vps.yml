@@ -194,8 +194,8 @@ jobs:
           echo "SOURCE_SHA256=$SOURCE_SHA256" >> "$GITHUB_ENV"
 
           ssh -F ~/.ssh/config -o ServerAliveInterval=30 -o ServerAliveCountMax=6 deploy-target "mkdir -p '$REMOTE_TMP'"
-          rsync -a --partial --inplace --timeout=60 --contimeout=30 \
-            -e "ssh -F $HOME/.ssh/config" \
+          rsync -a --partial --inplace --timeout=60 --info=progress2 \
+            -e "ssh -F $HOME/.ssh/config -o ConnectTimeout=30 -o ServerAliveInterval=30 -o ServerAliveCountMax=6" \
             "$SOURCE_ARCHIVE" "deploy-target:$REMOTE_ARCHIVE"
           REMOTE_SHA256="$(ssh -F ~/.ssh/config -o ServerAliveInterval=30 -o ServerAliveCountMax=6 deploy-target "sha256sum '$REMOTE_ARCHIVE'" | awk '{print $1}')"
           test "$REMOTE_SHA256" = "$SOURCE_SHA256"
