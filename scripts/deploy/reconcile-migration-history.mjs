@@ -21,8 +21,13 @@ try {
   } else {
     const columns = await prisma.$queryRawUnsafe('PRAGMA table_info("DiscoverItem")')
     const actual = new Set(columns.map((row) => row.name))
-    if (!REQUIRED_COLUMNS.every((column) => actual.has(column))) {
+    if (!REQUIRED_COLUMNS.slice(0, 3).every((column) => actual.has(column))) {
       throw new Error('DiscoverItem localization schema is incomplete; refusing history reconciliation')
+    }
+    if (!actual.has('publishedEn')) {
+      await prisma.$executeRawUnsafe(
+        'ALTER TABLE "DiscoverItem" ADD COLUMN "publishedEn" BOOLEAN NOT NULL DEFAULT false',
+      )
     }
     process.stdout.write(`${LOCALIZATION_MIGRATION}\n`)
   }

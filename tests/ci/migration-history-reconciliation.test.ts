@@ -9,6 +9,7 @@ describe('migration history reconciliation safety contract', () => {
     expect(script).toContain('20260828000000_add_discover_v3_fields')
     expect(script).toContain("['titleEn', 'descriptionEn', 'contentEn', 'publishedEn']")
     expect(script).toContain('refusing history reconciliation')
+    expect(script).toContain('ADD COLUMN "publishedEn" BOOLEAN NOT NULL DEFAULT false')
     expect(script).toContain('process.stdout.write(`${LOCALIZATION_MIGRATION}')
   })
 
