@@ -3,15 +3,17 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 const discoverItemMock = vi.hoisted(() => ({
   findMany: vi.fn(),
 }))
+const blogPostMock = vi.hoisted(() => ({ findMany: vi.fn() }))
 
 vi.mock('@/lib/db', () => ({
-  db: { discoverItem: discoverItemMock },
+  db: { discoverItem: discoverItemMock, blogPost: blogPostMock },
 }))
 
 describe('sitemap contract', () => {
   beforeEach(() => {
     vi.resetModules()
     vi.clearAllMocks()
+    blogPostMock.findMany.mockResolvedValue([])
     vi.stubEnv('NODE_ENV', 'test')
     process.env.NEXT_PUBLIC_SITE_URL = 'https://alirezasafaeisystems.ir'
     process.env.DATABASE_URL = 'file:./test.db'
