@@ -9,6 +9,7 @@ import { generateBreadcrumbSchema } from '@/lib/seo'
 import { DiscoverGrid, type DiscoverGridItem } from '@/components/discover/discover-grid'
 import { DiscoverTelemetry } from '@/components/discover/discover-telemetry'
 import { JsonLd } from '@/components/seo/json-ld'
+import { buildDiscoverOrderBy, buildDiscoverWhere, DISCOVER_PAGE_SIZE, parseDiscoverPublicQuery } from '@/lib/discover-query'
 
 const siteUrl = getSiteUrl()
 
@@ -16,10 +17,12 @@ type DiscoverPageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata({ searchParams }: DiscoverPageProps): Promise<Metadata> {
   const lang = await getRequestLanguage()
   const isEn = lang === 'en'
   const canonicalPath = isEn ? '/en/discover' : '/discover'
+  const query = parseDiscoverPublicQuery(await searchParams)
+  const hasFacets = Boolean(query.q || query.category || query.type || query.platform || query.page > 1)
   return {
     title: isEn ? 'Discover Tools, Guides and Resources' : 'Discover | ابزارها، راهنماها و منابع',
     description: isEn
@@ -33,6 +36,7 @@ export async function generateMetadata(): Promise<Metadata> {
         'x-default': `${siteUrl}/discover`,
       },
     },
+    ...(hasFacets ? { robots: { index: false, follow: true } } : {}),
   }
 }
 
@@ -40,9 +44,16 @@ export default async function DiscoverPage({ searchParams }: DiscoverPageProps) 
   const lang = await getRequestLanguage()
   const isEn = lang === 'en'
   const canonicalPath = isEn ? '/en/discover' : '/discover'
-  const attribution = extractDiscoverAttribution(await searchParams)
-  const records = await db.discoverItem.findMany({
-    where: { published: true },
+  const rawSearchParams = await searchParams
+  const attribution = extractDiscoverAttribution(rawSearchParams)
+  const query = parseDiscoverPublicQuery(rawSearchParams)
+  const where = buildDiscoverWhere(query, isEn ? 'en' : 'fa')
+  const [records, total] = await Promise.all([
+    db.discoverItem.findMany({
+    // where: { published: true }
+    where,
+    skip: (query.page - 1) * DISCOVER_PAGE_SIZE,
+    take: DISCOVER_PAGE_SIZE,
     select: {
       slug: true,
       title: true,
@@ -51,17 +62,18 @@ export default async function DiscoverPage({ searchParams }: DiscoverPageProps) 
       tags: true,
       featured: true,
       imageUrl: true,
+      titleEn: true,
+      descriptionEn: true,
     },
-    orderBy: [
-      { featured: 'desc' },
-      { order: 'asc' },
-      { publishedAt: 'desc' },
-      { createdAt: 'desc' },
-    ],
-  })
+    orderBy: buildDiscoverOrderBy(query),
+    }),
+    db.discoverItem.count({ where }),
+  ])
 
   const items: DiscoverGridItem[] = records.map((item) => ({
     ...item,
+    title: isEn ? (item.titleEn ?? item.title) : item.title,
+    description: isEn ? (item.descriptionEn ?? item.description) : item.description,
     tags: item.tags.split(',').map((tag) => tag.trim()).filter(Boolean),
   }))
 
@@ -70,14 +82,14 @@ export default async function DiscoverPage({ searchParams }: DiscoverPageProps) 
         eyebrow: 'ASDEV Resource Hub',
         title: 'Find the tools and resources I mention on Instagram',
         description: 'Search a name, open its real official destination, read the quick guide, and use the full Telegram resource when one is available.',
-        note: 'Use this page as the single link in my Instagram bio; no DM automation is required.',
+        note: `Use this page as the single link in my Instagram bio; no DM automation is required. ${total} items available.`,
         home: 'Back to home',
       }
     : {
         eyebrow: 'مرکز منابع ASDEV',
         title: 'ابزارها و منابعی که در اینستاگرام معرفی می‌کنم، اینجا پیدا کن',
         description: 'اسم ابزار را جستجو کن، به مقصد رسمی برو، راهنمای کوتاه را بخوان و اگر منبع کامل تلگرام موجود بود مستقیم همان را باز کن.',
-        note: 'این صفحه مقصد ثابت لینک بیوی اینستاگرام است و برای دریافت منابع نیازی به اتوماسیون دایرکت نیست.',
+        note: `این صفحه مقصد ثابت لینک بیوی اینستاگرام است و برای دریافت منابع نیازی به اتوماسیون دایرکت نیست. ${total} مورد موجود است.`,
         home: 'بازگشت به خانه',
       }
 
