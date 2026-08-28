@@ -24,6 +24,38 @@ const discoverContentSchema = z.string().trim().min(1).max(8000)
 const discoverCategorySchema = z.string().trim().min(1).max(60)
 const discoverOrderSchema = z.number().int().nonnegative()
 const discoverTagSchema = z.string().trim().min(1).max(40)
+const discoverTranslationTitleSchema = z.union([z.literal(''), z.string().trim().min(1).max(140), z.null()]).optional().transform((value) => value === '' ? null : value)
+const discoverTranslationDescriptionSchema = z.union([z.literal(''), z.string().trim().min(1).max(400), z.null()]).optional().transform((value) => value === '' ? null : value)
+const discoverTranslationContentSchema = z.union([z.literal(''), z.string().trim().min(1).max(8000), z.null()]).optional().transform((value) => value === '' ? null : value)
+const discoverSeoSchema = z.union([z.literal(''), z.string().trim().min(1).max(160), z.null()]).optional().transform((value) => value === '' ? null : value)
+
+export const DISCOVER_RESOURCE_TYPES = [
+  'tool', 'ai-tool', 'app', 'web-service', 'developer-tool',
+  'productivity', 'guide', 'resource', 'other',
+] as const
+
+export const DISCOVER_PRICING_MODELS = [
+  'free', 'freemium', 'paid', 'open-source', 'unknown',
+] as const
+
+const discoverResourceTypeSchema = z.enum(DISCOVER_RESOURCE_TYPES).default('tool')
+const discoverPricingModelSchema = z.enum(DISCOVER_PRICING_MODELS).default('unknown')
+const discoverPlatformSchema = z.string().trim().min(1).max(40)
+export const discoverPlatformsSchema = z
+  .union([z.array(discoverPlatformSchema), z.string()])
+  .transform((value) => {
+    const values = Array.isArray(value) ? value : value.split(',')
+    return [...new Set(values.map((platform) => platform.trim()).filter(Boolean))]
+  })
+  .refine((platforms) => platforms.length <= 12, 'At most 12 platforms are allowed')
+
+export function hasCompleteDiscoverTranslation(item: {
+  titleEn?: string | null
+  descriptionEn?: string | null
+  contentEn?: string | null
+}): boolean {
+  return Boolean(item.titleEn?.trim() && item.descriptionEn?.trim() && item.contentEn?.trim())
+}
 
 export const discoverTagsSchema = z
   .union([z.array(discoverTagSchema), z.string()])
@@ -80,6 +112,17 @@ export const discoverFieldsSchema = z.object({
   imageUrl: optionalDiscoverUrlSchema,
   instagramUrl: discoverInstagramUrlSchema,
   telegramGuideUrl: optionalTelegramUrlSchema,
+  titleEn: discoverTranslationTitleSchema,
+  descriptionEn: discoverTranslationDescriptionSchema,
+  contentEn: discoverTranslationContentSchema,
+  resourceType: discoverResourceTypeSchema,
+  platforms: discoverPlatformsSchema.optional().default([]),
+  pricingModel: discoverPricingModelSchema,
+  seoTitle: discoverSeoSchema,
+  seoDescription: discoverSeoSchema,
+  seoTitleEn: discoverSeoSchema,
+  seoDescriptionEn: discoverSeoSchema,
+  lastReviewedAt: z.string().datetime().nullable().optional().transform((value) => value ? new Date(value) : null),
   featured: z.boolean().optional().default(false),
   published: z.boolean().optional().default(false),
   order: discoverOrderSchema.optional().default(0),
@@ -99,6 +142,17 @@ export const discoverUpdateSchema = z.object({
   imageUrl: optionalDiscoverUrlSchema,
   instagramUrl: discoverInstagramUrlSchema,
   telegramGuideUrl: optionalTelegramUrlSchema,
+  titleEn: discoverTranslationTitleSchema,
+  descriptionEn: discoverTranslationDescriptionSchema,
+  contentEn: discoverTranslationContentSchema,
+  resourceType: z.enum(DISCOVER_RESOURCE_TYPES).optional(),
+  platforms: discoverPlatformsSchema.optional(),
+  pricingModel: z.enum(DISCOVER_PRICING_MODELS).optional(),
+  seoTitle: discoverSeoSchema,
+  seoDescription: discoverSeoSchema,
+  seoTitleEn: discoverSeoSchema,
+  seoDescriptionEn: discoverSeoSchema,
+  lastReviewedAt: z.string().datetime().nullable().optional().transform((value) => value ? new Date(value) : value),
   featured: z.boolean().optional(),
   published: z.boolean().optional(),
   order: discoverOrderSchema.optional(),

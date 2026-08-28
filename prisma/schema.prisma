@@ -88,6 +88,17 @@ model DiscoverItem {
   imageUrl     String?
   instagramUrl String?
   telegramGuideUrl String?
+  titleEn        String?
+  descriptionEn  String?
+  contentEn      String?
+  resourceType   String    @default("tool")
+  platforms      String    @default("")
+  pricingModel   String    @default("unknown")
+  seoTitle       String?
+  seoDescription String?
+  seoTitleEn     String?
+  seoDescriptionEn String?
+  lastReviewedAt DateTime?
   featured     Boolean   @default(false)
   published    Boolean   @default(false)
   order        Int       @default(0)
