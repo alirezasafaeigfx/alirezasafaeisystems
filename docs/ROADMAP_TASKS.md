@@ -1,7 +1,7 @@
 # نقشه راه و تسک‌بندی اولویت‌بندی‌شده
 
-**تاریخ به‌روزرسانی:** 2026-08-28  
-**وضعیت:** Release closure — staging TLS gate pending  
+**تاریخ به‌روزرسانی:** 2026-08-28
+**وضعیت:** Release closure — staging TLS gate pending
 **Objectives:** `docs/ROADMAP_OBJECTIVES.md`
 
 **Spec/Planهای مرجع:**
