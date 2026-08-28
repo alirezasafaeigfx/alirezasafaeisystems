@@ -33,11 +33,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   try {
-    const discoverItems = await db.discoverItem.findMany({
+    const [discoverItems, blogPosts] = await Promise.all([db.discoverItem.findMany({
       where: { published: true },
       select: { slug: true, updatedAt: true },
       orderBy: { updatedAt: 'desc' },
-    })
+    }), db.blogPost.findMany({ where: { published: true }, select: { slug: true, updatedAt: true, titleEn: true, excerptEn: true, contentEn: true }, orderBy: { updatedAt: 'desc' } })])
 
     const discoverEntries: MetadataRoute.Sitemap = discoverItems.map((item) => {
       const faPath = `/fa/discover/${item.slug}`
@@ -57,7 +57,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }
     })
 
-    return [...staticEntries, ...discoverEntries]
+    const blogEntries: MetadataRoute.Sitemap = blogPosts.map((post) => ({ url: `${baseUrl}/blog/${post.slug}`, lastModified: post.updatedAt, changeFrequency: 'monthly', priority: 0.7, alternates: { languages: { 'fa-IR': `${baseUrl}/blog/${post.slug}`, ...(post.titleEn && post.excerptEn && post.contentEn ? { 'en-US': `${baseUrl}/en/blog/${post.slug}` } : {}), 'x-default': `${baseUrl}/blog/${post.slug}` } } }))
+    return [...staticEntries, ...discoverEntries, ...blogEntries]
   } catch {
     // A build without a reachable content database must still expose the static sitemap.
     return staticEntries

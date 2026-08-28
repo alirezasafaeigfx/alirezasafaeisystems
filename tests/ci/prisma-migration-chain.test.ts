@@ -23,13 +23,46 @@ function runPrisma(args: string[], databaseUrl: string) {
   })
 }
 
-afterEach(() => {
+async function removeTemporaryDirectory(directory: string) {
+  let failure: unknown
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    try {
+      rmSync(directory, { recursive: true, force: true })
+      return
+    } catch (error) {
+      failure = error
+      await new Promise((resolveDelay) => setTimeout(resolveDelay, 100 * (attempt + 1)))
+    }
+  }
+  throw failure
+}
+
+afterEach(async () => {
   for (const directory of tempDirs.splice(0)) {
-    rmSync(directory, { recursive: true, force: true })
+    await removeTemporaryDirectory(directory)
   }
 })
 
 describe('Prisma migration history', () => {
+  it('reconciles the production localization migration before V3 fields', () => {
+    const migrationsDir = resolve(process.cwd(), 'prisma/migrations')
+    const historicalSql = readFileSync(
+      resolve(migrationsDir, '20260820135055_discover_v2_localization/migration.sql'),
+      'utf8',
+    ).trim()
+    const v3Sql = readFileSync(
+      resolve(migrationsDir, '20260828000000_add_discover_v3_fields/migration.sql'),
+      'utf8',
+    )
+
+    expect(historicalSql).toContain('ALTER TABLE "DiscoverItem" ADD COLUMN "titleEn" TEXT;')
+    expect(historicalSql).toContain('ALTER TABLE "DiscoverItem" ADD COLUMN "descriptionEn" TEXT;')
+    expect(historicalSql).toContain('ALTER TABLE "DiscoverItem" ADD COLUMN "contentEn" TEXT;')
+    expect(v3Sql).not.toContain('ADD COLUMN "titleEn"')
+    expect(v3Sql).not.toContain('ADD COLUMN "descriptionEn"')
+    expect(v3Sql).not.toContain('ADD COLUMN "contentEn"')
+  })
+
   it('keeps the Discover Telegram guide migration additive and ordered after the reconciled analytics schema', () => {
     const migrationsDir = resolve(process.cwd(), 'prisma/migrations')
     const migrations = readdirSync(migrationsDir, { withFileTypes: true })

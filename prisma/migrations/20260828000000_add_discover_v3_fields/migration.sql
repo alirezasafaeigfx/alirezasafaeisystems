@@ -1,0 +1,8 @@
+ALTER TABLE "DiscoverItem" ADD COLUMN "resourceType" TEXT NOT NULL DEFAULT 'tool';
+ALTER TABLE "DiscoverItem" ADD COLUMN "platforms" TEXT NOT NULL DEFAULT '';
+ALTER TABLE "DiscoverItem" ADD COLUMN "pricingModel" TEXT NOT NULL DEFAULT 'unknown';
+ALTER TABLE "DiscoverItem" ADD COLUMN "seoTitle" TEXT;
+ALTER TABLE "DiscoverItem" ADD COLUMN "seoDescription" TEXT;
+ALTER TABLE "DiscoverItem" ADD COLUMN "seoTitleEn" TEXT;
+ALTER TABLE "DiscoverItem" ADD COLUMN "seoDescriptionEn" TEXT;
+ALTER TABLE "DiscoverItem" ADD COLUMN "lastReviewedAt" DATETIME;

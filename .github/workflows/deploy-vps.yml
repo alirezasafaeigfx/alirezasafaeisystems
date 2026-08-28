@@ -1,23 +1,6 @@
 name: Deploy VPS
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - "src/**"
-      - "ops/**"
-      - "prisma/**"
-      - "public/**"
-      - "package.json"
-      - "pnpm-lock.yaml"
-      - "next.config.*"
-      - "postcss.config.*"
-      - "eslint.config.*"
-      - ".github/workflows/deploy-vps.yml"
-      - "scripts/deploy/**"
-      - "scripts/vps-preflight.sh"
-      - "scripts/verify.sh"
   workflow_dispatch:
     inputs:
       environment:
@@ -31,8 +14,16 @@ on:
         description: Git ref to deploy (branch/tag/sha)
         required: true
         default: main
-      confirmation:
-        description: Type DEPLOY to continue
+      staging_confirmation:
+        description: Type APPROVE_PHASE_2_STAGING_DEPLOY for a staging mutation
+        required: true
+        default: ""
+      production_confirmation:
+        description: Type APPROVE_CRITICAL_SITE_PRODUCTION_DEPLOY for a production deploy mutation
+        required: true
+        default: ""
+      migration_confirmation:
+        description: Type APPROVE_CRITICAL_SITE_MIGRATION for a production database migration
         required: true
         default: ""
 
@@ -45,13 +36,22 @@ jobs:
     name: Quality gate
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    if: ${{ github.event_name != 'workflow_dispatch' || inputs.confirmation == 'DEPLOY' }}
+    outputs:
+      resolved_sha: ${{ steps.resolve_ref.outputs.sha }}
     steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+
+      - id: resolve_ref
+        name: Resolve immutable deployment SHA
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
       - name: Publish deployment pending status
         env:
           GH_TOKEN: ${{ github.token }}
-          TARGET_ENV: ${{ github.event_name == 'workflow_dispatch' && inputs.environment || 'production' }}
-          TARGET_REF: ${{ github.event_name == 'workflow_dispatch' && inputs.ref || github.sha }}
+          TARGET_ENV: ${{ inputs.environment }}
+          TARGET_REF: ${{ steps.resolve_ref.outputs.sha }}
           RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           set -euo pipefail
@@ -74,9 +74,6 @@ jobs:
             "https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/$TARGET_REF" \
             -d "$PAYLOAD" >/dev/null
 
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.ref || github.sha }}
       - uses: pnpm/action-setup@v4
         with:
           version: 9.15.0
@@ -97,14 +94,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     needs: quality-gate
-    if: ${{ github.event_name != 'workflow_dispatch' || inputs.confirmation == 'DEPLOY' }}
-    environment: ${{ github.event_name == 'workflow_dispatch' && inputs.environment || 'production' }}
+    if: ${{ (inputs.environment == 'staging' && inputs.staging_confirmation == 'APPROVE_PHASE_2_STAGING_DEPLOY') || (inputs.environment == 'production' && inputs.production_confirmation == 'APPROVE_CRITICAL_SITE_PRODUCTION_DEPLOY' && inputs.migration_confirmation == 'APPROVE_CRITICAL_SITE_MIGRATION') }}
+    environment: ${{ inputs.environment }}
     concurrency:
-      group: deploy-vps-${{ github.event_name == 'workflow_dispatch' && inputs.environment || 'production' }}
+      group: deploy-vps-${{ inputs.environment }}
       cancel-in-progress: false
     env:
-      TARGET_ENV: ${{ github.event_name == 'workflow_dispatch' && inputs.environment || 'production' }}
-      TARGET_REF: ${{ github.event_name == 'workflow_dispatch' && inputs.ref || github.sha }}
+      TARGET_ENV: ${{ inputs.environment }}
+      TARGET_REF: ${{ needs.quality-gate.outputs.resolved_sha }}
       DEPLOY_BASE_DIR: /var/www/my-portfolio
       DEPLOY_APP_SLUG: my-portfolio
       DEPLOY_PERSISTENT_DB_PATH: /var/www/my-portfolio/shared/data/production.db
@@ -114,10 +111,11 @@ jobs:
       VPS_JUMP_HOST: ${{ secrets.VPS_JUMP_HOST }}
       VPS_JUMP_USER: ${{ secrets.VPS_JUMP_USER }}
       VPS_JUMP_PORT: ${{ secrets.VPS_JUMP_PORT }}
+      VPS_SSH_KEY_PASSPHRASE: ${{ secrets.VPS_SSH_KEY_PASSPHRASE }}
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.ref || github.sha }}
+          ref: ${{ needs.quality-gate.outputs.resolved_sha }}
 
       - uses: pnpm/action-setup@v4
         with:
@@ -137,26 +135,44 @@ jobs:
         run: |
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
-          printf '%s\n' "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/id_ed25519
-          printf '%s\n' "${{ secrets.VPS_JUMP_SSH_KEY }}" > ~/.ssh/id_jump_ed25519
+          printf '%s' "${{ secrets.VPS_SSH_KEY_B64 }}" | base64 --decode > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_jump_ed25519
-          ssh-keyscan -p "${VPS_JUMP_PORT:-22}" -H "$VPS_JUMP_HOST" >> ~/.ssh/known_hosts
+          if ! ssh-keygen -y -P '' -f ~/.ssh/id_ed25519 >/dev/null 2>&1; then
+            if [ -z "$VPS_SSH_KEY_PASSPHRASE" ]; then
+              echo "VPS_SSH_KEY_PASSPHRASE is required for the configured deploy key." >&2
+              exit 1
+            fi
+            printf '%s\n' '#!/bin/sh' 'printf "%s\\n" "$VPS_SSH_KEY_PASSPHRASE"' > /tmp/asdev-ssh-askpass
+            chmod 700 /tmp/asdev-ssh-askpass
+            eval "$(ssh-agent -s)"
+            SSH_ASKPASS=/tmp/asdev-ssh-askpass SSH_ASKPASS_REQUIRE=force DISPLAY=:0 ssh-add ~/.ssh/id_ed25519
+            rm -f /tmp/asdev-ssh-askpass
+            echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> "$GITHUB_ENV"
+            echo "SSH_AGENT_PID=$SSH_AGENT_PID" >> "$GITHUB_ENV"
+          fi
           cat > ~/.ssh/config <<EOF
-          Host deploy-jump
-            HostName $VPS_JUMP_HOST
-            User $VPS_JUMP_USER
-            Port ${VPS_JUMP_PORT:-22}
-            IdentityFile ~/.ssh/id_jump_ed25519
-            IdentitiesOnly yes
           Host deploy-target
             HostName $VPS_HOST
             User $VPS_USER
             Port ${VPS_PORT:-22}
             IdentityFile ~/.ssh/id_ed25519
             IdentitiesOnly yes
-            ProxyJump deploy-jump
           EOF
+          if [ -n "$VPS_JUMP_HOST" ]; then
+            printf '%s\n' "${{ secrets.VPS_JUMP_SSH_KEY }}" > ~/.ssh/id_jump_ed25519
+            chmod 600 ~/.ssh/id_jump_ed25519
+            ssh-keyscan -p "${VPS_JUMP_PORT:-22}" -H "$VPS_JUMP_HOST" >> ~/.ssh/known_hosts
+            cat >> ~/.ssh/config <<EOF
+            Host deploy-jump
+              HostName $VPS_JUMP_HOST
+              User $VPS_JUMP_USER
+              Port ${VPS_JUMP_PORT:-22}
+              IdentityFile ~/.ssh/id_jump_ed25519
+              IdentitiesOnly yes
+            Host deploy-target
+              ProxyJump deploy-jump
+          EOF
+          fi
           chmod 600 ~/.ssh/config
           ssh -F ~/.ssh/config -o StrictHostKeyChecking=accept-new deploy-target true
 
@@ -165,24 +181,28 @@ jobs:
           set -euo pipefail
           RELEASE_ID="$(date -u +%Y%m%dT%H%M%SZ)"
           REMOTE_TMP="/tmp/alirezasafaeisystems-${RELEASE_ID}"
+          SOURCE_ARCHIVE="/tmp/alirezasafaeisystems-${TARGET_REF}.tar"
+          REMOTE_ARCHIVE="/tmp/alirezasafaeisystems-source-${TARGET_REF}.tar"
           echo "RELEASE_ID=$RELEASE_ID" >> "$GITHUB_ENV"
           echo "REMOTE_TMP=$REMOTE_TMP" >> "$GITHUB_ENV"
+          echo "SOURCE_ARCHIVE=$SOURCE_ARCHIVE" >> "$GITHUB_ENV"
+          echo "REMOTE_ARCHIVE=$REMOTE_ARCHIVE" >> "$GITHUB_ENV"
 
-          ssh -F ~/.ssh/config deploy-target "mkdir -p '$REMOTE_TMP'"
+          git archive --format=tar HEAD > "$SOURCE_ARCHIVE"
+          test -s "$SOURCE_ARCHIVE"
+          SOURCE_SHA256="$(sha256sum "$SOURCE_ARCHIVE" | awk '{print $1}')"
+          echo "SOURCE_SHA256=$SOURCE_SHA256" >> "$GITHUB_ENV"
 
-          rsync -az --delete \
-            -e "ssh -F $HOME/.ssh/config" \
-            --exclude '.git' \
-            --exclude '.github' \
-            --exclude 'node_modules' \
-            --exclude '.next' \
-            --exclude 'coverage' \
-            --exclude 'playwright-report' \
-            --exclude 'test-results' \
-            ./ "deploy-target:$REMOTE_TMP/"
+          ssh -F ~/.ssh/config -o ServerAliveInterval=30 -o ServerAliveCountMax=6 deploy-target "mkdir -p '$REMOTE_TMP'"
+          rsync -a --partial --inplace --timeout=60 --info=progress2 \
+            -e "ssh -F $HOME/.ssh/config -o ConnectTimeout=30 -o ServerAliveInterval=30 -o ServerAliveCountMax=6" \
+            "$SOURCE_ARCHIVE" "deploy-target:$REMOTE_ARCHIVE"
+          REMOTE_SHA256="$(ssh -F ~/.ssh/config -o ServerAliveInterval=30 -o ServerAliveCountMax=6 deploy-target "sha256sum '$REMOTE_ARCHIVE'" | awk '{print $1}')"
+          test "$REMOTE_SHA256" = "$SOURCE_SHA256"
+          ssh -F ~/.ssh/config -o ServerAliveInterval=30 -o ServerAliveCountMax=6 deploy-target "tar -xf '$REMOTE_ARCHIVE' -C '$REMOTE_TMP' && rm -f '$REMOTE_ARCHIVE'"
 
       - name: Relocate legacy production SQLite to persistent storage
-        if: ${{ env.TARGET_ENV == 'production' }}
+        if: ${{ env.TARGET_ENV == 'production' && inputs.migration_confirmation == 'APPROVE_CRITICAL_SITE_MIGRATION' }}
         run: |
           set -euo pipefail
           ssh -F ~/.ssh/config deploy-target \
@@ -329,11 +349,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     needs: [quality-gate, deploy]
-    if: ${{ always() && (github.event_name != 'workflow_dispatch' || inputs.confirmation == 'DEPLOY') }}
+    if: ${{ always() }}
     env:
       GH_TOKEN: ${{ github.token }}
-      TARGET_ENV: ${{ github.event_name == 'workflow_dispatch' && inputs.environment || 'production' }}
-      TARGET_REF: ${{ github.event_name == 'workflow_dispatch' && inputs.ref || github.sha }}
+      TARGET_ENV: ${{ inputs.environment }}
+      TARGET_REF: ${{ needs.quality-gate.outputs.resolved_sha }}
       QUALITY_RESULT: ${{ needs.quality-gate.result }}
       DEPLOY_RESULT: ${{ needs.deploy.result }}
       RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}

@@ -4,6 +4,16 @@
 **Status**: ✅ Live and Operational
 **Usage**: Run before deployment and major changes
 
+## V3 Release Closure Snapshot — 2026-08-28
+
+- [x] Deterministic sitemap manifest regenerated and tracked for the release branch.
+- [x] Focused Admin parity E2E covers Discover publish/preview/edit/delete and Blog publish/public-route.
+- [x] Staging runtime and rollback release inventory identified without mutation.
+- [x] TLS root cause established from DNS, active nginx configuration, certificate inventory, ACME timer, and port ownership.
+- [ ] Staging HTTPS certificate, HTTPS vhost, and HTTP-to-HTTPS redirect — blocked pending `APPROVE_PHASE_2_STAGING_DEPLOY`.
+- [ ] Staging deploy/live-verification and latest-SHA hosted-CI closure — run only after the approved staging edge change.
+- [ ] Production migration/deploy — intentionally out of scope and requires separate production approval phrases.
+
 ---
 
 ## 🚀 Pre-Deployment Checklist

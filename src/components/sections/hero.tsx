@@ -224,16 +224,16 @@ export function Hero() {
 
           <div aria-labelledby="audience-title" className="rounded-2xl border border-primary/20 bg-primary/[0.04] p-5 md:p-6">
             <h2 id="audience-title" className="text-xl font-bold md:text-2xl">
-              {homeContent.audienceTitle}
+              {homeContent.proof.title}
             </h2>
             <div className="mt-4 grid gap-3 md:grid-cols-3">
-              {homeContent.audiences.map((audience, index) => (
-                <article key={audience.key} className="rounded-xl border border-border/70 bg-background/85 p-4 shadow-sm">
+              {homeContent.services.map((service, index) => (
+                <article key={service.title} className="rounded-xl border border-border/70 bg-background/85 p-4 shadow-sm">
                   <div className="mb-3 inline-flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-sm font-bold text-primary">
                     {index + 1}
                   </div>
-                  <h3 className="font-semibold">{audience.title}</h3>
-                  <p className="mt-2 text-base leading-7 text-muted-foreground">{audience.description}</p>
+                  <h3 className="font-semibold">{service.title}</h3>
+                  <p className="mt-2 text-base leading-7 text-muted-foreground">{service.description}</p>
                 </article>
               ))}
             </div>

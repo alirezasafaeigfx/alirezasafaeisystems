@@ -85,23 +85,23 @@ test('home page has dir attribute for RTL', async ({ page }) => {
 })
 
 test('contact form has proper labels', async ({ page }) => {
-  await page.goto('/fa/')
+  await page.goto('/fa/qualification')
   await page.waitForLoadState('networkidle')
 
-  const nameInput = page.locator('input[name="name"]')
-  const nameLabel = page.locator('label[for="name"]')
+  const nameInput = page.locator('#contactName')
+  const nameLabel = page.locator('label[for="contactName"]')
   await expect(nameLabel).toBeAttached()
   await expect(nameInput).toHaveAttribute('required')
 
-  const emailInput = page.locator('input[name="email"]')
+  const emailInput = page.locator('#email')
   const emailLabel = page.locator('label[for="email"]')
   await expect(emailLabel).toBeAttached()
   await expect(emailInput).toHaveAttribute('required')
 
-  const messageInput = page.locator('textarea[name="message"]')
-  const messageLabel = page.locator('label[for="message"]')
-  await expect(messageLabel).toBeAttached()
-  await expect(messageInput).toHaveAttribute('required')
+  const organizationInput = page.locator('#organizationName')
+  const organizationLabel = page.locator('label[for="organizationName"]')
+  await expect(organizationLabel).toBeAttached()
+  await expect(organizationInput).toHaveAttribute('required')
 })
 
 test('navigation has aria-current on active page', async ({ page }) => {

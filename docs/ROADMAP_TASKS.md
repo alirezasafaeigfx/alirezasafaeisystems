@@ -1,179 +1,496 @@
 # نقشه راه و تسک‌بندی اولویت‌بندی‌شده
 
-**تاریخ به‌روزرسانی:** 2026-08-15
-**منبع:** ترکیب `docs/IMMEDIATE_EXECUTION_MAP_2026-02-20.md` + `docs/ENTERPRISE_EXECUTION_BACKLOG.md` + `docs/runtime/EXECUTION_NOW.md`
+**تاریخ به‌روزرسانی:** 2026-08-28
+**وضعیت:** Release closure — staging TLS gate pending
+**Objectives:** `docs/ROADMAP_OBJECTIVES.md`
 
-## اصول اولویت‌بندی
-- **P0**: خط تولید و عملکرد اولیه سایت / ریسک بالا
-- **P1**: تاثیر مستقیم روی SEO/مسیریابی/تحلیل و پایداری محصول
-- **P2**: بهبود مداوم کیفیت مهندسی و رشد تبدیل
-- هر تسک یک مالک، خروجی قابل‌اعتبارسازی، و معیار پذیرش دارد.
+**Spec/Planهای مرجع:**
+- Homepage: `docs/product/PERSONAL_BRAND_HOMEPAGE_V3.md`
+- Discover Spec: `docs/superpowers/specs/2026-08-27-discover-hub-v3-design.md`
+- Discover Plan: `docs/superpowers/plans/2026-08-27-discover-hub-v3.md`
+- Admin Spec: `docs/superpowers/specs/2026-08-27-admin-control-center-v3-design.md`
+- Admin Plan: `docs/superpowers/plans/2026-08-27-admin-control-center-v3.md`
+- Blog Spec: `docs/superpowers/specs/2026-08-27-blog-insights-v1-design.md`
+- Blog Plan: `docs/superpowers/plans/2026-08-27-blog-insights-v1.md`
 
-## Backlog فعال (اولویت بالا)
+> این فایل backlog فعال را نشان می‌دهد. جزئیات قدیمی تکمیل‌شده در Git history باقی می‌ماند و نباید دوباره به‌عنوان کار فعال اجرا شود.
 
-### P1 — Discover داخل سایت شخصی
-- [ ] `P1-DISCOVER-1` **ادغام Portfolio-native Discover**
-  مالک: `FE + Backend + QA`
-  شرح: افزودن `/discover` و `/en/discover` با layout فعلی، تکمیل CRUD تب Projects در Admin، و استفاده از همان Prisma Project با تفکیک `contentType` و `published`.
-  خروجی: `docs/superpowers/specs/2026-08-15-discover-portfolio-integration-design.md`، plan، runbook، route، API، migration و تست‌ها.
-  پذیرش: چرخهٔ local create/edit/publish/public/reorder/unpublish/delete بدون deploy موفق باشد؛ `pnpm lint`, `pnpm type-check`, `pnpm test`, `pnpm build` سبز باشند.
+## وضعیت واقعی Release Closure — 2026-08-28
 
-### P0 — فوری (72 تا 120 ساعت آینده)
-- [ ] `P0-1` **ثبات دسترسی VPS و Edge-Origin**  
-  مالک: `DevOps`  
-  شرح: رفع timeoutهای دستیابی خارجی و تثبیت مسیر edge→origin (فایروال/نگه‌داری IP allowlist + تست‌های چندمکانی).  
-  خروجی: گزارش جدید در `docs/runtime/VPS_ACCESS_CHECK_*.md`.  
-  پذیرش: `https://alirezasafaeisystems.ir/` و `/api/ready` پایدار `200`.
+- Homepage V3، route-based Admin، Discover V3 و Blog V1 در شاخهٔ PR #12 پیاده‌سازی شده‌اند؛ برای این closure هیچ scope جدیدی باز نمی‌شود.
+- E2E parity تکمیلی: Admin auth/route-state، Projects lifecycle، Discover create/publish/preview/edit/delete و Blog create/publish/public-route در `e2e/admin-v3.spec.ts` پوشش داده شده‌اند.
+- `src/generated/sitemap-manifest.json` خروجی deterministic HEAD است؛ دو regeneration مستقل hash یکسان دادند و باید tracked بماند.
+- runtime staging روی `IRAN_PROD_SERVER` از `current/staging -> releases/staging/20260828T101500Z-a753577` اجرا می‌شود؛ rollback target آن `20260828T095500Z-d288727` است.
+- TLS staging هنوز PASS نیست: DNS `staging.alirezasafaeisystems.ir -> 193.93.169.32`، HTTP vhost به `127.0.0.1:3003` سالم است، اما HTTPS vhost/certificate برای همان hostname وجود ندارد و SNI گواهی `ir.llm.persiantoolbox.ir` را می‌گیرد. مسیر مستقل و امن: certificate اختصاصی certbot + vhost 443 همان upstream + redirect 80→443 + `nginx -t` پیش از reload.
+- این edge/deploy mutation فقط با عبارت `APPROVE_PHASE_2_STAGING_DEPLOY` اجرا می‌شود. هیچ production hostname، certificate، deploy یا migration در این closure تغییر نکرده است.
 
-- [x] `P0-2` **مهاجرت ناوبری به مسیر واقعی (Route-first)** ✅  
-  مالک: `FE`  
-  شرح: اصلاح `src/components/layout/header.tsx` برای لینک‌های واقعی صفحه‌ها.  
-  خروجی: فایل‌های تغییر یافته و Evidence route-refresh سالم.  
-  پذیرش: هر لینک منو روی Refresh پاسخ می‌دهد و مسیر ثابت می‌ماند.  
-  **تاریخ اتمام:** 2026-06-15 — هدر از مسیرهای واقعی `/services`, `/case-studies`, `/qualification` استفاده می‌کند.
+## اصول اجرا
 
-- [x] `P0-3` **بازنویسی Hero و پیام برند سازمانی** ✅  
-  مالک: `FE + Product`  
-  شرح: حذف آمار غیرمستند، افزودن پیام outcome-driven و proof chips.  
-  خروجی: به‌روزرسانی `src/components/sections/hero.tsx` و ترجمه‌ها.  
-  پذیرش: پیام ۳ ثانیه اول صفحه، authority + local stability + trust را منتقل کند.  
-  **تاریخ اتمام:** 2026-06-15 — Hero شامل intent router، capabilities و collaboration flow است.
+- **P0:** foundation، identity، migration safety، Admin control plane.
+- **P1:** Discover/Blog public product، SEO، analytics، A11y، performance.
+- **P2:** evidence، content growth، CRO و قابلیت‌های غیرضروری برای launch.
+- هر تسک باید test/evidence/acceptance criteria داشته باشد.
+- هیچ metric/testimonial/client/content/portrait جعلی ساخته نشود.
+- database migration فقط additive و با backup/rollback باشد.
+- production فقط از release/deploy موجود پروژه تغییر کند.
+- timeout یا not-run هرگز PASS محسوب نشود.
 
-- [x] `P0-4` **هم‌راستاسازی بخش تماس و microcopy اعتماد** ✅  
-  مالک: `FE`  
-  شرح: حذف `Remote / Global`، جایگزینی با `تهران / ریموت (سراسر ایران)` و افزودن microcopyهای اعتماد.  
-  خروجی: `src/components/sections/contact.tsx`.  
-  پذیرش: متن `Remote / Global` حذف شده و microcopyها روی صفحه قابل مشاهده باشند.  
-  **تاریخ اتمام:** 2026-06-15 — microcopy NDA/SLA اضافه شد.
+---
 
-- [x] `P0-5` **اصلاح فوری Sitemap** ✅  
-  مالک: `FE`  
-  شرح: جایگزینی `lastModified=now` با تاریخ واقعی به‌روزرسانی مسیرها.  
-  خروجی: `src/app/sitemap.ts` و تایید تست ساختار sitemap.  
-  پذیرش: `pnpm run test`/`build` بدون regression در sitemap.  
-  **تاریخ اتمام:** 2026-06-15 — Sitemap از `sitemap-manifest.json` با تاریخ واقعی git استفاده می‌کند.
+# P0 — Personal Brand Foundation
 
-### P1 — کوتاه‌مدت (هفته اول تا دوم)
-- [x] `P1-1` **مهاجرت مسیریابی locale-centered (`/fa`)** ✅  
-  مالک: `FE`  
-  شرح: پیاده‌سازی `src/proxy.ts` (middleware) و مسیریابی locale-aware.  
-  خروجی: routeهای locale-first در production-safe.  
-  پذیرش: canonical/hreflang قابل تولید براساس locale باشد.  
-  **تاریخ اتمام:** 2026-06-15 — proxy.ts شامل language detection، admin protection، security headers.
+## [ ] `P0-PBH-1` — Canonical identity alignment
 
-- [x] `P1-2` **بازطراحی Metadata و canonical per-locale** ✅  
-  مالک: `FE + SEO`  
-  شرح: تنظیم `generateMetadata` پویا در تمام صفحات و مدیریت self-reference/alternate.  
-  خروجی: بهبود schema متا برای فارسی و انگلیسی.  
-  پذیرش: canonical، `fa-IR` و `en-US` در مسیرهای مرتبط صحیح.  
-  **تاریخ اتمام:** 2026-06-15 — تمام ۱۲ صفحه متادیتای پویا و دوزبانه دارند.
+**مالک:** Product + FE + SEO  
+**وابستگی:** ندارد
 
-- [x] `P1-3` **اصلاح inLanguage در Schema** ✅  
-  مالک: `FE`  
-  شرح: پارامتری‌سازی `inLanguage` در `src/lib/seo.ts`.  
-  خروجی: `src/lib/seo.ts` و تست اعتبار خروجی JSON-LD.  
-  پذیرش: محتوای فارسی به‌درستی با `fa-IR` خروجی شود.  
-  **تاریخ اتمام:** 2026-06-15 — `inLanguage` پویا در Person, WebSite, Organization schemas.
+تمام source-of-truthها را با این identity همسو کن:
 
-- [x] `P1-4` **به‌روزرسانی مسیرهای LHCI مطابق مسیر نهایی** ✅  
-  مالک: `FE`  
-  شرح: هم‌سو سازی `lighthouserc.json` با مسیرهای جدید و اصلی سایت.  
-  خروجی: تنظیمات بهینه‌شده Lighthouse budget/route set.  
-  پذیرش: اجرای `pnpm run lighthouse:ci` بدون false-fail مرتبط با مسیر.  
-  **تاریخ اتمام:** 2026-06-15 — مسیرهای qualification و about-brand اضافه شد، آستانه‌ها افزایش یافت.
+- FA: `علیرضا صفایی — مهندس نرم‌افزار`
+- EN: `Alireza Safaei — Software Engineer`
+- specialization: Web Systems, Software Architecture, Production Reliability
 
-### P2 — میانه‌مدت (هفته دوم تا چهارم)
-- [x] `P2-1` **حاکمیت Design Token** ✅
-  مالک: `FE Lead`
-  شرح: Freeze tokenها برای رنگ/typography/spacing/radius/elevation و رفع hard-codeهای UI.
-  خروجی: `docs/DESIGN_TOKEN_REGISTRY.md` + به‌روزرسانی `src/app/globals.css` و کامپوننت‌ها.
-  پذیرش: رفرنس‌گذاری استاندارد در قالب tokenهای رسمی.
-  **تاریخ اتمام:** 2026-06-16 — audit کامل انجام شد، 0 hard-coded color در کامپوننت‌ها.
+**پذیرش:** UI، metadata، Person schema، brand config و docs تناقض نداشته باشند؛ repo reference قدیمی باقی نماند.
 
-- [x] `P2-2` **افزودن A11y gate به Playwright** ✅  
-  مالک: `QA + FE`  
-  شرح: افزودن تست‌های accessibility برای مسیرهای اصلی با Axe.  
-  خروجی: `e2e/a11y.spec.ts` و اسکریپت اجرا در CI.  
-  پذیرش: عدم وجود critical violations در صفحه اصلی و Qualification.  
-  **تاریخ اتمام:** 2026-06-15 — ۹ صفحه تست می‌شوند، شامل heading hierarchy، skip-link، lang/dir attrs، form labels.
+## [ ] `P0-PBH-2` — Personal Hero V3
 
-- [x] `P2-3` **فرم دو مرحله‌ای Qualification** ✅  
-  مالک: `FE + Product`  
-  شرح: دو مرحله‌ای‌سازی فرم با ذخیره‌ی پیش‌نویس.  
-  خروجی: فرم step1/step2 و رفتار بازگشت‌پذیر در خطای submit.  
-  پذیرش: بهبود completion نسبت به baseline فعلی + تست e2e مسیر فرم.  
-  **تاریخ اتمام:** 2026-06-15 — فرم شامل ۲ مرحله، draft saving با localStorage، progress bar ARIA.
+**مالک:** FE + Product + QA  
+**وابستگی:** `P0-PBH-1`
 
-## تسک‌های راهبردی باز از بک‌لاگ (P1/P2)
-- [x] `STRAT-1` Freeze نقش/هدف هر دامنه + KPI اصلی + ۳ KPI پشتیبان. ✅
-- [x] `STRAT-2` تعریف taxonomy مشترک eventها (`source`, `stage`, `intent`, `outcome`). ✅
-- [x] `STRAT-3` تعریف acceptance criteria برای `qualified lead`. ✅
-- [x] `STRAT-4` اجرای baseline فنی/UX/SEO (network readiness, metadata, link integrity) و گزارش `critical/high/medium`. ✅
-- [x] `STRAT-5` حذف مسیرهای intent تکراری و dead-end در IA. ✅
-- [x] `STRAT-6` استانداردسازی microcopy فرم/خطا/موفقیت و glossary اصطلاحات فنی فارسی. ✅
-- [x] `STRAT-7` اجرای segment و consistency های SEO (canonical/hreflang/meta/schema) و بهینه‌سازی internal linking. ✅
-- [x] `STRAT-8` Define SLO/availability budget + اعتبارسنجی incident rollback readiness. ✅
+Hero شخصی با portrait واقعی/placeholder خنثی، H1 جدید، value proposition کوتاه و دقیقاً دو CTA dominant:
 
-## بهبودهای فنی انجام شده (این جلسه - 2026-06-16)
+1. `شروع همکاری`
+2. `مشاهده پروژه‌ها`
 
-### حاکمیت و مستندات
-- [x] حاکمیت Design Token اجرا و freeze شد (P2-1)
-- [x] Domain KPIs برای تمام دامنه‌ها تعریف شد (STRAT-1)
-- [x] Event taxonomy مشترک تعریف شد (STRAT-2)
-- [x] Lead qualification criteria تعریف شد (STRAT-3)
-- [x] SLO و availability budget تعریف شد (STRAT-8)
-- [x] Baseline گزارش کامل فنی/UX/SEO ایجاد شد (STRAT-4)
+**پذیرش:** intent-router/page-roadmap/product CTAهای رقیب از first viewport حذف؛ FA/EN و RTL/LTR و desktop/mobile سالم.
 
-### مستندات جدید
-- `docs/DOMAIN_KPIS.md` - KPIهای هر دامنه
-- `docs/EVENT_TAXONOMY.md` - taxonomy مشترک eventها
-- `docs/LEAD_QUALIFICATION_CRITERIA.md` - معیارهای qualified lead
-- `docs/SLO_AVAILABILITY_BUDGET.md` - SLO و availability budget
-- `docs/runtime/BASELINE_REPORT_2026-06-16.md` - گزارش baseline
+## [ ] `P0-PBH-3` — Homepage IA simplification
 
-### کیفیت کد
-- [x] حذف `withLocale` تکراری → `locale-utils.ts` مشترک
-- [x] `api-schemas.ts` مشترک برای Zod validation
-- [x] حذف ۴۸ کامپوننت بی‌استفاده (۳۹ UI + ۹ section)
-- [x] حذف ۳۳ پکیج بی‌استفاده (framer-motion, Radix unused, recharts, cmdk, ...)
-- [x] `prisma` به devDependencies منتقل شد
-- [x] `console.*` در service-worker با logger جایگزین شد
+**مالک:** Product + FE  
+**وابستگی:** `P0-PBH-2`
 
-### SEO
-- [x] متادیتای تمام ۱۲ صفحه دوزبانه شد
-- [x] Schema.org تکراری حذف شد → single @graph
-- [x] OG Image مabsolute شد
-- [x] x-default hreflang اضافه شد
-- [x] proficiencyLevel Expert شد
-- [x] inLanguage پویا در schemas
+IA هدف:
 
-### UI/UX
-- [x] `scroll-padding-top` برای رفع overlap هدر
-- [x] Redirect فرم تماس به `/thank-you`
-- [x] خطای فرم تماس به کاربر نمایش داده می‌شود
-- [x] RTL ArrowRight اصلاح شد
-- [x] `loading.tsx` و `not-found.tsx` اضافه شد
-- [x] progress bar ARIA attributes
+1. Header
+2. Personal Hero
+3. 3 Core Services
+4. 3 Selected Projects
+5. Proof/Outcomes
+6. Engineering Principles
+7. Short About
+8. Simple Contact CTA
+9. Footer
 
-### امنیت
-- [x] `dangerouslyAllowSVG: false`
-- [x] `.env.example` پاکسازی شده
-- [x] Rate limiting روی تمام API endpoints
+**پذیرش:** Home materially کوتاه‌تر، target 30–40% کاهش density؛ qualification second-stage.
 
-### عملکرد
-- [x] حذف Turbopack (نابالغ)
-- [x] حذف `tailwindcss-animate` plugin (tw-animate-css جایگزین)
-- [x] CSS self-referencing variable حذف شد
-- [x] Comment گمراه‌کننده اصلاح شد
+## [ ] `P0-PBH-4` — Evidence-first selected work
 
-## تعریف Done (برای هر تسک)
-- [ ] PR اتمیک و دامنه‌بندی‌شده (یک هدف)
-- [ ] مدارک شواهد قبل/بعد اگر UI یا UX تغییر کرده
-- [ ] اجرای کامل در CI: `pnpm run verify`
-- [ ] اگر مسیر/UX: `pnpm run lighthouse:ci`
-- [ ] آپدیت مستندات مرتبط در همان PR
+**مالک:** Product + FE  
+**وابستگی:** `P0-PBH-3`
 
-## روش اجرای پیشنهادی روزانه
-1. اجرای تسک‌های `P0` به شکل PRهای کوچک (حداکثر ۱-۲ فایل/تغییر مرکزی در هر PR)
-2. ثبت خروجی پس از هر PR در `docs/runtime/` یا فایل اثبات اجرایی مربوط
-3. بازنگری ۲ روز یک‌بار روی `STRAT-*` و اولویت‌بندی مجدد طبق impact/effort
+حداکثر 3 پروژه؛ اولویت PersianToolbox / Novax / Audit Systems یا proof واقعی بهتر. Metric بدون source/methodology حذف یا qualitative شود.
+
+---
+
+# P0 — Admin Control Plane Foundation
+
+## [ ] `P0-ADM-1` — Baseline + security + rollback audit
+
+**مالک:** Backend + Security + DevOps + QA  
+**وابستگی:** ندارد
+
+قبل از schema/UI changes:
+
+- snapshot/backup DB؛
+- audit session/auth/rate-limit/no-store/noindex؛
+- audit state-changing admin endpoint CSRF/Origin posture؛
+- capture current Leads/Messages/Projects/Discover CRUD behavior؛
+- document rollback path.
+
+**پذیرش:** baseline و rollback evidence ثبت شده؛ vulnerability فقط در صورت evidence گزارش شود.
+
+## [ ] `P0-ADM-2` — Route-based Admin shell
+
+**مالک:** FE + Backend  
+**وابستگی:** `P0-ADM-1`
+
+ایجاد routeهای واقعی:
+
+- `/admin`
+- `/admin/leads`
+- `/admin/messages`
+- `/admin/projects`
+- `/admin/discover`
+- `/admin/blog`
+- `/admin/analytics`
+
+**پذیرش:** auth boundary حفظ؛ route state با refresh/back درست؛ responsive shell؛ module isolation.
+
+## [ ] `P0-ADM-3` — Server-first Overview / Leads / Messages
+
+**مالک:** FE + Backend + QA  
+**وابستگی:** `P0-ADM-2`
+
+- Overview فقط bounded/actionable counts؛
+- Leads فقط Leads data؛
+- Messages فقط Messages data؛
+- initial reads server-side where practical؛
+- existing secure mutation endpoints reused unless defect.
+
+**پذیرش:** cross-module fetch حذف؛ E2E parity green.
+
+## [ ] `P0-ADM-4` — Projects extraction
+
+**مالک:** FE + Backend  
+**وابستگی:** `P0-ADM-2`
+
+ProjectManager از dashboard monolith جدا شود؛ CRUD/state/order/contentType contract regress نکند.
+
+---
+
+# P0/P1 — Discover Hub V3
+
+## [ ] `P0-DISC-1` — Additive Discover schema migration
+
+**مالک:** Backend + Data + QA  
+**وابستگی:** `P0-ADM-1`
+
+Additive fields:
+
+- `titleEn`, `descriptionEn`, `contentEn`
+- `resourceType`, `platforms`, `pricingModel`
+- FA/EN SEO override fields
+- `lastReviewedAt`
+
+**پذیرش:** existing rows/data preserved؛ migration/restore tested؛ Prisma type-check green.
+
+## [ ] `P0-DISC-2` — Discover validation/API V3
+
+**مالک:** Backend + Security  
+**وابستگی:** `P0-DISC-1`
+
+- controlled taxonomy via Zod؛
+- translation completeness helper؛
+- secure CRUD persists new fields؛
+- upload validation verified/hardened؛
+- no SVG in this scope.
+
+**پذیرش:** auth/rate-limit/validation/slug conflict/upload tests green.
+
+## [ ] `P1-DISC-1` — Server-backed search/filter/pagination
+
+**مالک:** FE + Backend  
+**وابستگی:** `P0-DISC-2`
+
+URL state:
+
+- `q`
+- `category`
+- `type`
+- `platform`
+- `sort=featured|latest`
+- `page`
+
+**پذیرش:** refresh/share/back state stable؛ fixed page size 24؛ no client copy of all records needed.
+
+## [ ] `P1-DISC-2` — Discover landing redesign
+
+**مالک:** Product + FE + UI/UX + QA  
+**وابستگی:** `P1-DISC-1`
+
+Structure:
+
+1. search-first hero
+2. featured resources <=4
+3. filters/sort
+4. cards
+5. pagination
+6. disclosure/trust
+7. contextual ASDEV CTA
+
+**پذیرش:** 375/768/1024/1440 usable؛ keyboard focus؛ no heavy carousel/search dependency.
+
+## [ ] `P1-DISC-3` — Resource Profile redesign
+
+**مالک:** Product + FE + SEO  
+**وابستگی:** `P1-DISC-2`
+
+Detail:
+
+- localized identity/summary/body
+- why useful / use cases
+- official primary action
+- optional Telegram/Instagram
+- related Discover
+- related Blog when available
+- disclosure
+- contextual ASDEV path
+
+**پذیرش:** EN incomplete item does not expose/index English shell.
+
+## [ ] `P1-DISC-4` — Discover SEO/sitemap/analytics
+
+**مالک:** SEO + FE + Analytics  
+**وابستگی:** `P1-DISC-3`
+
+- base canonical locale routes؛
+- faceted/search states noindex,follow + canonical base؛
+- EN hreflang only for complete translations؛
+- sitemap only canonical/published routes؛
+- structured data conservative؛
+- normalized Discover event taxonomy.
+
+**پذیرش:** metadata/schema/sitemap unit tests + E2E/Axe green.
+
+## [ ] `P1-ADM-DISC-1` — Discover Admin workspace
+
+**مالک:** FE + Backend + Product  
+**وابستگی:** `P0-DISC-2`, `P0-ADM-2`
+
+Editor groups:
+
+1. Basic
+2. Persian
+3. English
+4. Taxonomy
+5. Media
+6. Links
+7. SEO
+8. Publishing
+
+**پذیرش:** create/edit/publish/unpublish/preview/delete + translation status + safe confirmation fully operational.
+
+---
+
+# P0/P1 — Blog / Insights V1
+
+## [ ] `P0-BLOG-1` — Additive BlogPost migration
+
+**مالک:** Backend + Data  
+**وابستگی:** `P0-ADM-1`
+
+Extend existing BlogPost with:
+
+- EN title/excerpt/content
+- category
+- featured
+- publishedAt/lastReviewedAt
+- FA/EN SEO overrides
+- indexes
+
+**پذیرش:** migration additive, current DB safe, Prisma/type-check green.
+
+## [ ] `P0-BLOG-2` — Safe Markdown/content contract
+
+**مالک:** FE + Backend + Security  
+**وابستگی:** `P0-BLOG-1`
+
+- `react-markdown` + `remark-gfm` if no equivalent already exists؛
+- raw HTML disabled؛
+- heading hierarchy protected؛
+- deterministic read-time helper؛
+- Zod schemas/categories/tags/translation completeness.
+
+**پذیرش:** script/raw-HTML safety tests + validation tests green.
+
+## [ ] `P0-BLOG-3` — Secure Blog Admin API
+
+**مالک:** Backend + Security  
+**وابستگی:** `P0-BLOG-2`
+
+Authenticated CRUD + draft/publish lifecycle + slug conflict + media policy + calculated readTime.
+
+**پذیرش:** unauthenticated rejection, draft, publish, edit, delete tests green.
+
+## [ ] `P1-ADM-BLOG-1` — Blog Admin workspace
+
+**مالک:** FE + Product  
+**وابستگی:** `P0-BLOG-3`, `P0-ADM-2`
+
+Library/editor/preview/publish panel with FA/EN, Markdown preview, cover, tags/category, SEO, translation completeness and safe delete.
+
+**پذیرش:** authenticated Blog CRUD E2E green.
+
+## [ ] `P1-BLOG-1` — Public Blog landing
+
+**مالک:** FE + SEO  
+**وابستگی:** `P0-BLOG-2`
+
+- `/blog`, `/en/blog`
+- featured article max 1
+- category filter
+- pagination
+- author/expertise context
+
+**پذیرش:** published only؛ EN incomplete excluded؛ route metadata correct.
+
+## [ ] `P1-BLOG-2` — Article detail + BlogPosting
+
+**مالک:** FE + SEO + QA  
+**وابستگی:** `P1-BLOG-1`
+
+- one H1
+- safe server-rendered Markdown
+- author/date/update/readTime
+- related article/Discover
+- contextual service/case-study CTA
+- BlogPosting + BreadcrumbList
+
+**پذیرش:** draft/incomplete EN notFound؛ schema backed by visible facts.
+
+## [ ] `P1-BLOG-3` — Sitemap/site integration
+
+**مالک:** SEO + FE  
+**وابستگی:** `P1-BLOG-2`
+
+- sitemap published/translated routes;
+- Blog navigation;
+- optional Home latest <=3 only if Homepage density budget remains valid;
+- related Blog links on Discover detail.
+
+**پذیرش:** no index bloat; Home simplification does not regress.
+
+---
+
+# P1 — Shared SEO / Analytics / Quality
+
+## [ ] `P1-SHARED-1` — Metadata/entity/hreflang alignment
+
+**مالک:** SEO + FE
+
+Across Home/Discover/Blog:
+
+- canonical locale strategy;
+- Person/author entity alignment;
+- x-default policy;
+- content-timestamp sitemap dates;
+- no duplicate English shells.
+
+## [ ] `P1-SHARED-2` — Event taxonomy V3
+
+**مالک:** Analytics + FE
+
+Minimum groups:
+
+### Home
+- `hero_impression`
+- `hero_primary_cta_click`
+- `hero_projects_cta_click`
+- `project_card_click`
+- `contact_cta_click`
+- `qualification_start`
+- `qualification_submit_success`
+
+### Discover
+- `discover_landing_view`
+- `discover_search_submit`
+- `discover_filter_change`
+- `discover_item_open`
+- `discover_item_view`
+- `discover_external_click`
+- `discover_telegram_guide_click`
+- `discover_instagram_click`
+- `discover_related_item_click`
+- `discover_asdev_cta_click`
+
+### Blog
+- `blog_landing_view`
+- `blog_article_open`
+- `blog_article_view`
+- `blog_related_article_click`
+- `blog_discover_click`
+- `blog_service_cta_click`
+- `blog_case_study_click`
+
+**پذیرش:** duplicate/obsolete event path حذف/مستند؛ sensitive query retention policy رعایت.
+
+## [ ] `P1-SHARED-3` — Full responsive/A11y/performance gate
+
+**مالک:** QA + FE
+
+Run:
+
+```bash
+pnpm run verify
+pnpm run test:e2e:smoke
+pnpm run test:e2e:a11y
+pnpm run lighthouse:ci
+pnpm run scan:secrets
+```
+
+Plus targeted:
+
+- Homepage V3 desktop/mobile;
+- `e2e/admin-v3.spec.ts`;
+- `e2e/discover-v3.spec.ts`;
+- `e2e/blog-v1.spec.ts`.
+
+**پذیرش:** no Critical/Serious Axe; public Lighthouse targets preserved where environment stable; no console errors; no secret/private DB/media leakage.
+
+## [ ] `P1-SHARED-4` — Production release + live verification
+
+**مالک:** DevOps + QA
+
+- backup DB before migration؛
+- deploy via established pipeline؛
+- verify apex + www؛
+- verify Home, Discover, representative item, Blog/article, `/api/ready`؛
+- authenticated Admin smoke؛
+- exact SHA + migration + rollback evidence.
+
+---
+
+# P2 — Growth After Stable Launch
+
+## [ ] `P2-1` — Case-study evidence enrichment
+
+Before/After + measurement window + source/methodology. Unsupported claims removed/qualified.
+
+## [ ] `P2-2` — Seed Blog content
+
+Publish 3–5 real high-signal articles. Suggested themes:
+
+1. production readiness;
+2. project rescue without rewrite;
+3. reliability/performance for Iranian infrastructure;
+4. technical SEO as engineering;
+5. reducing fragile external dependencies.
+
+## [ ] `P2-3` — Discover editorial growth
+
+Add reviewed high-quality resources, keep `lastReviewedAt` current, avoid bulk scraping/import.
+
+## [ ] `P2-4` — CRO baseline and experiments
+
+Only after stable analytics baseline. Each experiment needs hypothesis + metric + stop condition.
+
+## [ ] `P2-5` — Optional Admin bulk actions
+
+Only after single-item workflows are stable and real content volume justifies bulk publish/feature/reorder.
+
+---
+
+# Release / Completion Gate
+
+Content Platform V3 is **Done** only when all four surfaces satisfy their acceptance gates:
+
+1. **Home** — personal identity + simplified conversion path;
+2. **Discover** — general public Resource Hub + social destination;
+3. **Admin** — route-based maintainable control center;
+4. **Blog** — safe first-party editorial platform.
+
+Global completion requires:
+
+- FA/EN policy correct;
+- additive migrations verified;
+- old Admin monolith removed only after parity;
+- quality gates actually executed;
+- security posture not regressed;
+- production SHA documented;
+- live verification recorded;
+- rollback path recorded;
+- no fabricated proof/content.
+
+## Historical note
+
+Existing production capabilities such as route-first navigation, locale metadata, sitemap manifest, design-token governance, A11y testing, secure Admin auth/API helpers, Discover attribution and qualification flow are baseline guarantees. V3 must preserve or improve them, never silently regress them.

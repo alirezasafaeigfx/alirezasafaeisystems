@@ -78,7 +78,7 @@ describe('Discover production rollout contract', () => {
     expect(deployIndex).toBeGreaterThan(jobsIndex)
     expect(workflowConcurrencyIndex === -1 || workflowConcurrencyIndex > jobsIndex).toBe(true)
     expect(deployConcurrencyIndex).toBeGreaterThan(deployIndex)
-    expect(workflow).toContain('group: deploy-vps-${{ github.event_name == \'workflow_dispatch\' && inputs.environment || \'production\' }}')
+    expect(workflow).toContain('group: deploy-vps-${{ inputs.environment }}')
     expect(workflow).toContain('cancel-in-progress: false')
     expect(pendingStatusIndex).toBeGreaterThan(jobsIndex)
     expect(pendingStatusIndex).toBeLessThan(deployIndex)

@@ -10,6 +10,23 @@ trap 'rm -f "$TMP_OUT"' EXIT
 
 RG_BIN="${SCAN_SECRETS_RG_BIN:-rg}"
 GIT_BIN="${SCAN_SECRETS_GIT_BIN:-git}"
+
+# LOCAL_PC may expose ripgrep only as a native Windows executable while this
+# script runs under Git Bash. Discover that executable without bypassing the
+# scanner or falling back to a weaker pattern.
+if ! command -v "$RG_BIN" >/dev/null 2>&1 && command -v where.exe >/dev/null 2>&1; then
+  native_rg="$(where.exe rg.exe 2>/dev/null | head -n 1 | tr -d '\r' || true)"
+  if [ -n "$native_rg" ]; then
+    if command -v cygpath >/dev/null 2>&1; then
+      RG_BIN="$(cygpath -u "$native_rg")"
+    else
+      # WSL Git Bash images may not ship cygpath; convert the common C:\ path.
+      native_rg="${native_rg//\\//}"
+      drive="$(printf '%s' "${native_rg:0:1}" | tr '[:upper:]' '[:lower:]')"
+      RG_BIN="/mnt/${drive}${native_rg:2}"
+    fi
+  fi
+fi
 PATTERN='(AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{36}|xox[baprs]-[A-Za-z0-9-]{10,}|AIza[0-9A-Za-z_-]{35}|-----BEGIN (RSA|EC|OPENSSH|PGP) PRIVATE KEY-----|(?i)(api[_-]?key|token|secret|password)\s*[:=]\s*["'"'"'`][^"'"'"'`]{8,}["'"'"'`])'
 
 handle_scan_status() {

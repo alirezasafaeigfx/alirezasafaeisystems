@@ -88,6 +88,18 @@ model DiscoverItem {
   imageUrl     String?
   instagramUrl String?
   telegramGuideUrl String?
+  titleEn        String?
+  descriptionEn  String?
+  contentEn      String?
+  publishedEn    Boolean   @default(false)
+  resourceType   String    @default("tool")
+  platforms      String    @default("")
+  pricingModel   String    @default("unknown")
+  seoTitle       String?
+  seoDescription String?
+  seoTitleEn     String?
+  seoDescriptionEn String?
+  lastReviewedAt DateTime?
   featured     Boolean   @default(false)
   published    Boolean   @default(false)
   order        Int       @default(0)
@@ -136,6 +148,20 @@ model BlogPost {
   readTime    Int      // in minutes
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  titleEn          String?
+  excerptEn        String?
+  contentEn        String?
+  category         String   @default("engineering")
+  featured         Boolean  @default(false)
+  publishedAt      DateTime?
+  lastReviewedAt   DateTime?
+  seoTitle         String?
+  seoDescription   String?
+  seoTitleEn       String?
+  seoDescriptionEn String?
+
+  @@index([published, featured, publishedAt])
+  @@index([category, published])
 }
 
 model ContactMessage {

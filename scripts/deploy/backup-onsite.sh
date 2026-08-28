@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+umask 077
 
 BASE_DIR="/var/www/my-portfolio"
 BACKUP_ROOT="/var/backups/my-portfolio"
@@ -37,7 +38,8 @@ Notes:
     - <nginx-dir>
     - <systemd-dir>/my-portfolio-*.service
     - <base-dir>/shared/env
-    - SQLite files from shared/env (<env>.db when present)
+    - A transactionally consistent persistent SQLite snapshot
+    - Discover uploaded media beside the persistent database when present
 USAGE
 }
 
@@ -91,7 +93,9 @@ manifest_path="${target_dir}/${archive_name}.manifest.txt"
 sha_path="${target_dir}/${archive_name}.sha256"
 
 shared_env_dir="${BASE_DIR}/shared/env"
-env_db="${shared_env_dir}/${ENV_NAME}.db"
+persistent_db_path="${PERSISTENT_DB_PATH:-${BASE_DIR}/shared/data/${ENV_NAME}.db}"
+discover_upload_dir="${DISCOVER_UPLOAD_DIR:-$(dirname "$persistent_db_path")/uploads/discover}"
+sqlite_bin="${SQLITE_BIN:-sqlite3}"
 
 [[ -d "$shared_env_dir" ]] || die "Missing env dir: $shared_env_dir"
 if [[ ! -d "$NGINX_DIR" ]]; then
@@ -103,7 +107,10 @@ if [[ ! -d "$NGINX_DIR" ]]; then
 fi
 
 tmp_manifest="$(mktemp)"
-cleanup() { rm -f "$tmp_manifest"; }
+snapshot_parent="${BACKUP_ROOT}/.tmp"
+snapshot_dir=""
+snapshot_db="${snapshot_dir}/persistent.sqlite"
+cleanup() { rm -f "$tmp_manifest"; rm -rf "$snapshot_dir"; }
 trap cleanup EXIT
 
 {
@@ -121,21 +128,48 @@ trap cleanup EXIT
   printf '%s\n' "$shared_env_dir"
 } >"$tmp_manifest"
 
-if [[ -f "$env_db" ]]; then
-  printf '%s\n' "$env_db" >>"$tmp_manifest"
+if [[ "$DRY_RUN" == "1" ]]; then
+  if [[ -f "$persistent_db_path" ]]; then
+    printf '%s\n' "$persistent_db_path" >>"$tmp_manifest"
+  else
+    log "warning: missing persistent database: $persistent_db_path"
+  fi
+else
+  [[ -f "$persistent_db_path" ]] || die "Missing persistent database: $persistent_db_path"
+  command -v "$sqlite_bin" >/dev/null 2>&1 || die "Missing SQLite client: $sqlite_bin"
+  mkdir -p "$BACKUP_ROOT" "$snapshot_parent"
+  chmod 700 "$BACKUP_ROOT" "$snapshot_parent"
+  snapshot_dir="$(mktemp -d "${snapshot_parent}/persistent.XXXXXX")"
+  snapshot_db="${snapshot_dir}/persistent.sqlite"
+  "$sqlite_bin" -readonly "$persistent_db_path" ".backup '$snapshot_db'" || die "Persistent database snapshot failed"
+  snapshot_integrity="$("$sqlite_bin" -readonly "$snapshot_db" 'PRAGMA integrity_check;' | tr -d '\r')"
+  [[ "$snapshot_integrity" == "ok" ]] || die "Persistent database snapshot integrity failed: $snapshot_integrity"
+  printf '%s\n' "$snapshot_db" >>"$tmp_manifest"
+fi
+
+if [[ -d "$discover_upload_dir" ]]; then
+  printf '%s\n' "$discover_upload_dir" >>"$tmp_manifest"
+else
+  log "warning: missing Discover upload directory, skipping: $discover_upload_dir"
 fi
 
 log "frequency=$FREQUENCY env=$ENV_NAME base=$BASE_DIR"
 run "mkdir -p '$target_dir'"
 run "cp '$tmp_manifest' '$manifest_path'"
 
+if [[ "$DRY_RUN" != "1" ]]; then
+  chmod 700 "$target_dir"
+  chmod 600 "$manifest_path"
+fi
+
 if [[ "$DRY_RUN" == "1" ]]; then
   log "would create archive: $archive_path"
   log "manifest:"
   cat "$tmp_manifest"
 else
-  tar -czf "$archive_path" -T "$tmp_manifest"
+  tar -czf "$archive_path" --transform='s|.*/persistent\.sqlite$|persistent.sqlite|' -T "$tmp_manifest"
   sha256sum "$archive_path" > "$sha_path"
+  chmod 600 "$archive_path" "$sha_path"
   log "created archive: $archive_path"
   log "sha256 file: $sha_path"
 fi

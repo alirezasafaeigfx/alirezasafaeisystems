@@ -1,9 +1,17 @@
 import fs from 'node:fs'
+import { randomBytes } from 'node:crypto'
 import { resolve } from 'node:path'
 
 const systemChromePath = '/usr/bin/google-chrome'
 const disableWebServer = process.env.PLAYWRIGHT_DISABLE_WEBSERVER === 'true'
 const playwrightDatabaseUrl = `file:${resolve(process.cwd(), 'test-results/playwright.db')}`
+const runtimeToken = () => randomBytes(24).toString('base64url')
+const playwrightAdminEnv = {
+  ADMIN_USERNAME: process.env.ADMIN_USERNAME || `e2e-${runtimeToken().slice(0, 16)}`,
+  ADMIN_PASSWORD: process.env.ADMIN_PASSWORD || runtimeToken(),
+  ADMIN_SESSION_SECRET: process.env.ADMIN_SESSION_SECRET || runtimeToken(),
+}
+Object.assign(process.env, playwrightAdminEnv)
 const launchOptions = fs.existsSync(systemChromePath)
   ? {
       executablePath: systemChromePath,
@@ -33,6 +41,7 @@ const config = {
         timeout: 240_000,
         env: {
           DATABASE_URL: playwrightDatabaseUrl,
+          ...playwrightAdminEnv,
         },
       },
 }
