@@ -21,6 +21,18 @@ WARNINGS=()
 # Resolve it before defining the wrapper so a missing or broken scanner can
 # never be interpreted as a clean scan by legacy `|| true` call sites.
 RG_BIN="${EXTERNAL_SCAN_RG_BIN:-rg}"
+if ! command -v "$RG_BIN" >/dev/null 2>&1 && command -v where.exe >/dev/null 2>&1; then
+    native_rg="$(where.exe rg.exe 2>/dev/null | head -n 1 | tr -d '\r' || true)"
+    if [ -n "$native_rg" ]; then
+        if command -v cygpath >/dev/null 2>&1; then
+            RG_BIN="$(cygpath -u "$native_rg")"
+        else
+            native_rg="${native_rg//\\//}"
+            drive="$(printf '%s' "${native_rg:0:1}" | tr '[:upper:]' '[:lower:]')"
+            RG_BIN="/mnt/${drive}${native_rg:2}"
+        fi
+    fi
+fi
 if ! RG_PATH="$(command -v "$RG_BIN" 2>/dev/null)" || [ -z "$RG_PATH" ]; then
     echo -e "${RED}❌ External scan unavailable: required scanner '$RG_BIN' was not found.${NC}" >&2
     exit 2
