@@ -21,7 +21,18 @@ export function buildDiscoverWhere(query: DiscoverPublicQuery, locale: 'fa' | 'e
     : [{ title: { contains: query.q } }, { description: { contains: query.q } }, { category: { contains: query.q } }, { tags: { contains: query.q } }, { platforms: { contains: query.q } }]
   return {
     published: true,
-    ...(locale === 'en' ? { titleEn: { not: null }, AND: [{ descriptionEn: { not: null } }, { contentEn: { not: null } }] } : {}),
+    ...(locale === 'en'
+      ? {
+          titleEn: { not: null },
+          AND: [
+            { titleEn: { not: '' } },
+            { descriptionEn: { not: null } },
+            { descriptionEn: { not: '' } },
+            { contentEn: { not: null } },
+            { contentEn: { not: '' } },
+          ],
+        }
+      : {}),
     ...(query.category ? { category: query.category } : {}),
     ...(query.type ? { resourceType: query.type } : {}),
     ...(query.platform ? { platforms: { contains: query.platform } } : {}),
