@@ -25,6 +25,16 @@ NC='\033[0m' # No Color
 PASS_COUNT=0
 FAIL_COUNT=0
 
+# Git for Windows can resolve `pnpm` to a WSL shim whose node executable is
+# unavailable in LOCAL_PC. Prefer the native command when present while
+# retaining the standard pnpm binary on Linux/AUTOMATION_SERVER.
+PNPM_CMD="${PNPM_CMD:-pnpm}"
+if command -v pnpm.cmd >/dev/null 2>&1; then
+    # `.cmd` files are not executable by the Git Bash interpreter used to
+    # launch this script; invoke the package manager through native node.exe.
+    PNPM_CMD="node.exe C:/Users/ASDEV/AppData/Roaming/npm/node_modules/pnpm/bin/pnpm.cjs"
+fi
+
 # Function to run a check
 run_check() {
     local name=$1
@@ -50,7 +60,7 @@ echo ""
 echo "🔧 STEP 1: Running linter..."
 # Ensure optional test artifact paths exist to avoid ESLint filesystem edge-cases.
 mkdir -p test-results playwright-report
-if ! run_check "ESLint" "pnpm run lint"; then
+if ! run_check "ESLint" "$PNPM_CMD run lint"; then
     echo -e "${RED}Linting failed!${NC}"
     exit 1
 fi
@@ -59,7 +69,7 @@ fi
 echo ""
 echo "📘 STEP 2: Running type check..."
 if grep -q "tsc" package.json 2>/dev/null; then
-    if ! run_check "TypeScript" "pnpm run type-check 2>/dev/null || pnpm exec tsc --noEmit"; then
+    if ! run_check "TypeScript" "$PNPM_CMD run type-check 2>/dev/null || $PNPM_CMD exec tsc --noEmit"; then
         echo -e "${YELLOW}Type check not available or failed${NC}"
     fi
 else
@@ -69,7 +79,7 @@ fi
 # Check 3: Tests with Coverage
 echo ""
 echo "🧪 STEP 3: Running tests..."
-if ! run_check "Tests" "pnpm run test"; then
+if ! run_check "Tests" "$PNPM_CMD run test"; then
     echo -e "${RED}Tests failed!${NC}"
     exit 1
 fi
@@ -77,7 +87,7 @@ fi
 # Check 4: Build
 echo ""
 echo "🏗️  STEP 4: Running build..."
-if ! run_check "Build" "pnpm run build"; then
+if ! run_check "Build" "$PNPM_CMD run build"; then
     echo -e "${RED}Build failed!${NC}"
     exit 1
 fi
