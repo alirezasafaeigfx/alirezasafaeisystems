@@ -98,7 +98,7 @@ echo "🔒 STEP 5: Running external request scan..."
 if [ -f "scripts/offline-external-scan.sh" ]; then
     # The external scanner is intentionally fail-closed. CI/deploy callers must
     # provision the repository-pinned ripgrep binary before invoking verify.
-    if ! command -v rg >/dev/null 2>&1; then
+    if ! command -v rg >/dev/null 2>&1 && ! command -v rg.exe >/dev/null 2>&1 && ! command -v where.exe >/dev/null 2>&1; then
         echo -e "${RED}Verification requires ripgrep (rg); provision it before running pnpm run verify.${NC}" >&2
         exit 2
     fi

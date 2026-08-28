@@ -13,8 +13,8 @@ test.describe('Admin Control Center V3 authentication boundary', () => {
 test.describe('Admin Control Center V3 authenticated shell', () => {
   test('keeps route state and exposes every module link', async ({ page }) => {
     await page.goto('/admin/login')
-    await page.getByLabel('Username').fill('playwright-admin')
-    await page.getByLabel('Password').fill('playwright-only-password-not-for-production')
+    await page.getByLabel('Username').fill(process.env.ADMIN_USERNAME ?? '')
+    await page.getByLabel('Password').fill(process.env.ADMIN_PASSWORD ?? '')
     await page.getByRole('button', { name: 'Sign in' }).click()
 
     await expect(page).toHaveURL(/\/admin$/)
@@ -31,8 +31,8 @@ test.describe('Admin Control Center V3 authenticated shell', () => {
 
   test('Projects create, edit, publish, and delete parity', async ({ page }) => {
     await page.goto('/admin/login')
-    await page.getByLabel('Username').fill('playwright-admin')
-    await page.getByLabel('Password').fill('playwright-only-password-not-for-production')
+    await page.getByLabel('Username').fill(process.env.ADMIN_USERNAME ?? '')
+    await page.getByLabel('Password').fill(process.env.ADMIN_PASSWORD ?? '')
     await page.getByRole('button', { name: 'Sign in' }).click()
     await expect(page).toHaveURL(/\/admin$/)
 
