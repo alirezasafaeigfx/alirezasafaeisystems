@@ -1,9 +1,9 @@
 # Personal Brand + Content Platform V3 baseline
 
-**Environment:** `LOCAL_PC`  
-**Repository:** `alirezasafaeigfx/alirezasafaeisystems`  
-**Implementation branch:** `feat/personal-brand-content-platform-v3`  
-**Source-of-truth SHA:** `75b3452147144283a4beafccdef39663d271a54c`  
+**Environment:** `LOCAL_PC`
+**Repository:** `alirezasafaeigfx/alirezasafaeisystems`
+**Implementation branch:** `feat/personal-brand-content-platform-v3`
+**Source-of-truth SHA:** `75b3452147144283a4beafccdef39663d271a54c`
 **Production impact:** none
 
 ## Source verification
