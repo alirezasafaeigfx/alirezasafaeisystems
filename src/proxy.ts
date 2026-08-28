@@ -233,6 +233,16 @@ export async function proxy(request: NextRequest) {
       return withSecurityHeaders(response, pathname, nonce)
     }
 
+    // Keep the English homepage on its explicit route. This avoids a
+    // standalone-runtime rewrite losing the locale request headers before
+    // RootLayout resolves html[lang]/dir.
+    if (pathname === '/en') {
+      const response = NextResponse.next({ request: { headers: requestHeadersWithContext } })
+      response.cookies.set('lang', 'en', { path: '/', sameSite: 'lax', maxAge: 60 * 60 * 24 * 365 })
+      withRequestContextHeaders(response, { correlationId, nonce, locale: 'en', pathname })
+      return withSecurityHeaders(response, pathname, nonce)
+    }
+
     const rewriteUrl = request.nextUrl.clone()
     rewriteUrl.pathname = normalizedLocalePath
     rewriteUrl.protocol = 'http:'
