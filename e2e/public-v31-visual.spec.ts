@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect, type Page } from '@playwright/test'
 
 const viewportMatrix = [
   { width: 360, height: 800 },
@@ -11,10 +11,13 @@ const viewportMatrix = [
 ]
 
 const publicRoutes = ['/', '/discover', '/blog']
-const evidenceRoot = 'test-results/v31-evidence'
 const visualBlogSlug = 'v31-visual-evidence-article'
 
-async function signInAsAdmin(page) {
+type VisualBlogPost = {
+  slug: string
+}
+
+async function signInAsAdmin(page: Page) {
   const username = process.env.ADMIN_USERNAME
   const password = process.env.ADMIN_PASSWORD
 
@@ -27,12 +30,12 @@ async function signInAsAdmin(page) {
   expect(response.ok()).toBe(true)
 }
 
-async function ensureVisualBlogFixture(page) {
+async function ensureVisualBlogFixture(page: Page): Promise<VisualBlogPost> {
   await signInAsAdmin(page)
 
   const listing = await page.request.get('/api/admin/blog')
   expect(listing.ok()).toBe(true)
-  const payload = await listing.json()
+  const payload = await listing.json() as { posts?: VisualBlogPost[] }
   const existing = payload.posts?.find((post) => post.slug === visualBlogSlug)
   if (existing) return existing
 
@@ -52,7 +55,8 @@ async function ensureVisualBlogFixture(page) {
     },
   })
   expect(created.status()).toBe(201)
-  return (await created.json()).post
+  const body = await created.json() as { post: VisualBlogPost }
+  return body.post
 }
 
 test.describe('V3.1 public visual contract', () => {
