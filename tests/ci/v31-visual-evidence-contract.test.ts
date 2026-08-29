@@ -5,16 +5,20 @@ import { describe, expect, it } from 'vitest'
 const read = (path: string) => readFileSync(resolve(process.cwd(), path), 'utf8')
 
 describe('V3.1 visual evidence contract', () => {
-  it('captures the required public screenshot matrix under the stable evidence directory', () => {
+  it('captures the complete public review matrix under the stable evidence directory', () => {
     const visual = read('e2e/public-v31-visual.spec.ts')
 
     for (const file of [
-      'home-fa-mobile-390.png',
-      'home-en-desktop-1440.png',
-      'discover-mobile-390.png',
-      'discover-desktop-1440.png',
-      'blog-landing-desktop.png',
-      'blog-article-desktop.png',
+      'home-fa-1440.png',
+      'home-fa-390.png',
+      'home-en-1440.png',
+      'home-en-390.png',
+      'discover-fa-1440.png',
+      'discover-fa-390.png',
+      'discover-detail.png',
+      'blog-landing.png',
+      'blog-article.png',
+      'focus-state.png',
       'admin-dashboard-desktop.png',
     ]) {
       expect(visual).toContain(`test-results/v31-evidence/${file}`)
@@ -29,6 +33,16 @@ describe('V3.1 visual evidence contract', () => {
     expect(workflow).toContain('test-results/v31-evidence')
     expect(workflow).toContain('v31-visual-evidence-${{ github.sha }}')
     expect(workflow).toContain('if-no-files-found: error')
+  })
+
+  it('keeps production cookie security intact and adapts only the disposable browser context', () => {
+    const visual = read('e2e/public-v31-visual.spec.ts')
+    const auth = read('src/lib/admin-auth.ts')
+
+    expect(auth).toContain("secure: env.NODE_ENV === 'production'")
+    expect(visual).toContain("headers()['set-cookie']")
+    expect(visual).toContain('page.context().addCookies')
+    expect(visual).toContain('secure: false')
   })
 
   it('never hardcodes an admin credential in the visual evidence test', () => {
