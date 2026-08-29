@@ -8,6 +8,7 @@ describe('V3.1 visual evidence contract', () => {
   it('captures the complete public review matrix under the stable evidence directory', () => {
     const visual = read('e2e/public-v31-visual.spec.ts')
 
+    expect(visual).toContain('test-results/v31-evidence/')
     for (const file of [
       'home-fa-1440.png',
       'home-fa-390.png',
@@ -21,7 +22,7 @@ describe('V3.1 visual evidence contract', () => {
       'focus-state.png',
       'admin-dashboard-desktop.png',
     ]) {
-      expect(visual).toContain(`test-results/v31-evidence/${file}`)
+      expect(visual).toContain(`'${file}'`)
     }
   })
 
