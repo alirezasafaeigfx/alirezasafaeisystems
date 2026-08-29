@@ -1,0 +1,141 @@
+:root {
+  --public-section-y: clamp(4.25rem, 7vw, 7.25rem);
+  --public-section-y-compact: clamp(3.25rem, 5vw, 5rem);
+  --public-content-max: 76rem;
+  --public-copy-max: 42rem;
+  --public-ink: var(--foreground);
+  --public-cobalt: var(--primary);
+  --public-surface: color-mix(in oklab, var(--card) 94%, var(--background));
+  --public-surface-soft: color-mix(in oklab, var(--card) 82%, var(--muted));
+  --public-surface-dark: oklch(0.16 0.035 258);
+  --public-border: color-mix(in oklab, var(--border) 78%, transparent);
+  --public-shadow: 0 26px 80px -42px oklch(0.24 0.04 258 / 0.36);
+}
+
+.public-section {
+  padding-block: var(--public-section-y);
+}
+
+.public-section-compact {
+  padding-block: var(--public-section-y-compact);
+}
+
+.public-shell {
+  width: min(calc(100% - 2rem), var(--public-content-max));
+  margin-inline: auto;
+}
+
+.public-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--public-cobalt);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+[dir='rtl'] .public-kicker {
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.public-kicker::before {
+  content: '';
+  width: 1.75rem;
+  height: 2px;
+  border-radius: 999px;
+  background: currentColor;
+  opacity: 0.9;
+}
+
+.public-display {
+  color: var(--public-ink);
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+[dir='rtl'] .public-display {
+  line-height: 1.38;
+  letter-spacing: 0;
+}
+
+.public-visual-frame {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-width: 0;
+  border: 1px solid var(--public-border);
+  border-radius: clamp(1.25rem, 2vw, 2rem);
+  background:
+    linear-gradient(145deg, color-mix(in oklab, var(--primary) 10%, transparent), transparent 45%),
+    var(--public-surface);
+  box-shadow: var(--public-shadow);
+}
+
+.public-visual-frame::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  box-shadow: inset 0 1px 0 color-mix(in oklab, white 42%, transparent);
+}
+
+.public-hairline {
+  border-color: var(--public-border);
+}
+
+.public-surface {
+  border: 1px solid var(--public-border);
+  background: var(--public-surface);
+  box-shadow: var(--public-shadow);
+}
+
+.public-dark-surface {
+  background:
+    radial-gradient(circle at 15% 0%, color-mix(in oklab, var(--primary) 24%, transparent), transparent 34%),
+    radial-gradient(circle at 85% 100%, color-mix(in oklab, var(--accent) 18%, transparent), transparent 36%),
+    var(--public-surface-dark);
+  color: white;
+}
+
+.public-link-arrow {
+  transition: transform 180ms ease;
+}
+
+.group:hover .public-link-arrow,
+.group:focus-visible .public-link-arrow {
+  transform: translateX(-0.18rem);
+}
+
+[dir='ltr'] .group:hover .public-link-arrow,
+[dir='ltr'] .group:focus-visible .public-link-arrow {
+  transform: translateX(0.18rem);
+}
+
+@media (max-width: 639px) {
+  :root {
+    --public-section-y: 4.25rem;
+    --public-section-y-compact: 3.25rem;
+  }
+
+  .public-shell {
+    width: min(calc(100% - 1.5rem), var(--public-content-max));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .public-link-arrow {
+    transition: none;
+  }
+
+  .group:hover .public-link-arrow,
+  .group:focus-visible .public-link-arrow,
+  [dir='ltr'] .group:hover .public-link-arrow,
+  [dir='ltr'] .group:focus-visible .public-link-arrow {
+    transform: none;
+  }
+}
