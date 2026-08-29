@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/alirezasafaeigfx/alirezasafaeisystems/compare/v1.0.1...v1.0.2) (2026-08-29)
+
+
+### Bug Fixes
+
+* **verify:** classify benign Next RSC aborts ([b3ae3f7](https://github.com/alirezasafaeigfx/alirezasafaeisystems/commit/b3ae3f73f6ea4baa64a88ea3520bc046b7fcdae2))
+
 ## [1.0.1](https://github.com/alirezasafaeigfx/alirezasafaeisystems/compare/v1.0.0...v1.0.1) (2026-08-28)
 
 
