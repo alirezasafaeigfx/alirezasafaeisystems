@@ -111,8 +111,9 @@ async function hydrateLazyMedia(page: Page) {
   })
 
   await page.waitForLoadState('networkidle')
-  await page.locator('img').evaluateAll(async (images) => {
-    await Promise.all(images.map(async (image) => {
+  await page.locator('img').evaluateAll(async (nodes) => {
+    await Promise.all(nodes.map(async (node) => {
+      const image = node as HTMLImageElement
       if (image.complete && image.naturalWidth > 0) {
         try {
           await image.decode()
