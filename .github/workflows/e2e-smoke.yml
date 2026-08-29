@@ -44,6 +44,15 @@ jobs:
           PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/ms-playwright
         run: pnpm exec playwright test e2e/a11y.spec.ts
       - name: Run V3.1 visual contract
+        if: always()
         env:
           PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/ms-playwright
         run: pnpm exec playwright test e2e/public-v31-visual.spec.ts
+      - name: Upload V3.1 visual evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v31-visual-evidence-${{ github.sha }}
+          path: test-results/v31-evidence
+          if-no-files-found: error
+          retention-days: 14
