@@ -41,6 +41,9 @@ describe('V3.1 visual evidence contract', () => {
     expect(visual).toContain('nonNearWhiteRatio')
     expect(visual).toContain('luminanceVariance')
     expect(visual).toContain('tonalRange')
+    expect(visual).toContain('edgeDensity')
+    expect(visual).toContain('activeCellRatio')
+    expect(visual).toContain('quantizedColorCount')
     expect(visual).toContain('real project imagery stays visibly non-empty in rendered evidence')
   })
 

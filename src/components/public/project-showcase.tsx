@@ -50,6 +50,7 @@ export function ProjectShowcase({
               src={imageSrc}
               alt={imageAlt ?? title}
               fill
+              priority
               sizes="(min-width: 768px) 52vw, 100vw"
               className="object-cover object-top"
             />
