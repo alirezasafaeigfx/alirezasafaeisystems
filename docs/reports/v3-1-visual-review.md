@@ -4,6 +4,8 @@ Status: **BLOCKED — NOT READY FOR OWNER VISUAL APPROVAL**
 
 This review records deterministic visual evidence for the V3.1 public UX work. Automated checks are necessary but are not authority to mark PR #17 ready. The owner-approved portrait and verified project screenshots required by Task 9 are still missing, so the visual gate remains intentionally closed.
 
+Since this report was first written, truthful live screenshots were captured and wired for PersianToolbox and Audit Systems. The homepage now renders those real project images. Novax is still unavailable at its documented live URL, which currently returns HTTP 503, so the Novax proof slot remains blocked. The owner-approved portrait is still missing.
+
 ## Evidence
 
 Reviewed implementation head: `39856d70849d0bf62777fb2926cd519bd5928e16`
@@ -32,6 +34,10 @@ Required evidence files present:
 - `blog-article.png`
 - `focus-state.png`
 - `admin-dashboard-desktop.png`
+- `public/images/portfolio/persiantoolbox-showcase.png`
+- `public/images/portfolio/audit-systems-home.png`
+- `public/images/portfolio/audit-systems-sample-report.png`
+- `public/images/portfolio/novax-live-503.png` (blocker evidence, not a project screenshot)
 
 ## Review rubric
 
@@ -82,11 +88,11 @@ The V3.1 direction improves the baseline in the following ways:
 The following primary assets remain required before this review can pass:
 
 1. Owner-approved real portrait of Alireza Safaei with clear provenance/permission.
-2. Verified real PersianToolbox project screenshot(s).
-3. Verified real Novax project screenshot(s).
-4. Verified real Audit Systems project screenshot(s).
+2. Verified real Novax project screenshot(s).
 
 Do not substitute generated portraits, social-media mockups, watermarked graphics, unverified library candidates or invented product screenshots for this gate.
+
+The current homepage now uses real PersianToolbox and Audit Systems screenshots from the live sites, but Novax remains blocked because the documented live endpoint is currently unavailable. That keeps the visual review blocked even though part of Task 9 is now complete.
 
 Once the approved sources exist, the implementation must wire them with stable paths, truthful alt text, explicit image sizing and an asset-contract test. The visual evidence matrix must then be regenerated and this rubric re-scored from the new rendered artifact.
 

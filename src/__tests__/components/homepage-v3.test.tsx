@@ -44,9 +44,14 @@ describe('Homepage V3.1', () => {
 
     const projects = screen.getByLabelText('پروژه‌های منتخب')
     expect(within(projects).getAllByRole('article')).toHaveLength(3)
-    expect(within(projects).getByLabelText('تصویر پروژه پلتفرم PersianToolbox')).toBeInTheDocument()
+    expect(within(projects).getAllByRole('img')).toHaveLength(2)
+    expect(
+      within(projects).getByRole('img', { name: 'اسکرین‌شات صفحه اصلی PersianToolbox' }),
+    ).toBeInTheDocument()
+    expect(
+      within(projects).getByRole('img', { name: 'اسکرین‌شات صفحه اصلی Audit Systems' }),
+    ).toBeInTheDocument()
     expect(within(projects).getByLabelText('تصویر پروژه هشدار قیمت Novax')).toBeInTheDocument()
-    expect(within(projects).getByLabelText('تصویر پروژه پلتفرم Audit Systems')).toBeInTheDocument()
   })
 
   it('renders evidence and personal-trust surfaces instead of generic filler sections', () => {

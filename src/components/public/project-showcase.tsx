@@ -46,7 +46,13 @@ export function ProjectShowcase({
         <VisualFrame ariaLabel={mediaLabel} ratio="landscape" className="public-project-media min-w-0">
           <div className={cn('absolute inset-0 bg-gradient-to-br', tones[tone])} aria-hidden="true" />
           {imageSrc ? (
-            <Image src={imageSrc} alt={imageAlt ?? title} fill sizes="(min-width: 768px) 52vw, 100vw" className="object-cover" />
+            <Image
+              src={imageSrc}
+              alt={imageAlt ?? title}
+              fill
+              sizes="(min-width: 768px) 52vw, 100vw"
+              className="object-cover object-top"
+            />
           ) : (
             <div
               className="relative z-10 flex h-full min-w-0 flex-col justify-between p-6 sm:p-8"

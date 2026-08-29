@@ -226,7 +226,8 @@ export function HomePageV3({ language }: HomePageV3Props) {
                 role={project.role}
                 technologies={project.technologies}
                 href={withLocale(project.href, language)}
-                imageAlt={isFa ? `تصویر پروژه ${project.title}` : `${project.title} project visual`}
+                imageSrc={project.imageSrc}
+                imageAlt={project.imageAlt}
                 tone={projectTones[index]}
                 locale={language}
                 index={`0${index + 1}`}

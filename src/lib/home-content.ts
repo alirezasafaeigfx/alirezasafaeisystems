@@ -13,6 +13,8 @@ type HomeCard = HomeLink & {
 type ProjectCard = HomeCard & {
   role: string
   technologies: string[]
+  imageSrc?: string
+  imageAlt?: string
 }
 
 export type HomeContent = {
@@ -78,6 +80,8 @@ const content: Record<Language, HomeContent> = {
         description: 'پلتفرم ابزارهای فارسی local-first با تجربه کاربری ساده و عملیات انتشار پایدار.',
         role: 'معماری، طراحی سیستم Frontend و آمادگی استقرار عملیاتی',
         technologies: ['Next.js', 'TypeScript'],
+        imageSrc: '/images/portfolio/persiantoolbox-showcase.png',
+        imageAlt: 'اسکرین‌شات صفحه اصلی PersianToolbox',
         label: 'مشاهده مطالعه موردی',
         href: '/case-studies/asdev-persiantoolbox-platform',
       },
@@ -94,6 +98,8 @@ const content: Record<Language, HomeContent> = {
         description: 'گردش‌کار ارزیابی سایت برای عملکرد، امنیت و سئو فنی با خروجی عملی و قابل اجرا.',
         role: 'طراحی و راه‌اندازی محصول ارزیابی فنی',
         technologies: ['Next.js', 'Prisma'],
+        imageSrc: '/images/portfolio/audit-systems-home.png',
+        imageAlt: 'اسکرین‌شات صفحه اصلی Audit Systems',
         label: 'مشاهده مطالعه موردی',
         href: '/case-studies',
       },
@@ -152,6 +158,8 @@ const content: Record<Language, HomeContent> = {
         description: 'A local-first Persian utility platform engineered to be fast, reliable, and intentionally simple for everyday users.',
         role: 'Product engineering lead: architecture, frontend system design, QA governance, and operational deployment readiness.',
         technologies: ['Next.js', 'TypeScript'],
+        imageSrc: '/images/portfolio/persiantoolbox-showcase.png',
+        imageAlt: 'PersianToolbox homepage screenshot',
         label: 'View case study',
         href: '/case-studies/asdev-persiantoolbox-platform',
       },
@@ -168,6 +176,8 @@ const content: Record<Language, HomeContent> = {
         description: 'Production audit workflow for performance, security, and technical SEO with actionable outputs.',
         role: 'Technical audit product design and delivery.',
         technologies: ['Next.js', 'Prisma'],
+        imageSrc: '/images/portfolio/audit-systems-home.png',
+        imageAlt: 'Audit Systems homepage screenshot',
         label: 'View case study',
         href: '/case-studies',
       },
