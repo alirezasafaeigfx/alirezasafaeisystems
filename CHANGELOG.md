@@ -1,3 +1,10 @@
+## [1.0.3](https://github.com/alirezasafaeigfx/alirezasafaeisystems/compare/v1.0.2...v1.0.3) (2026-08-29)
+
+
+### Bug Fixes
+
+* **verify:** accept non-navigation RSC abort telemetry ([8b618ae](https://github.com/alirezasafaeigfx/alirezasafaeisystems/commit/8b618aecf0ad80c21e619e9227154a1b48b5730c))
+
 ## [1.0.2](https://github.com/alirezasafaeigfx/alirezasafaeisystems/compare/v1.0.1...v1.0.2) (2026-08-29)
 
 
