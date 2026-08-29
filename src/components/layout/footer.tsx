@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { ArrowUpLeft, Github, Instagram, Linkedin, Mail, Send } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useI18n } from '@/lib/i18n-context'
@@ -17,8 +18,13 @@ const footerLinks = [
 
 export function Footer() {
   const { t, language } = useI18n()
+  const pathname = usePathname()
   const currentYear = new Date().getFullYear()
   const isFa = language === 'fa'
+
+  if (pathname === '/admin' || pathname.startsWith('/admin/')) {
+    return null
+  }
 
   const socialLinks = [
     { name: 'GitHub', href: brand.githubUrl, icon: Github },
