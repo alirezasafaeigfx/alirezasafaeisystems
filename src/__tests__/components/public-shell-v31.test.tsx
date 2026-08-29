@@ -76,7 +76,7 @@ describe('V3.1 global public shell', () => {
     expect(within(primaryNav).getByRole('link', { name: 'Blog' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Start collaboration' })).toHaveAttribute(
       'href',
-      '/qualification',
+      '/en/qualification',
     )
   })
 
