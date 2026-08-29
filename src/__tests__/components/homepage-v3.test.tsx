@@ -33,11 +33,32 @@ describe('Homepage V3.1', () => {
     expect(within(portraitFrame).getByText('AS')).toBeInTheDocument()
   })
 
-  it('renders only the three scoped services and selected-work cards', () => {
+  it('renders three differentiated services and three visual project showcases', () => {
     render(<HomePageV3 language="fa" />)
 
-    expect(within(screen.getByLabelText('خدمات اصلی')).getAllByRole('article')).toHaveLength(3)
-    expect(within(screen.getByLabelText('پروژه‌های منتخب')).getAllByRole('article')).toHaveLength(3)
+    const services = screen.getByLabelText('خدمات اصلی')
+    expect(within(services).getAllByRole('article')).toHaveLength(3)
+    expect(within(services).getByText('01')).toBeInTheDocument()
+    expect(within(services).getByText('02')).toBeInTheDocument()
+    expect(within(services).getByText('03')).toBeInTheDocument()
+
+    const projects = screen.getByLabelText('پروژه‌های منتخب')
+    expect(within(projects).getAllByRole('article')).toHaveLength(3)
+    expect(within(projects).getByLabelText('تصویر پروژه پلتفرم PersianToolbox')).toBeInTheDocument()
+    expect(within(projects).getByLabelText('تصویر پروژه هشدار قیمت Novax')).toBeInTheDocument()
+    expect(within(projects).getByLabelText('تصویر پروژه پلتفرم Audit Systems')).toBeInTheDocument()
+  })
+
+  it('renders evidence and personal-trust surfaces instead of generic filler sections', () => {
+    render(<HomePageV3 language="fa" />)
+
+    const proof = screen.getByLabelText('شواهد واقعی')
+    expect(within(proof).getByText('PersianToolbox')).toBeInTheDocument()
+    expect(within(proof).getByText('Novax')).toBeInTheDocument()
+    expect(within(proof).getByText('Audit Systems')).toBeInTheDocument()
+
+    const about = screen.getByLabelText('درباره علیرضا صفایی')
+    expect(within(about).getByRole('heading', { level: 2, name: 'درباره من' })).toBeInTheDocument()
   })
 
   it('tracks both hero actions without identifying metadata', () => {
