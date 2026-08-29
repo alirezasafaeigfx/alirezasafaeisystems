@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { DiscoverGrid } from '@/components/discover/discover-grid'
 
@@ -49,31 +49,19 @@ describe('DiscoverGrid', () => {
     expect(parsed.searchParams.get('utm_content')).toBe('reel-42')
   })
 
-  it('filters cards by category and search without creating query-page URLs', () => {
+  it('renders exactly the server-provided result set without local filter truth', () => {
     render(<DiscoverGrid items={items} isEn={false} attribution={{}} />)
 
-    fireEvent.click(screen.getByRole('button', { name: 'Design' }))
-    expect(screen.getByText('Canva')).toBeInTheDocument()
-    expect(screen.queryByText('NotebookLM')).not.toBeInTheDocument()
-
-    fireEvent.click(screen.getByRole('button', { name: 'همه' }))
-    fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'research' } })
     expect(screen.getByText('NotebookLM')).toBeInTheDocument()
-    expect(screen.queryByText('Canva')).not.toBeInTheDocument()
+    expect(screen.getByText('Canva')).toBeInTheDocument()
+    expect(screen.queryByRole('searchbox')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'AI' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Design' })).not.toBeInTheDocument()
   })
 
-  it('provides accessible search/filter controls and exposes the active category state', () => {
-    render(<DiscoverGrid items={items} isEn={false} attribution={{}} />)
+  it('renders an accessible empty state for an empty server result set', () => {
+    render(<DiscoverGrid items={[]} isEn={false} attribution={{}} />)
 
-    expect(screen.getByRole('searchbox', { name: 'جستجو بین ابزارها و سرویس‌ها' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'همه' })).toHaveAttribute('aria-pressed', 'true')
-    expect(screen.getByRole('button', { name: 'AI' })).toHaveAttribute('aria-pressed', 'false')
-    expect(screen.getByRole('button', { name: 'Design' })).toHaveAttribute('aria-pressed', 'false')
-
-    fireEvent.click(screen.getByRole('button', { name: 'AI' }))
-
-    expect(screen.getByRole('button', { name: 'همه' })).toHaveAttribute('aria-pressed', 'false')
-    expect(screen.getByRole('button', { name: 'AI' })).toHaveAttribute('aria-pressed', 'true')
-    expect(screen.getByText('1 مورد')).toHaveAttribute('aria-live', 'polite')
+    expect(screen.getByRole('status')).toHaveTextContent('موردی با این فیلتر پیدا نشد.')
   })
 })
