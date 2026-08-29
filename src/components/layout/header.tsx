@@ -1,12 +1,13 @@
 'use client'
 
 import Link from 'next/link'
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
+import { ArrowUpLeft, Languages, Menu, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useI18n } from '@/lib/i18n-context'
 import { brand } from '@/lib/brand'
-import { withLocale, getLocalizedPathname } from '@/lib/locale-utils'
+import { getLocalizedPathname, withLocale } from '@/lib/locale-utils'
 import type { Locale } from '@/lib/locale-utils'
 import {
   DropdownMenu,
@@ -19,7 +20,6 @@ import {
   SheetContent,
   SheetTrigger,
 } from '@/components/ui/sheet'
-import { Languages, X, Menu, Sparkles } from 'lucide-react'
 
 const navItems = [
   { key: 'home', name: 'nav.home', href: '/' },
@@ -27,147 +27,178 @@ const navItems = [
   { key: 'caseStudies', name: 'nav.caseStudies', href: '/case-studies' },
   { key: 'discover', name: 'nav.discover', href: '/discover' },
   { key: 'blog', name: 'nav.blog', href: '/blog' },
-  { key: 'auditReadiness', name: 'nav.auditReadiness', href: '/audit-readiness' },
-  { key: 'contact', name: 'nav.contact', href: '/qualification' },
-]
+] as const
 
 export function Header() {
   const { t, language, setLanguage } = useI18n()
   const pathname = usePathname()
   const router = useRouter()
-
   const [isScrolled, setIsScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20)
-    }
-    window.addEventListener('scroll', handleScroll)
+    const handleScroll = () => setIsScrolled(window.scrollY > 16)
+    handleScroll()
+    window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
   const changeLanguage = (lang: Locale) => {
     setLanguage(lang)
-    const localizedPath = getLocalizedPathname(pathname, lang)
-    router.push(localizedPath)
+    router.push(getLocalizedPathname(pathname, lang))
     router.refresh()
   }
 
-  const getNavText = (name: string): string => {
-    return t(name)
-  }
+  const collaborationLabel = language === 'fa' ? 'شروع همکاری' : 'Start collaboration'
+  const primaryNavLabel = language === 'fa' ? 'ناوبری اصلی' : 'Primary navigation'
+  const mobileNavLabel = language === 'fa' ? 'ناوبری موبایل' : 'Mobile navigation'
 
   return (
-    <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled
-          ? 'bg-background/75 backdrop-blur-xl border-b shadow-sm'
-          : 'bg-transparent'
-      }`}
-    >
-      <nav className="container mx-auto px-4 py-4">
-        <div className="flex items-center justify-between">
+    <header className="fixed inset-x-0 top-0 z-50 pointer-events-none">
+      <div className="public-shell pt-3 md:pt-4">
+        <div
+          className={`pointer-events-auto flex min-h-16 items-center justify-between gap-3 rounded-2xl border px-3.5 py-2.5 transition-[background-color,border-color,box-shadow] duration-200 md:px-4 ${
+            isScrolled
+              ? 'border-border/80 bg-background/92 shadow-[0_18px_55px_-34px_rgba(15,23,42,0.55)] backdrop-blur-xl'
+              : 'border-border/65 bg-background/82 shadow-[0_12px_40px_-34px_rgba(15,23,42,0.4)] backdrop-blur-lg'
+          }`}
+        >
           <Link
             href={withLocale('/', language)}
-            className="text-2xl font-bold gradient-text hover:opacity-80 transition-opacity flex items-center gap-2"
+            className="group flex shrink-0 items-center gap-2.5 rounded-xl px-1 py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             onClick={() => setMobileMenuOpen(false)}
+            aria-label={language === 'fa' ? 'خانه علیرضا صفایی' : 'Alireza Safaei home'}
           >
-            <Sparkles className="h-6 w-6" />
-            {brand.brandName}
+            <span className="grid size-9 place-items-center rounded-xl bg-primary text-sm font-black text-primary-foreground shadow-sm">
+              AS
+            </span>
+            <span className="hidden leading-tight sm:block">
+              <span className="block text-sm font-extrabold text-foreground">{brand.ownerName}</span>
+              <span className="block text-[11px] font-medium text-muted-foreground">
+                {language === 'fa' ? 'مهندس نرم‌افزار' : 'Software Engineer'}
+              </span>
+            </span>
           </Link>
 
-          <div className="hidden md:flex items-center gap-6 rounded-full border border-border/70 bg-card/70 px-4 py-2 shadow-sm">
+          <nav
+            aria-label={primaryNavLabel}
+            className="hidden items-center gap-0.5 rounded-xl border border-border/55 bg-muted/30 p-1 lg:flex"
+          >
             {navItems.map((item) => {
               const target = withLocale(item.href, language)
-              const active = pathname === target || pathname.startsWith(`${target}/`)
+              const active = pathname === target || (target !== '/' && pathname.startsWith(`${target}/`))
               return (
                 <Link
                   key={item.key}
                   href={target}
                   aria-current={active ? 'page' : undefined}
-                  className={`text-sm font-medium transition-colors relative group px-2 py-1 rounded-md ${
-                    active ? 'text-primary bg-primary/10' : 'text-muted-foreground hover:text-primary hover:bg-muted/60'
+                  className={`rounded-lg px-3 py-2 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                    active
+                      ? 'bg-background text-foreground shadow-sm'
+                      : 'text-muted-foreground hover:bg-background/70 hover:text-foreground'
                   }`}
                 >
-                  {getNavText(item.name)}
-                  <span className={`absolute -bottom-1 left-0 h-0.5 bg-primary transition-all ${active ? 'w-full' : 'w-0 group-hover:w-full'}`} />
+                  {t(item.name)}
                 </Link>
               )
             })}
+          </nav>
 
-            <div className="flex items-center gap-2">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-10 w-10 card-hover"
-                    aria-label={t('ui.changeLanguage')}
-                  >
-                    <Languages className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => changeLanguage('en')}>
-                    {t('nav.english')}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => changeLanguage('fa')}>
-                    {t('nav.persian')}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </div>
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="size-10 rounded-xl"
+                  aria-label={t('ui.changeLanguage')}
+                >
+                  <Languages className="size-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => changeLanguage('en')}>
+                  {t('nav.english')}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => changeLanguage('fa')}>
+                  {t('nav.persian')}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
-          <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-            <SheetTrigger asChild className="md:hidden">
-              <Button
-                variant="ghost"
-                size="icon"
-                aria-label={mobileMenuOpen ? t('ui.closeMenu') : t('ui.openMenu')}
-              >
-                {mobileMenuOpen ? <X /> : <Menu />}
-              </Button>
-            </SheetTrigger>
-            <SheetContent side={language === 'fa' ? 'left' : 'right'} className="w-72">
-              <nav className="flex flex-col gap-4 mt-8">
-                {navItems.map((item) => {
-                  const target = withLocale(item.href, language)
-                  const active = pathname === target || pathname.startsWith(`${target}/`)
-                  return (
-                    <Link
-                      key={item.key}
-                      href={target}
-                      aria-current={active ? 'page' : undefined}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className={`text-lg font-medium px-4 py-2 rounded-lg transition-colors ${language === 'fa' ? 'text-right' : 'text-left'} ${
-                        active ? 'bg-primary/10 text-primary' : 'hover:bg-muted text-foreground/90'
-                      }`}
-                    >
-                      {getNavText(item.name)}
-                    </Link>
-                  )
-                })}
-              </nav>
-              <div className="mt-8 pt-8 border-t space-y-4">
-                <div className="flex items-center justify-between px-4">
-                  <span className="text-sm text-muted-foreground">{t('ui.language')}</span>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => changeLanguage(language === 'en' ? 'fa' : 'en')}
-                    >
-                      {language === 'en' ? 'FA' : 'EN'}
+            <Button asChild className="hidden min-h-10 rounded-xl px-4 font-bold sm:inline-flex">
+              <Link href={withLocale('/qualification', language)} aria-label={collaborationLabel}>
+                {collaborationLabel}
+                <ArrowUpLeft
+                  aria-hidden="true"
+                  className={language === 'fa' ? 'size-4' : 'size-4 rotate-90'}
+                />
+              </Link>
+            </Button>
+
+            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+              <SheetTrigger asChild className="lg:hidden">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="size-10 rounded-xl"
+                  aria-label={mobileMenuOpen ? t('ui.closeMenu') : t('ui.openMenu')}
+                >
+                  {mobileMenuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
+                </Button>
+              </SheetTrigger>
+              <SheetContent side={language === 'fa' ? 'left' : 'right'} className="w-[min(88vw,22rem)] p-0">
+                <div className="flex h-full flex-col p-5 pt-8">
+                  <div className="mb-8">
+                    <p className="text-lg font-extrabold">{brand.ownerName}</p>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      {language === 'fa' ? 'مهندس نرم‌افزار' : 'Software Engineer'}
+                    </p>
+                  </div>
+
+                  <nav aria-label={mobileNavLabel} className="grid gap-1.5">
+                    {navItems.map((item) => {
+                      const target = withLocale(item.href, language)
+                      const active = pathname === target || (target !== '/' && pathname.startsWith(`${target}/`))
+                      return (
+                        <Link
+                          key={item.key}
+                          href={target}
+                          aria-current={active ? 'page' : undefined}
+                          onClick={() => setMobileMenuOpen(false)}
+                          className={`rounded-xl px-4 py-3 text-base font-semibold transition-colors ${
+                            active ? 'bg-primary/10 text-primary' : 'text-foreground/85 hover:bg-muted'
+                          }`}
+                        >
+                          {t(item.name)}
+                        </Link>
+                      )
+                    })}
+                  </nav>
+
+                  <div className="mt-auto space-y-3 border-t border-border/70 pt-5">
+                    <Button asChild size="lg" className="w-full rounded-xl font-bold">
+                      <Link
+                        href={withLocale('/qualification', language)}
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        {collaborationLabel}
+                      </Link>
                     </Button>
+                    <button
+                      type="button"
+                      onClick={() => changeLanguage(language === 'en' ? 'fa' : 'en')}
+                      className="min-h-11 w-full rounded-xl border border-border px-4 text-sm font-semibold"
+                    >
+                      {language === 'en' ? 'فارسی' : 'English'}
+                    </button>
                   </div>
                 </div>
-              </div>
-            </SheetContent>
-          </Sheet>
+              </SheetContent>
+            </Sheet>
+          </div>
         </div>
-      </nav>
+      </div>
     </header>
   )
 }
