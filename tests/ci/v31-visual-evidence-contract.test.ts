@@ -26,11 +26,17 @@ describe('V3.1 visual evidence contract', () => {
     }
   })
 
+  it('does not start heavy visual work after cancellation but still preserves upload-on-failure semantics', () => {
+    const workflow = read('.github/workflows/e2e-smoke.yml')
+
+    expect(workflow).toContain('- name: Run V3.1 visual contract\n        if: ${{ !cancelled() }}')
+    expect(workflow).toContain('- name: Upload V3.1 visual evidence\n        if: always()')
+  })
+
   it('uploads screenshot evidence for every SHA even when visual verification fails', () => {
     const workflow = read('.github/workflows/e2e-smoke.yml')
 
     expect(workflow).toContain('actions/upload-artifact@v4')
-    expect(workflow).toContain('if: always()')
     expect(workflow).toContain('test-results/v31-evidence')
     expect(workflow).toContain('v31-visual-evidence-${{ github.sha }}')
     expect(workflow).toContain('if-no-files-found: error')
