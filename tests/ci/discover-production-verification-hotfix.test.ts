@@ -28,4 +28,15 @@ describe('Discover production verification hotfix contracts', () => {
 
     expect(verifier).toContain("waitUntil: 'networkidle'")
   })
+
+  it('keeps page, console, HTTP 500, and non-benign request diagnostics fatal', () => {
+    const verifier = readFileSync(resolve(process.cwd(), 'scripts/deploy/live-verify.mjs'), 'utf8')
+
+    expect(verifier).toContain("if (message.type() === 'error')")
+    expect(verifier).toContain("page.on('pageerror'")
+    expect(verifier).toContain('response.status() >= 500')
+    expect(verifier).toContain('if (isBenignNextRscAbort(request, baseOrigin))')
+    expect(verifier).toContain('warnings.push(')
+    expect(verifier).toContain('recordFailure(scope, `request failed:')
+  })
 })
