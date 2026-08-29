@@ -2,19 +2,40 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { db } from '@/lib/db'
-import { discoverAnalyticsMetadata, extractDiscoverAttribution } from '@/lib/discover'
+import {
+  DISCOVER_RESOURCE_TYPES,
+  discoverAnalyticsMetadata,
+  extractDiscoverAttribution,
+} from '@/lib/discover'
 import { getRequestLanguage } from '@/lib/i18n/server'
 import { getSiteUrl } from '@/lib/site-config'
 import { generateBreadcrumbSchema } from '@/lib/seo'
+import { DiscoverControls } from '@/components/discover/discover-controls'
 import { DiscoverGrid, type DiscoverGridItem } from '@/components/discover/discover-grid'
+import { DiscoverPagination } from '@/components/discover/discover-pagination'
 import { DiscoverTelemetry } from '@/components/discover/discover-telemetry'
 import { JsonLd } from '@/components/seo/json-ld'
-import { buildDiscoverOrderBy, buildDiscoverWhere, DISCOVER_PAGE_SIZE, parseDiscoverPublicQuery } from '@/lib/discover-query'
+import {
+  buildDiscoverOrderBy,
+  buildDiscoverWhere,
+  DISCOVER_PAGE_SIZE,
+  parseDiscoverPublicQuery,
+  type DiscoverPublicQuery,
+} from '@/lib/discover-query'
 
 const siteUrl = getSiteUrl()
 
 type DiscoverPageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>
+}
+
+const emptyDiscoverQuery: DiscoverPublicQuery = {
+  q: '',
+  category: '',
+  type: '',
+  platform: '',
+  sort: 'featured',
+  page: 1,
 }
 
 export async function generateMetadata({ searchParams }: DiscoverPageProps): Promise<Metadata> {
@@ -43,31 +64,40 @@ export async function generateMetadata({ searchParams }: DiscoverPageProps): Pro
 export default async function DiscoverPage({ searchParams }: DiscoverPageProps) {
   const lang = await getRequestLanguage()
   const isEn = lang === 'en'
+  const locale = isEn ? 'en' : 'fa'
   const canonicalPath = isEn ? '/en/discover' : '/discover'
   const rawSearchParams = await searchParams
   const attribution = extractDiscoverAttribution(rawSearchParams)
   const query = parseDiscoverPublicQuery(rawSearchParams)
-  const where = buildDiscoverWhere(query, isEn ? 'en' : 'fa')
-  const [records, total] = await Promise.all([
+  const where = buildDiscoverWhere(query, locale)
+  const taxonomyWhere = buildDiscoverWhere(emptyDiscoverQuery, locale)
+
+  const [records, total, taxonomyRecords] = await Promise.all([
     db.discoverItem.findMany({
-    // where: { published: true }
-    where,
-    skip: (query.page - 1) * DISCOVER_PAGE_SIZE,
-    take: DISCOVER_PAGE_SIZE,
-    select: {
-      slug: true,
-      title: true,
-      description: true,
-      category: true,
-      tags: true,
-      featured: true,
-      imageUrl: true,
-      titleEn: true,
-      descriptionEn: true,
-    },
-    orderBy: buildDiscoverOrderBy(query),
+      where,
+      skip: (query.page - 1) * DISCOVER_PAGE_SIZE,
+      take: DISCOVER_PAGE_SIZE,
+      select: {
+        slug: true,
+        title: true,
+        description: true,
+        category: true,
+        tags: true,
+        featured: true,
+        imageUrl: true,
+        titleEn: true,
+        descriptionEn: true,
+      },
+      orderBy: buildDiscoverOrderBy(query),
     }),
     db.discoverItem.count({ where }),
+    db.discoverItem.findMany({
+      where: taxonomyWhere,
+      select: {
+        category: true,
+        platforms: true,
+      },
+    }),
   ])
 
   const items: DiscoverGridItem[] = records.map((item) => ({
@@ -77,19 +107,36 @@ export default async function DiscoverPage({ searchParams }: DiscoverPageProps) 
     tags: item.tags.split(',').map((tag) => tag.trim()).filter(Boolean),
   }))
 
+  const categories = [...new Set(
+    taxonomyRecords
+      .map((item) => item.category.trim())
+      .filter(Boolean),
+  )].sort((a, b) => a.localeCompare(b))
+
+  const platforms = [...new Set(
+    taxonomyRecords.flatMap((item) =>
+      item.platforms
+        .split(',')
+        .map((platform) => platform.trim())
+        .filter(Boolean),
+    ),
+  )].sort((a, b) => a.localeCompare(b))
+
   const copy = isEn
     ? {
         eyebrow: 'ASDEV Resource Hub',
         title: 'Find the tools and resources I mention on Instagram',
         description: 'Search a name, open its real official destination, read the quick guide, and use the full Telegram resource when one is available.',
-        note: `Use this page as the single link in my Instagram bio; no DM automation is required. ${total} items available.`,
+        note: `Use this page as the single link in my Instagram bio; no DM automation is required. ${total} items match this view.`,
+        results: `${total} resources`,
         home: 'Back to home',
       }
     : {
         eyebrow: 'مرکز منابع ASDEV',
         title: 'ابزارها و منابعی که در اینستاگرام معرفی می‌کنم، اینجا پیدا کن',
         description: 'اسم ابزار را جستجو کن، به مقصد رسمی برو، راهنمای کوتاه را بخوان و اگر منبع کامل تلگرام موجود بود مستقیم همان را باز کن.',
-        note: `این صفحه مقصد ثابت لینک بیوی اینستاگرام است و برای دریافت منابع نیازی به اتوماسیون دایرکت نیست. ${total} مورد موجود است.`,
+        note: `این صفحه مقصد ثابت لینک بیوی اینستاگرام است و برای دریافت منابع نیازی به اتوماسیون دایرکت نیست. ${total} مورد با این فیلتر پیدا شد.`,
+        results: `${total} منبع`,
         home: 'بازگشت به خانه',
       }
 
@@ -103,7 +150,7 @@ export default async function DiscoverPage({ searchParams }: DiscoverPageProps) 
       ])} />
       <DiscoverTelemetry
         name="discover_landing_view"
-        locale={isEn ? 'en' : 'fa'}
+        locale={locale}
         metadata={discoverAnalyticsMetadata(attribution, { surface: 'discover' })}
       />
 
@@ -115,7 +162,27 @@ export default async function DiscoverPage({ searchParams }: DiscoverPageProps) 
           <p className="max-w-4xl text-xs leading-6 text-muted-foreground">{copy.note}</p>
         </header>
 
+        <DiscoverControls
+          query={query}
+          categories={categories}
+          platforms={platforms}
+          resourceTypes={[...DISCOVER_RESOURCE_TYPES]}
+          isEn={isEn}
+        />
+
+        <p className="text-sm text-muted-foreground" aria-live="polite">
+          {copy.results}
+        </p>
+
         <DiscoverGrid items={items} attribution={attribution} isEn={isEn} />
+
+        <DiscoverPagination
+          query={query}
+          total={total}
+          pageSize={DISCOVER_PAGE_SIZE}
+          isEn={isEn}
+          attribution={attribution}
+        />
 
         <Link
           href={isEn ? '/en/' : '/'}
