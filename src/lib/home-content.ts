@@ -47,8 +47,8 @@ const content: Record<Language, HomeContent> = {
     hero: {
       name: 'علیرضا صفایی',
       title: 'مهندس نرم‌افزار',
-      description: 'سیستم‌ها و محصولات وبی می‌سازم که سریع، پایدار، امن و آماده استفاده واقعی در Production باشند.',
-      detail: 'از طراحی معماری و توسعه نرم‌افزار تا بهینه‌سازی، استقرار و نجات پروژه‌های نیمه‌کاره.',
+      description: 'سیستم‌های وبی طراحی و می‌سازم که از اولین تصمیم معماری تا استفاده واقعی در Production سریع، قابل نگهداری و قابل اتکا بمانند.',
+      detail: 'تمرکز من روی معماری نرم‌افزار، توسعه محصول، پایدارسازی و نجات پروژه‌هایی است که باید واقعاً کار کنند؛ نه فقط در دمو خوب به نظر برسند.',
       primaryCta: 'شروع همکاری',
       secondaryCta: 'مشاهده پروژه‌ها',
     },
@@ -121,8 +121,8 @@ const content: Record<Language, HomeContent> = {
     hero: {
       name: 'Alireza Safaei',
       title: 'Software Engineer',
-      description: 'I design and build web systems that are fast, reliable, secure, and ready for real production use.',
-      detail: 'From software architecture and development to optimization, deployment, and rescuing incomplete projects.',
+      description: 'I design and build web systems that stay fast, maintainable, and dependable from the first architecture decision through real production use.',
+      detail: 'My work spans software architecture, product delivery, stabilization, and rescuing projects that need to work reliably—not just look good in a demo.',
       primaryCta: 'Start collaboration',
       secondaryCta: 'View projects',
     },
