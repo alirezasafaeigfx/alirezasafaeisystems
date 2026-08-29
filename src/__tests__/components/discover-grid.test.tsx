@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { DiscoverGrid } from '@/components/discover/discover-grid'
 
@@ -11,6 +11,9 @@ const items = [
     tags: ['research', 'productivity'],
     featured: true,
     imageUrl: null,
+    resourceType: 'ai-tool',
+    platforms: ['Web'],
+    pricingModel: 'free',
   },
   {
     slug: 'canva',
@@ -20,6 +23,9 @@ const items = [
     tags: ['design'],
     featured: false,
     imageUrl: null,
+    resourceType: 'app',
+    platforms: ['Web', 'Android'],
+    pricingModel: 'freemium',
   },
 ]
 
@@ -57,6 +63,24 @@ describe('DiscoverGrid', () => {
     expect(screen.queryByRole('searchbox')).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'AI' })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Design' })).not.toBeInTheDocument()
+  })
+
+  it('gives featured resources explicit semantics and one clear internal CTA per card', () => {
+    render(<DiscoverGrid items={items} isEn={false} attribution={{}} />)
+
+    const featured = screen.getByRole('article', { name: 'منبع منتخب: NotebookLM' })
+    const regular = screen.getByRole('article', { name: 'منبع: Canva' })
+
+    expect(within(featured).getByText('ai-tool')).toBeInTheDocument()
+    expect(within(featured).getByText('Web')).toBeInTheDocument()
+    expect(within(featured).getByText('free')).toBeInTheDocument()
+    expect(within(featured).getAllByRole('link')).toHaveLength(1)
+
+    expect(within(regular).getByText('app')).toBeInTheDocument()
+    expect(within(regular).getByText('Android')).toBeInTheDocument()
+    expect(within(regular).getByText('freemium')).toBeInTheDocument()
+    expect(within(regular).queryByText('منتخب')).not.toBeInTheDocument()
+    expect(within(regular).getAllByRole('link')).toHaveLength(1)
   })
 
   it('renders an accessible empty state for an empty server result set', () => {
