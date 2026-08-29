@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import {
   ArrowLeft,
@@ -28,7 +29,6 @@ const labels = {
     hero: 'معرفی علیرضا صفایی',
     heroActions: 'اقدام‌های اصلی',
     portrait: 'قاب تصویر علیرضا صفایی',
-    portraitStatus: 'تصویر واقعی مالک در نسخه نهایی جایگزین می‌شود',
     annotation: 'معماری نرم‌افزار • توسعه محصول • پایداری',
     services: 'خدمات اصلی',
     servicesEyebrow: 'خدمات اصلی',
@@ -51,7 +51,6 @@ const labels = {
     hero: 'Alireza Safaei introduction',
     heroActions: 'Primary actions',
     portrait: 'Alireza Safaei portrait frame',
-    portraitStatus: 'Owner-approved portrait will replace this development visual',
     annotation: 'Software architecture • Product delivery • Reliability',
     services: 'Core services',
     servicesEyebrow: 'Core services',
@@ -148,22 +147,20 @@ export function HomePageV3({ language }: HomePageV3Props) {
               </div>
             </div>
 
-            <div className="order-1 lg:order-2" data-testid="owner-portrait-frame" data-asset-status="pending-owner-portrait">
+            <div className="order-1 lg:order-2" data-testid="owner-portrait-frame" data-asset-status="owner-portrait">
               <VisualFrame ariaLabel={copy.portrait} ratio="portrait" className="min-h-[28rem] sm:min-h-[34rem] lg:min-h-0">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_34%,color-mix(in_oklab,var(--primary)_24%,transparent),transparent_35%),linear-gradient(155deg,color-mix(in_oklab,var(--card)_96%,transparent),color-mix(in_oklab,var(--muted)_88%,transparent))]" />
-                <div className="absolute inset-0 opacity-45 [background-image:linear-gradient(to_right,color-mix(in_oklab,var(--border)_45%,transparent)_1px,transparent_1px),linear-gradient(to_bottom,color-mix(in_oklab,var(--border)_45%,transparent)_1px,transparent_1px)] [background-size:44px_44px] [mask-image:radial-gradient(circle_at_center,black_15%,transparent_72%)]" aria-hidden="true" />
-                <div className="absolute inset-x-[12%] top-[10%] aspect-square rounded-full border border-primary/20" aria-hidden="true" />
-                <div className="absolute inset-x-[20%] top-[18%] aspect-square rounded-full border border-primary/12" aria-hidden="true" />
-
-                <div className="relative z-10 flex h-full min-h-[28rem] flex-col items-center justify-center px-6 py-8 text-center sm:min-h-[34rem] lg:min-h-full">
-                  <div className="grid size-36 place-items-center rounded-[2rem] border border-primary/20 bg-background/72 text-5xl font-black tracking-[-0.06em] text-primary shadow-xl backdrop-blur-sm sm:size-44 sm:text-6xl">
-                    AS
-                  </div>
-                  <p className="mt-7 max-w-xs text-sm font-bold leading-7 text-foreground/80">
+                <Image
+                  src="/images/portrait/alireza-safaei.webp"
+                  alt={isFa ? 'پرتره حرفه‌ای علیرضا صفایی' : 'Professional portrait of Alireza Safaei'}
+                  fill
+                  priority
+                  sizes="(min-width: 1280px) 36vw, (min-width: 1024px) 40vw, 100vw"
+                  className="object-cover object-center"
+                />
+                <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-black/75 via-black/35 to-transparent" aria-hidden="true" />
+                <div className="absolute inset-x-0 bottom-0 z-10 p-5 text-start sm:p-6">
+                  <p className="max-w-sm text-sm font-bold leading-7 text-white/90">
                     {copy.annotation}
-                  </p>
-                  <p className="mt-2 max-w-xs text-xs leading-6 text-muted-foreground">
-                    {copy.portraitStatus}
                   </p>
                 </div>
               </VisualFrame>
