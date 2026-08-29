@@ -1,6 +1,7 @@
 'use client'
 
 import type { FormEvent } from 'react'
+import { Search } from 'lucide-react'
 import { useTransition } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import type { DiscoverPublicQuery } from '@/lib/discover-query'
@@ -38,6 +39,7 @@ export function DiscoverControls({
         featured: 'Featured first',
         latest: 'Latest',
         submit: 'Search',
+        filters: 'Resource filters',
       }
     : {
         search: 'جستجوی منابع',
@@ -51,6 +53,7 @@ export function DiscoverControls({
         featured: 'منتخب‌ها',
         latest: 'جدیدترین',
         submit: 'جستجو',
+        filters: 'فیلترهای منابع',
       }
 
   function setParams(updates: Record<string, string | null>) {
@@ -77,21 +80,22 @@ export function DiscoverControls({
   }
 
   const selectClassName =
-    'min-h-11 rounded-xl border border-border bg-background px-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20'
+    'min-h-10 min-w-0 rounded-lg border border-border/80 bg-background px-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20'
 
   return (
     <section
       aria-label={isEn ? 'Discover controls' : 'کنترل‌های جستجوی منابع'}
-      className="rounded-2xl border border-border/70 bg-card p-4 md:p-5"
+      className="space-y-3"
       aria-busy={isPending}
     >
       <form
         role="search"
         aria-label={copy.search}
         onSubmit={submitSearch}
-        className="grid gap-3 lg:grid-cols-[minmax(16rem,1.4fr)_repeat(4,minmax(9rem,0.7fr))_auto]"
+        className="relative flex items-center gap-2 rounded-2xl border border-border/80 bg-card p-2 shadow-sm focus-within:border-primary/70 focus-within:ring-4 focus-within:ring-primary/10"
       >
-        <label className="grid gap-1.5">
+        <Search className="ms-2 size-5 shrink-0 text-muted-foreground" aria-hidden="true" />
+        <label className="min-w-0 flex-1">
           <span className="sr-only">{copy.search}</span>
           <input
             key={query.q}
@@ -100,17 +104,30 @@ export function DiscoverControls({
             defaultValue={query.q}
             aria-label={copy.search}
             placeholder={copy.search}
-            className="min-h-11 rounded-xl border border-border bg-background px-4 text-sm outline-none transition placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20"
+            className="min-h-12 w-full bg-transparent px-2 text-base outline-none placeholder:text-muted-foreground md:text-lg"
           />
         </label>
+        <button
+          type="submit"
+          className="min-h-11 shrink-0 rounded-xl bg-primary px-5 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60"
+          disabled={isPending}
+        >
+          {copy.submit}
+        </button>
+      </form>
 
-        <label className="grid gap-1.5">
+      <div
+        role="group"
+        aria-label={copy.filters}
+        className="grid grid-cols-2 gap-2 rounded-xl border border-border/60 bg-muted/25 p-2 md:grid-cols-4"
+      >
+        <label className="min-w-0">
           <span className="sr-only">{copy.category}</span>
           <select
             aria-label={copy.category}
             value={query.category}
             onChange={(event) => setParams({ category: event.target.value || null })}
-            className={selectClassName}
+            className={`${selectClassName} w-full`}
           >
             <option value="">{copy.allCategories}</option>
             {categories.map((category) => (
@@ -119,13 +136,13 @@ export function DiscoverControls({
           </select>
         </label>
 
-        <label className="grid gap-1.5">
+        <label className="min-w-0">
           <span className="sr-only">{copy.type}</span>
           <select
             aria-label={copy.type}
             value={query.type}
             onChange={(event) => setParams({ type: event.target.value || null })}
-            className={selectClassName}
+            className={`${selectClassName} w-full`}
           >
             <option value="">{copy.allTypes}</option>
             {resourceTypes.map((type) => (
@@ -134,13 +151,13 @@ export function DiscoverControls({
           </select>
         </label>
 
-        <label className="grid gap-1.5">
+        <label className="min-w-0">
           <span className="sr-only">{copy.platform}</span>
           <select
             aria-label={copy.platform}
             value={query.platform}
             onChange={(event) => setParams({ platform: event.target.value || null })}
-            className={selectClassName}
+            className={`${selectClassName} w-full`}
           >
             <option value="">{copy.allPlatforms}</option>
             {platforms.map((platform) => (
@@ -149,27 +166,19 @@ export function DiscoverControls({
           </select>
         </label>
 
-        <label className="grid gap-1.5">
+        <label className="min-w-0">
           <span className="sr-only">{copy.sort}</span>
           <select
             aria-label={copy.sort}
             value={query.sort}
             onChange={(event) => setParams({ sort: event.target.value })}
-            className={selectClassName}
+            className={`${selectClassName} w-full`}
           >
             <option value="featured">{copy.featured}</option>
             <option value="latest">{copy.latest}</option>
           </select>
         </label>
-
-        <button
-          type="submit"
-          className="min-h-11 rounded-xl bg-primary px-5 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60"
-          disabled={isPending}
-        >
-          {copy.submit}
-        </button>
-      </form>
+      </div>
     </section>
   )
 }
