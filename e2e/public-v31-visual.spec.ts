@@ -94,10 +94,41 @@ async function ensureVisualBlogFixture(page: Page): Promise<VisualBlogPost> {
   return body.post
 }
 
+async function hydrateLazyMedia(page: Page) {
+  await page.evaluate(async () => {
+    const delay = (ms: number) => new Promise((resolve) => window.setTimeout(resolve, ms))
+    const maxY = Math.max(0, document.documentElement.scrollHeight - window.innerHeight)
+    const step = Math.max(320, Math.floor(window.innerHeight * 0.75))
+
+    for (let y = 0; y <= maxY; y += step) {
+      window.scrollTo(0, y)
+      await delay(70)
+    }
+
+    window.scrollTo(0, maxY)
+    await delay(120)
+    window.scrollTo(0, 0)
+  })
+
+  await page.waitForLoadState('networkidle')
+  await page.locator('img').evaluateAll(async (images) => {
+    await Promise.all(images.map(async (image) => {
+      if (image.complete && image.naturalWidth > 0) {
+        try {
+          await image.decode()
+        } catch {
+          // A decoded screenshot is best-effort; network/server failures stay visible in evidence.
+        }
+      }
+    }))
+  })
+}
+
 async function capture(page: Page, path: string, file: string, width: number, height: number) {
   await page.setViewportSize({ width, height })
   await page.goto(path)
   await page.waitForLoadState('networkidle')
+  await hydrateLazyMedia(page)
   await page.screenshot({ path: `test-results/v31-evidence/${file}`, fullPage: true })
 }
 
@@ -175,6 +206,7 @@ test.describe('V3.1 public visual contract', () => {
     await page.setViewportSize({ width: 1440, height: 960 })
     await page.goto('/')
     await page.waitForLoadState('networkidle')
+    await hydrateLazyMedia(page)
     await page.keyboard.press('Tab')
     await expect(page.locator(':focus-visible')).toBeVisible()
     await page.screenshot({ path: 'test-results/v31-evidence/focus-state.png', fullPage: true })
