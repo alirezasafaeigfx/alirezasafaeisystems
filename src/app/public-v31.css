@@ -84,6 +84,19 @@
   box-shadow: inset 0 1px 0 color-mix(in oklab, white 42%, transparent);
 }
 
+.public-project-media {
+  transform-origin: center;
+  transition:
+    transform 220ms ease,
+    box-shadow 220ms ease;
+}
+
+.group:hover .public-project-media,
+.group:focus-within .public-project-media {
+  transform: translateY(-0.18rem) scale(1.012);
+  box-shadow: 0 30px 86px -46px oklch(0.24 0.04 258 / 0.42);
+}
+
 .public-hairline {
   border-color: var(--public-border);
 }
@@ -128,10 +141,14 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .public-project-media,
   .public-link-arrow {
     transition: none;
   }
 
+  .public-project-media,
+  .group:hover .public-project-media,
+  .group:focus-within .public-project-media,
   .group:hover .public-link-arrow,
   .group:focus-visible .public-link-arrow,
   [dir='ltr'] .group:hover .public-link-arrow,
