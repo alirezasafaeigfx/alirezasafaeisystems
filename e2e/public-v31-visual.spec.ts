@@ -180,6 +180,16 @@ test.describe('V3.1 public visual contract', () => {
     await page.screenshot({ path: 'test-results/v31-evidence/focus-state.png', fullPage: true })
   })
 
+  test('admin control center is isolated from public chrome', async ({ page }) => {
+    await signInAsAdmin(page)
+    await page.goto('/admin')
+    await page.waitForLoadState('networkidle')
+
+    await expect(page.getByRole('link', { name: 'ASDEV Control Center' })).toBeVisible()
+    await expect(page.getByRole('navigation', { name: /Primary navigation|ناوبری اصلی/ })).toHaveCount(0)
+    await expect(page.locator('footer')).toHaveCount(0)
+  })
+
   test('captures authenticated admin dashboard evidence', async ({ page }) => {
     await signInAsAdmin(page)
     await page.setViewportSize({ width: 1440, height: 960 })
