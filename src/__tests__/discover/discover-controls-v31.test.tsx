@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { DiscoverControls } from '@/components/discover/discover-controls'
 
@@ -63,5 +63,24 @@ describe('DiscoverControls V3.1', () => {
       '/discover?sort=featured&page=1&category=AI',
       { scroll: false },
     )
+  })
+
+  it('keeps search visually and semantically primary while filters form a compact secondary group', () => {
+    render(
+      <DiscoverControls
+        query={query}
+        categories={['AI', 'Design']}
+        platforms={['Android', 'Web']}
+        resourceTypes={['ai-tool', 'app']}
+        isEn={false}
+      />,
+    )
+
+    const search = screen.getByRole('search', { name: 'جستجوی منابع' })
+    const filters = screen.getByRole('group', { name: 'فیلترهای منابع' })
+
+    expect(within(search).getByRole('searchbox', { name: 'جستجوی منابع' })).toBeInTheDocument()
+    expect(within(filters).getAllByRole('combobox')).toHaveLength(4)
+    expect(within(search).queryByRole('combobox')).not.toBeInTheDocument()
   })
 })
