@@ -44,6 +44,10 @@ describe('live verifier Next.js RSC abort classification', () => {
     expect(isBenignNextRscAbort(request({ url: 'https://example.test/en?_rsc=abc' }), origin)).toBe(true)
   })
 
+  it('classifies a non-navigation RSC abort regardless of Playwright resource classification', () => {
+    expect(isBenignNextRscAbort(request({ resourceType: 'other' }), origin)).toBe(true)
+  })
+
   it('keeps a document navigation ERR_ABORTED fatal', () => {
     expect(isBenignNextRscAbort(request({ resourceType: 'document', navigation: true }), origin)).toBe(false)
   })

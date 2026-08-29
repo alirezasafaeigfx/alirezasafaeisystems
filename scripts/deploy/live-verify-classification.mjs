@@ -4,7 +4,6 @@ export function isBenignNextRscAbort(request, expectedOrigin) {
     return url.origin === expectedOrigin
       && request.method() === 'GET'
       && url.searchParams.has('_rsc')
-      && request.resourceType() === 'fetch'
       && !request.isNavigationRequest()
       && request.failure()?.errorText === 'net::ERR_ABORTED'
   } catch {
