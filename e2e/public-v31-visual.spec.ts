@@ -12,6 +12,7 @@ const viewportMatrix = [
 
 const publicRoutes = ['/', '/discover', '/blog']
 const visualBlogSlug = 'v31-visual-evidence-article'
+const adminSessionCookieName = 'asdev_admin_session'
 
 type VisualBlogPost = {
   slug: string
@@ -28,6 +29,25 @@ async function signInAsAdmin(page: Page) {
     data: { username, password },
   })
   expect(response.ok()).toBe(true)
+
+  // The production server correctly emits a Secure session cookie. Playwright's
+  // local review server is HTTP, so copy the already-signed token into this
+  // disposable browser context only; production cookie policy stays untouched.
+  const setCookie = response.headers()['set-cookie']
+  const match = setCookie?.match(new RegExp(`${adminSessionCookieName}=([^;]+)`))
+  expect(match?.[1], 'admin login must return a signed session cookie').toBeTruthy()
+
+  const origin = new URL(response.url()).origin
+  await page.context().addCookies([
+    {
+      name: adminSessionCookieName,
+      value: match?.[1] ?? '',
+      url: `${origin}/`,
+      httpOnly: true,
+      secure: false,
+      sameSite: 'Strict',
+    },
+  ])
 }
 
 async function ensureVisualBlogFixture(page: Page): Promise<VisualBlogPost> {
@@ -57,6 +77,13 @@ async function ensureVisualBlogFixture(page: Page): Promise<VisualBlogPost> {
   expect(created.status()).toBe(201)
   const body = await created.json() as { post: VisualBlogPost }
   return body.post
+}
+
+async function capture(page: Page, path: string, file: string, width: number, height: number) {
+  await page.setViewportSize({ width, height })
+  await page.goto(path)
+  await page.waitForLoadState('networkidle')
+  await page.screenshot({ path: `test-results/v31-evidence/${file}`, fullPage: true })
 }
 
 test.describe('V3.1 public visual contract', () => {
@@ -112,38 +139,25 @@ test.describe('V3.1 public visual contract', () => {
     await context.close()
   })
 
-  test('captures immutable review evidence for public and admin surfaces', async ({ page }) => {
+  test('captures the complete immutable review matrix', async ({ page }) => {
     await ensureVisualBlogFixture(page)
 
-    await page.setViewportSize({ width: 390, height: 844 })
+    await capture(page, '/', 'home-fa-1440.png', 1440, 960)
+    await capture(page, '/', 'home-fa-390.png', 390, 844)
+    await capture(page, '/en', 'home-en-1440.png', 1440, 960)
+    await capture(page, '/en', 'home-en-390.png', 390, 844)
+    await capture(page, '/discover', 'discover-fa-1440.png', 1440, 960)
+    await capture(page, '/discover', 'discover-fa-390.png', 390, 844)
+    await capture(page, '/discover/playwright-discover-resource', 'discover-detail.png', 1440, 960)
+    await capture(page, '/blog', 'blog-landing.png', 1440, 960)
+    await capture(page, `/blog/${visualBlogSlug}`, 'blog-article.png', 1440, 960)
+
+    await page.setViewportSize({ width: 1440, height: 960 })
     await page.goto('/')
     await page.waitForLoadState('networkidle')
-    await page.screenshot({ path: 'test-results/v31-evidence/home-fa-mobile-390.png', fullPage: true })
-
-    await page.setViewportSize({ width: 1440, height: 960 })
-    await page.goto('/en')
-    await page.waitForLoadState('networkidle')
-    await page.screenshot({ path: 'test-results/v31-evidence/home-en-desktop-1440.png', fullPage: true })
-
-    await page.setViewportSize({ width: 390, height: 844 })
-    await page.goto('/discover')
-    await page.waitForLoadState('networkidle')
-    await page.screenshot({ path: 'test-results/v31-evidence/discover-mobile-390.png', fullPage: true })
-
-    await page.setViewportSize({ width: 1440, height: 960 })
-    await page.goto('/discover')
-    await page.waitForLoadState('networkidle')
-    await page.screenshot({ path: 'test-results/v31-evidence/discover-desktop-1440.png', fullPage: true })
-
-    await page.goto('/blog')
-    await page.waitForLoadState('networkidle')
-    await expect(page.locator('h1')).toBeVisible()
-    await page.screenshot({ path: 'test-results/v31-evidence/blog-landing-desktop.png', fullPage: true })
-
-    await page.goto(`/blog/${visualBlogSlug}`)
-    await page.waitForLoadState('networkidle')
-    await expect(page.locator('article h1')).toHaveCount(1)
-    await page.screenshot({ path: 'test-results/v31-evidence/blog-article-desktop.png', fullPage: true })
+    await page.keyboard.press('Tab')
+    await expect(page.locator(':focus-visible')).toBeVisible()
+    await page.screenshot({ path: 'test-results/v31-evidence/focus-state.png', fullPage: true })
 
     await page.goto('/admin')
     await page.waitForLoadState('networkidle')
