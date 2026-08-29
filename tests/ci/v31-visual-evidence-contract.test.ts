@@ -34,6 +34,16 @@ describe('V3.1 visual evidence contract', () => {
     expect(visual).toContain('window.scrollTo')
   })
 
+  it('measures rendered image tone and variance before accepting project proof', () => {
+    const visual = read('e2e/public-v31-visual.spec.ts')
+
+    expect(visual).toContain('sampleRenderedImageStats')
+    expect(visual).toContain('nonNearWhiteRatio')
+    expect(visual).toContain('luminanceVariance')
+    expect(visual).toContain('tonalRange')
+    expect(visual).toContain('real project imagery stays visibly non-empty in rendered evidence')
+  })
+
   it('does not start heavy visual work after cancellation but still preserves upload-on-failure semantics', () => {
     const workflow = read('.github/workflows/e2e-smoke.yml')
 

@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test'
+import { test, expect, type Locator, type Page } from '@playwright/test'
 
 const viewportMatrix = [
   { width: 360, height: 800 },
@@ -125,6 +125,75 @@ async function hydrateLazyMedia(page: Page) {
   })
 }
 
+type RenderedImageStats = {
+  naturalWidth: number
+  naturalHeight: number
+  nonNearWhiteRatio: number
+  luminanceVariance: number
+  tonalRange: number
+}
+
+async function sampleRenderedImageStats(page: Page, locator: Locator): Promise<RenderedImageStats> {
+  await locator.scrollIntoViewIfNeeded()
+  await expect(locator).toBeVisible()
+  await locator.evaluate(async (node) => {
+    const image = node as HTMLImageElement
+    if (image.complete && image.naturalWidth > 0) {
+      try {
+        await image.decode()
+      } catch {
+        // Decoding is best-effort for evidence capture.
+      }
+    }
+  })
+
+  return locator.evaluate((node) => {
+    const image = node as HTMLImageElement
+    const canvas = document.createElement('canvas')
+    const size = 48
+    canvas.width = size
+    canvas.height = size
+    const context = canvas.getContext('2d', { willReadFrequently: true })
+    if (!context) throw new Error('2d canvas context unavailable')
+
+    context.drawImage(image, 0, 0, size, size)
+    const { data } = context.getImageData(0, 0, size, size)
+
+    let nonNearWhite = 0
+    let sumL = 0
+    let sumL2 = 0
+    let minL = 255
+    let maxL = 0
+
+    for (let i = 0; i < data.length; i += 4) {
+      const r = data[i]
+      const g = data[i + 1]
+      const b = data[i + 2]
+      const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b
+      sumL += luminance
+      sumL2 += luminance * luminance
+      minL = Math.min(minL, luminance)
+      maxL = Math.max(maxL, luminance)
+
+      if (!(r > 245 && g > 245 && b > 245)) {
+        nonNearWhite += 1
+      }
+    }
+
+    const samples = data.length / 4
+    const meanL = sumL / samples
+    const luminanceVariance = sumL2 / samples - meanL * meanL
+
+    return {
+      naturalWidth: image.naturalWidth,
+      naturalHeight: image.naturalHeight,
+      nonNearWhiteRatio: nonNearWhite / samples,
+      luminanceVariance,
+      tonalRange: maxL - minL,
+    }
+  })
+}
+
 async function capture(page: Page, path: string, file: string, width: number, height: number) {
   await page.setViewportSize({ width, height })
   await page.goto(path)
@@ -184,6 +253,25 @@ test.describe('V3.1 public visual contract', () => {
     await expect(media).toHaveCSS('transition-duration', '0s')
 
     await context.close()
+  })
+
+  test('real project imagery stays visibly non-empty in rendered evidence', async ({ page }) => {
+    await page.goto('/')
+    await hydrateLazyMedia(page)
+
+    const persianToolbox = page.getByRole('img', { name: 'اسکرین‌شات صفحه اصلی PersianToolbox' })
+    const auditSystems = page.getByRole('img', { name: 'اسکرین‌شات صفحه اصلی Audit Systems' })
+
+    const persianStats = await sampleRenderedImageStats(page, persianToolbox)
+    const auditStats = await sampleRenderedImageStats(page, auditSystems)
+
+    const message = `Audit stats=${JSON.stringify(auditStats)} | PersianToolbox stats=${JSON.stringify(persianStats)}`
+
+    expect(auditStats.naturalWidth, message).toBeGreaterThan(0)
+    expect(auditStats.naturalHeight, message).toBeGreaterThan(0)
+    expect(auditStats.nonNearWhiteRatio, message).toBeGreaterThanOrEqual(Math.min(0.12, persianStats.nonNearWhiteRatio * 0.4))
+    expect(auditStats.luminanceVariance, message).toBeGreaterThanOrEqual(Math.min(35, persianStats.luminanceVariance * 0.3))
+    expect(auditStats.tonalRange, message).toBeGreaterThanOrEqual(Math.min(60, persianStats.tonalRange * 0.6))
   })
 
   for (const evidence of publicEvidenceCases) {

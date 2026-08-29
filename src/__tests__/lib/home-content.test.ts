@@ -35,7 +35,7 @@ describe('home content', () => {
       ]),
       projects: expect.arrayContaining([
         expect.objectContaining({ title: 'پلتفرم PersianToolbox' }),
-        expect.objectContaining({ title: 'هشدار قیمت Novax' }),
+        expect.objectContaining({ title: 'نجات بومی‌سازی زیرساخت' }),
         expect.objectContaining({ title: 'پلتفرم Audit Systems' }),
       ]),
     })

@@ -46,14 +46,16 @@ describe('Homepage V3.1', () => {
 
     const projects = screen.getByLabelText('پروژه‌های منتخب')
     expect(within(projects).getAllByRole('article')).toHaveLength(3)
-    expect(within(projects).getAllByRole('img')).toHaveLength(2)
+    expect(within(projects).getAllByRole('img')).toHaveLength(3)
     expect(
       within(projects).getByRole('img', { name: 'اسکرین‌شات صفحه اصلی PersianToolbox' }),
     ).toBeInTheDocument()
     expect(
+      within(projects).getByRole('img', { name: 'اسکرین‌شات مطالعه موردی نجات بومی‌سازی زیرساخت' }),
+    ).toBeInTheDocument()
+    expect(
       within(projects).getByRole('img', { name: 'اسکرین‌شات صفحه اصلی Audit Systems' }),
     ).toBeInTheDocument()
-    expect(within(projects).getByLabelText('تصویر پروژه هشدار قیمت Novax')).toBeInTheDocument()
   })
 
   it('renders evidence and personal-trust surfaces instead of generic filler sections', () => {
@@ -61,7 +63,7 @@ describe('Homepage V3.1', () => {
 
     const proof = screen.getByLabelText('شواهد واقعی')
     expect(within(proof).getByText('PersianToolbox')).toBeInTheDocument()
-    expect(within(proof).getByText('Novax')).toBeInTheDocument()
+    expect(within(proof).getByText('Infrastructure Localization Rescue')).toBeInTheDocument()
     expect(within(proof).getByText('Audit Systems')).toBeInTheDocument()
 
     const about = screen.getByLabelText('درباره علیرضا صفایی')

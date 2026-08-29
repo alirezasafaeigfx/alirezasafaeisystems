@@ -245,12 +245,12 @@ export function HomePageV3({ language }: HomePageV3Props) {
               isFa
                 ? [
                     { title: 'PersianToolbox', description: 'محصول و مطالعه موردی قابل بررسی در اکوسیستم ASDEV.' },
-                    { title: 'Novax', description: 'مطالعه موردی محصول با معماری، Backend، TWA و عملیات.' },
+                    { title: 'Infrastructure Localization Rescue', description: 'مطالعه موردی واقعی برای حاکمیت انتشار و local-first stabilization.' },
                     { title: 'Audit Systems', description: 'گردش‌کار ارزیابی فنی با خروجی عملی برای وب‌سایت و محصول.' },
                   ]
                 : [
                     { title: 'PersianToolbox', description: 'A product and case study that can be inspected across the ASDEV ecosystem.' },
-                    { title: 'Novax', description: 'A documented product case spanning architecture, backend, TWA, and operations.' },
+                    { title: 'Infrastructure Localization Rescue', description: 'A real case study for release governance and local-first stabilization.' },
                     { title: 'Audit Systems', description: 'A technical assessment workflow built around actionable web and product output.' },
                   ]
             }
