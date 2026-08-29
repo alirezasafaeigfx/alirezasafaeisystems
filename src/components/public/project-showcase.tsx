@@ -41,41 +41,41 @@ export function ProjectShowcase({
   const mediaLabel = imageAlt ?? (isFa ? `تصویر پروژه ${title}` : `${title} project visual`)
 
   return (
-    <article className="group grid gap-6 border-t border-border/70 py-8 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] md:items-center md:gap-10 md:py-10">
-      <div className="md:order-2">
-        <VisualFrame ariaLabel={mediaLabel} ratio="landscape" className="min-h-60 sm:min-h-72">
+    <article className="group grid min-w-0 gap-6 border-t border-border/70 py-8 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] md:items-center md:gap-10 md:py-10">
+      <div className="min-w-0 md:order-2">
+        <VisualFrame ariaLabel={mediaLabel} ratio="landscape" className="public-project-media min-w-0">
           <div className={cn('absolute inset-0 bg-gradient-to-br', tones[tone])} aria-hidden="true" />
           {imageSrc ? (
             <Image src={imageSrc} alt={imageAlt ?? title} fill sizes="(min-width: 768px) 52vw, 100vw" className="object-cover" />
           ) : (
             <div
-              className="relative z-10 flex h-full min-h-60 flex-col justify-between p-6 sm:min-h-72 sm:p-8"
+              className="relative z-10 flex h-full min-w-0 flex-col justify-between p-6 sm:p-8"
               data-asset-status="pending-project-screenshot"
             >
-              <div className="flex items-center justify-between gap-4">
-                <span className="text-xs font-black tracking-[0.16em] text-primary">{index}</span>
-                <span className="rounded-full border border-border/80 bg-background/70 px-3 py-1 text-[11px] font-semibold text-muted-foreground backdrop-blur-sm">
+              <div className="flex min-w-0 items-start justify-between gap-3">
+                <span className="shrink-0 text-xs font-black tracking-[0.16em] text-primary">{index}</span>
+                <span className="max-w-[76%] rounded-full border border-border/80 bg-background/70 px-3 py-1 text-center text-[11px] font-semibold leading-5 text-muted-foreground backdrop-blur-sm">
                   {isFa ? 'اسکرین‌شات واقعی در RC نهایی' : 'Real screenshot required for final RC'}
                 </span>
               </div>
-              <div>
-                <p className="text-3xl font-black leading-tight text-foreground sm:text-4xl">{title}</p>
-                <p className="mt-2 text-sm font-medium text-muted-foreground">{technologies.slice(0, 2).join(' • ')}</p>
+              <div className="min-w-0">
+                <p className="break-words text-3xl font-black leading-tight text-foreground sm:text-4xl">{title}</p>
+                <p className="mt-2 break-words text-sm font-medium text-muted-foreground">{technologies.slice(0, 2).join(' • ')}</p>
               </div>
             </div>
           )}
         </VisualFrame>
       </div>
 
-      <div className="md:order-1">
+      <div className="min-w-0 md:order-1">
         <p className="text-xs font-black tracking-[0.16em] text-primary">{index}</p>
-        <h3 className="mt-3 text-2xl font-black leading-tight md:text-3xl">{title}</h3>
+        <h3 className="mt-3 break-words text-2xl font-black leading-tight md:text-3xl">{title}</h3>
         <p className="mt-4 max-w-xl text-base leading-8 text-muted-foreground">{description}</p>
         <p className="mt-4 max-w-xl text-sm font-semibold leading-7 text-foreground/80">{role}</p>
         {outcome ? <p className="mt-4 border-s-2 border-primary ps-4 text-sm leading-7 text-muted-foreground">{outcome}</p> : null}
-        <ul className="mt-5 flex flex-wrap gap-2" aria-label={`${title} technologies`}>
+        <ul className="mt-5 flex min-w-0 flex-wrap gap-2" aria-label={`${title} technologies`}>
           {technologies.slice(0, 3).map((technology) => (
-            <li key={technology} className="rounded-full border border-border/75 bg-background/65 px-3 py-1 text-xs font-semibold text-muted-foreground">
+            <li key={technology} className="max-w-full break-words rounded-full border border-border/75 bg-background/65 px-3 py-1 text-xs font-semibold text-muted-foreground">
               {technology}
             </li>
           ))}
