@@ -50,13 +50,18 @@ test.describe('smoke', () => {
     await expect(page.locator('h1')).toContainText('Software Engineer')
   })
 
-  test('Discover keeps English locale and presents the Resource Hub contract', async ({ page }) => {
+  test('Discover keeps English locale and presents the search-first Resource Hub contract', async ({ page }) => {
     await page.goto('/en/discover')
     await expect.poll(async () => page.evaluate(() => document.documentElement.lang)).toBe('en')
     await expect.poll(async () => page.evaluate(() => document.documentElement.dir)).toBe('ltr')
-    await expect(page.locator('h1')).toContainText('Find the tools and resources I mention on Instagram')
-    await expect(page.getByText('Search a name, open its real official destination, read the quick guide, and use the full Telegram resource when one is available.')).toBeVisible()
-    await expect(page.getByText('Use this page as the single link in my Instagram bio; no DM automation is required.')).toBeVisible()
+    await expect(page.getByRole('heading', { level: 1, name: 'Find the tool. Get the real source.' })).toBeVisible()
+    await expect(page.getByRole('search', { name: 'Search resources' })).toBeVisible()
+    await expect(page.getByRole('searchbox', { name: 'Search resources' })).toBeVisible()
+    await expect(page.getByRole('group', { name: 'Resource filters' })).toBeVisible()
+    await expect(page.getByRole('combobox', { name: 'Category' })).toBeVisible()
+    await expect(page.getByRole('combobox', { name: 'Resource type' })).toBeVisible()
+    await expect(page.getByRole('combobox', { name: 'Platform' })).toBeVisible()
+    await expect(page.getByRole('combobox', { name: 'Sort' })).toBeVisible()
   })
 
   test('Discover resource detail preserves the exact Telegram guide link without campaign leakage', async ({ page }) => {
