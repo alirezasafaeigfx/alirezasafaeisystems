@@ -26,6 +26,14 @@ describe('V3.1 visual evidence contract', () => {
     }
   })
 
+  it('hydrates lazy media before full-page screenshot capture', () => {
+    const visual = read('e2e/public-v31-visual.spec.ts')
+
+    expect(visual).toContain('async function hydrateLazyMedia')
+    expect(visual).toContain('await hydrateLazyMedia(page)')
+    expect(visual).toContain('window.scrollTo')
+  })
+
   it('does not start heavy visual work after cancellation but still preserves upload-on-failure semantics', () => {
     const workflow = read('.github/workflows/e2e-smoke.yml')
 
