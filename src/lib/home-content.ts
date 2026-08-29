@@ -103,13 +103,13 @@ const content: Record<Language, HomeContent> = {
       description: 'هر همکاری با زمینه مسئله، تصمیم‌های فنی و خروجی قابل بررسی توضیح داده می‌شود.',
     },
     principles: [
-      'تصمیم‌های معماری بر اساس مسئله واقعی کسب‌وکار',
-      'کیفیت و قابلیت نگهداری از ابتدای مسیر توسعه',
-      'تحویل شفاف با شواهد قابل بررسی',
+      'اول مسئله و محدودیت واقعی را روشن می‌کنم، بعد تکنولوژی و معماری را انتخاب می‌کنم.',
+      'کیفیت، قابلیت نگهداری و مسیر انتشار را از ابتدای توسعه جزئی از محصول می‌بینم.',
+      'تحویل برای من یعنی سیستم قابل بررسی، مستند و قابل ادامه؛ نه صرفاً کدی که یک‌بار اجرا شده است.',
     ],
     about: {
       title: 'درباره من',
-      description: 'علیرضا صفایی، مهندس نرم‌افزار و سازنده سیستم‌های وب در ASDEV است.',
+      description: 'من علیرضا صفایی‌ام؛ مهندس نرم‌افزار و سازنده سیستم‌های وب. بیشتر از اضافه‌کردن تکنولوژی، به کم‌کردن ابهام، انتخاب معماری درست و رساندن محصول به وضعیتی فکر می‌کنم که تیم بتواند با اطمینان آن را ادامه دهد.',
     },
     contact: {
       title: 'برای همکاری آماده‌اید؟',
@@ -177,13 +177,13 @@ const content: Record<Language, HomeContent> = {
       description: 'Each engagement is explained through its problem context, technical decisions, and reviewable outcome.',
     },
     principles: [
-      'Architecture decisions grounded in the real business problem',
-      'Quality and maintainability from the start of delivery',
-      'Clear handover with reviewable evidence',
+      'Clarify the real problem and constraints first; choose technology and architecture second.',
+      'Treat maintainability, quality, and the release path as product concerns from the beginning.',
+      'A handoff should leave a system that is reviewable, documented, and safe to continue—not code that merely ran once.',
     ],
     about: {
       title: 'About me',
-      description: 'Alireza Safaei is a Software Engineer and web systems builder at ASDEV.',
+      description: 'I am Alireza Safaei, a Software Engineer and web-systems builder. I care less about adding technology for its own sake and more about reducing ambiguity, choosing the right architecture, and leaving teams with a product they can continue with confidence.',
     },
     contact: {
       title: 'Ready to collaborate?',
