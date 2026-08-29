@@ -53,6 +53,10 @@ export function Header() {
   const primaryNavLabel = language === 'fa' ? 'ناوبری اصلی' : 'Primary navigation'
   const mobileNavLabel = language === 'fa' ? 'ناوبری موبایل' : 'Mobile navigation'
 
+  if (pathname === '/admin' || pathname.startsWith('/admin/')) {
+    return null
+  }
+
   return (
     <header className="fixed inset-x-0 top-0 z-50 pointer-events-none">
       <div className="public-shell pt-3 md:pt-4">
