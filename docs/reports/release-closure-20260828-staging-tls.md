@@ -1,5 +1,7 @@
 # Release Closure Evidence — Staging TLS
 
+> **Historical record — superseded for V3 closure.** Staging TLS was subsequently verified and V3 reached `V3 PRODUCTION COMPLETE` on `IRAN_PROD_SERVER`: release `20260829T044320Z`, deployed SHA `14501b25c20292c90c33f888eb40227e042b3bfd`, production workflow `33234404337` successful with migration, smoke, backup/rollback readiness, and two consecutive browser-verification passes. No further V3 mutations are authorized by this record.
+
 - Repository: `alirezasafaeigfx/alirezasafaeisystems`
 - Branch: `feat/personal-brand-content-platform-v3`
 - Baseline SHA: `a753577822be9da420a131c824bdd3dc76319a5e`
