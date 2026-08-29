@@ -16,7 +16,7 @@ describe('Homepage V3.1', () => {
     trackEventMock.mockResolvedValue(undefined)
   })
 
-  it('renders the personal Persian hero with exactly two actions and a real visual frame contract', () => {
+  it('renders the personal Persian hero with exactly two actions and a real owner portrait', () => {
     render(<HomePageV3 language="fa" />)
 
     const hero = screen.getByRole('region', { name: 'معرفی علیرضا صفایی' })
@@ -30,7 +30,9 @@ describe('Homepage V3.1', () => {
     const portraitFrame = within(hero).getByTestId('owner-portrait-frame')
     expect(portraitFrame).toBeInTheDocument()
     expect(portraitFrame).not.toHaveAttribute('aria-hidden', 'true')
-    expect(within(portraitFrame).getByText('AS')).toBeInTheDocument()
+    expect(portraitFrame).not.toHaveAttribute('data-asset-status', 'pending-owner-portrait')
+    expect(within(portraitFrame).getByRole('img', { name: 'پرتره حرفه‌ای علیرضا صفایی' })).toBeInTheDocument()
+    expect(within(portraitFrame).queryByText('AS')).not.toBeInTheDocument()
   })
 
   it('renders three differentiated services and three visual project showcases', () => {
