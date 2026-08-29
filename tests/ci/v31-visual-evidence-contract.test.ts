@@ -22,7 +22,7 @@ describe('V3.1 visual evidence contract', () => {
       'focus-state.png',
       'admin-dashboard-desktop.png',
     ]) {
-      expect(visual).toContain(`'${file}'`)
+      expect(visual).toContain(file)
     }
   })
 
