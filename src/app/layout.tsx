@@ -4,7 +4,6 @@ import "./public-v31.css";
 import { Toaster } from "@/components/ui/toaster";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
-import { BottomNav } from "@/components/layout/bottom-nav";
 import { ScrollProgress } from "@/components/layout/scroll-progress";
 import { JsonLd } from "@/components/seo/json-ld";
 import { I18nProvider } from "@/lib/i18n-context";
@@ -156,7 +155,6 @@ export default async function RootLayout({
           nonce={nonce}
         >
           <I18nProvider initialLanguage={lang as 'fa' | 'en'}>
-          {/* Skip to main content link for accessibility */}
           <a
             href="#main-content"
             className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 z-50 bg-primary text-primary-foreground px-4 py-2 rounded-md"
@@ -164,7 +162,6 @@ export default async function RootLayout({
             {lang === 'fa' ? 'پرش به محتوای اصلی' : 'Skip to main content'}
           </a>
 
-          {/* Schema.org Structured Data - Single @graph to avoid duplicates */}
           <JsonLd
             data={{
               '@context': 'https://schema.org',
@@ -195,10 +192,9 @@ export default async function RootLayout({
           <Header />
           <FontCdnLoader enabled={fontCdnEnabled} href={fontCdnUrl} />
           <WebVitals />
-          <main id="main-content" className="flex-1 pb-20 md:pb-0">
+          <main id="main-content" className="flex-1">
             {children}
           </main>
-          <BottomNav />
           <Footer />
           <Toaster />
         </I18nProvider>
