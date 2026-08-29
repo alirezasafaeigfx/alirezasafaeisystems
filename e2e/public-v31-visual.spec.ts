@@ -14,6 +14,21 @@ const publicRoutes = ['/', '/discover', '/blog']
 const visualBlogSlug = 'v31-visual-evidence-article'
 const adminSessionCookieName = 'asdev_admin_session'
 
+const publicEvidenceCases = [
+  { path: '/', file: 'home-fa-1440.png', width: 1440, height: 960 },
+  { path: '/', file: 'home-fa-390.png', width: 390, height: 844 },
+  { path: '/en', file: 'home-en-1440.png', width: 1440, height: 960 },
+  { path: '/en', file: 'home-en-390.png', width: 390, height: 844 },
+  { path: '/discover', file: 'discover-fa-1440.png', width: 1440, height: 960 },
+  { path: '/discover', file: 'discover-fa-390.png', width: 390, height: 844 },
+  {
+    path: '/discover/playwright-discover-resource',
+    file: 'discover-detail.png',
+    width: 1440,
+    height: 960,
+  },
+] as const
+
 type VisualBlogPost = {
   slug: string
 }
@@ -139,26 +154,35 @@ test.describe('V3.1 public visual contract', () => {
     await context.close()
   })
 
-  test('captures the complete immutable review matrix', async ({ page }) => {
+  for (const evidence of publicEvidenceCases) {
+    test(`captures ${evidence.file}`, async ({ page }) => {
+      await capture(page, evidence.path, evidence.file, evidence.width, evidence.height)
+    })
+  }
+
+  test('captures blog landing evidence', async ({ page }) => {
     await ensureVisualBlogFixture(page)
-
-    await capture(page, '/', 'home-fa-1440.png', 1440, 960)
-    await capture(page, '/', 'home-fa-390.png', 390, 844)
-    await capture(page, '/en', 'home-en-1440.png', 1440, 960)
-    await capture(page, '/en', 'home-en-390.png', 390, 844)
-    await capture(page, '/discover', 'discover-fa-1440.png', 1440, 960)
-    await capture(page, '/discover', 'discover-fa-390.png', 390, 844)
-    await capture(page, '/discover/playwright-discover-resource', 'discover-detail.png', 1440, 960)
     await capture(page, '/blog', 'blog-landing.png', 1440, 960)
-    await capture(page, `/blog/${visualBlogSlug}`, 'blog-article.png', 1440, 960)
+  })
 
+  test('captures blog article evidence', async ({ page }) => {
+    await ensureVisualBlogFixture(page)
+    await capture(page, `/blog/${visualBlogSlug}`, 'blog-article.png', 1440, 960)
+    await expect(page.locator('article h1')).toHaveCount(1)
+  })
+
+  test('captures visible keyboard focus evidence', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 960 })
     await page.goto('/')
     await page.waitForLoadState('networkidle')
     await page.keyboard.press('Tab')
     await expect(page.locator(':focus-visible')).toBeVisible()
     await page.screenshot({ path: 'test-results/v31-evidence/focus-state.png', fullPage: true })
+  })
 
+  test('captures authenticated admin dashboard evidence', async ({ page }) => {
+    await signInAsAdmin(page)
+    await page.setViewportSize({ width: 1440, height: 960 })
     await page.goto('/admin')
     await page.waitForLoadState('networkidle')
     await expect(page).toHaveURL(/\/admin(?:\/|$)/)
