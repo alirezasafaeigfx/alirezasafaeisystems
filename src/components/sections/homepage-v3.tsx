@@ -1,8 +1,9 @@
 'use client'
 
 import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, ArrowUpLeft, CheckCircle2, Code2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { VisualFrame } from '@/components/public/visual-frame'
 import { trackEvent } from '@/lib/analytics/client'
 import { getHomeContent } from '@/lib/home-content'
 import { withLocale, type Locale } from '@/lib/locale-utils'
@@ -15,6 +16,9 @@ const labels = {
   fa: {
     hero: 'معرفی علیرضا صفایی',
     heroActions: 'اقدام‌های اصلی',
+    portrait: 'قاب تصویر علیرضا صفایی',
+    portraitStatus: 'تصویر واقعی مالک در نسخه نهایی جایگزین می‌شود',
+    annotation: 'معماری نرم‌افزار • توسعه محصول • پایداری',
     services: 'خدمات اصلی',
     servicesTitle: 'چه کاری انجام می‌دهم',
     projects: 'پروژه‌های منتخب',
@@ -25,6 +29,9 @@ const labels = {
   en: {
     hero: 'Alireza Safaei introduction',
     heroActions: 'Primary actions',
+    portrait: 'Alireza Safaei portrait frame',
+    portraitStatus: 'Owner-approved portrait will replace this development visual',
+    annotation: 'Software architecture • Product delivery • Reliability',
     services: 'Core services',
     servicesTitle: 'What I do',
     projects: 'Selected projects',
@@ -46,31 +53,86 @@ export function HomePageV3({ language }: HomePageV3Props) {
     })
   }
 
+  function trackProjectsCta() {
+    void trackEvent({
+      name: 'hero_projects_cta_click',
+      category: 'engagement',
+      locale: language,
+    })
+  }
+
   return (
     <div dir={language === 'fa' ? 'rtl' : 'ltr'}>
-      <section aria-label={copy.hero} className="section-block">
-        <div className="container mx-auto px-4">
-          <div className="grid items-center gap-10 py-10 md:grid-cols-[minmax(0,1.2fr)_minmax(18rem,0.8fr)] md:py-16">
-            <div className="order-2 max-w-3xl space-y-6 md:order-1">
-              <p className="text-sm font-semibold text-primary">{content.hero.name}</p>
-              <div className="space-y-4">
-                <h1 className="headline-tight text-4xl font-bold tracking-tight md:text-6xl">{content.hero.title}</h1>
-                <p className="max-w-2xl text-base leading-8 text-muted-foreground md:text-lg">{content.hero.description}</p>
-                <p className="max-w-2xl text-base leading-8 text-muted-foreground">{content.hero.detail}</p>
+      <section aria-label={copy.hero} className="public-section overflow-hidden pt-28 md:pt-36 lg:pt-40">
+        <div className="public-shell">
+          <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1.12fr)_minmax(20rem,0.88fr)] lg:gap-14 xl:gap-20">
+            <div className="order-2 max-w-3xl lg:order-1">
+              <p className="public-kicker">{content.hero.name}</p>
+              <div className="mt-5 space-y-5">
+                <h1 className="public-display text-5xl font-black sm:text-6xl lg:text-7xl xl:text-[5.25rem]">
+                  {content.hero.title}
+                </h1>
+                <p className="max-w-2xl text-lg font-medium leading-9 text-foreground/86 md:text-xl md:leading-10">
+                  {content.hero.description}
+                </p>
+                <p className="max-w-2xl text-base leading-8 text-muted-foreground md:text-lg">
+                  {content.hero.detail}
+                </p>
               </div>
-              <div aria-label={copy.heroActions} role="group" className="flex flex-col gap-3 sm:flex-row">
-                <Button asChild size="lg" className="min-h-11">
+
+              <div aria-label={copy.heroActions} role="group" className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <Button asChild size="lg" className="min-h-12 rounded-xl px-6 font-extrabold shadow-sm">
                   <Link href={withLocale('/qualification', language)} onClick={trackPrimaryCta}>
                     {content.hero.primaryCta}
-                    <ArrowLeft aria-hidden="true" className={language === 'fa' ? 'size-4' : 'size-4 rotate-180'} />
+                    <ArrowUpLeft
+                      aria-hidden="true"
+                      className={language === 'fa' ? 'size-4' : 'size-4 rotate-90'}
+                    />
                   </Link>
                 </Button>
-                <Button asChild size="lg" variant="outline" className="min-h-11">
-                  <Link href={withLocale('/case-studies', language)}>{content.hero.secondaryCta}</Link>
+                <Button asChild size="lg" variant="outline" className="min-h-12 rounded-xl px-6 font-bold">
+                  <Link href={withLocale('/case-studies', language)} onClick={trackProjectsCta}>
+                    {content.hero.secondaryCta}
+                    <ArrowLeft
+                      aria-hidden="true"
+                      className={language === 'fa' ? 'size-4' : 'size-4 rotate-180'}
+                    />
+                  </Link>
                 </Button>
               </div>
+
+              <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted-foreground">
+                <span className="inline-flex items-center gap-2">
+                  <CheckCircle2 className="size-4 text-primary" aria-hidden="true" />
+                  {language === 'fa' ? 'تمرکز روی استفاده واقعی در Production' : 'Built for real production use'}
+                </span>
+                <span className="inline-flex items-center gap-2">
+                  <Code2 className="size-4 text-primary" aria-hidden="true" />
+                  {language === 'fa' ? 'تصمیم‌های فنی قابل توضیح و قابل بررسی' : 'Reviewable, explainable engineering decisions'}
+                </span>
+              </div>
             </div>
-            <div aria-hidden="true" className="order-1 aspect-[4/5] rounded-2xl border border-border bg-muted md:order-2" />
+
+            <div className="order-1 lg:order-2" data-testid="owner-portrait-frame" data-asset-status="pending-owner-portrait">
+              <VisualFrame ariaLabel={copy.portrait} ratio="portrait" className="min-h-[28rem] sm:min-h-[34rem] lg:min-h-0">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_34%,color-mix(in_oklab,var(--primary)_24%,transparent),transparent_35%),linear-gradient(155deg,color-mix(in_oklab,var(--card)_96%,transparent),color-mix(in_oklab,var(--muted)_88%,transparent))]" />
+                <div className="absolute inset-0 opacity-45 [background-image:linear-gradient(to_right,color-mix(in_oklab,var(--border)_45%,transparent)_1px,transparent_1px),linear-gradient(to_bottom,color-mix(in_oklab,var(--border)_45%,transparent)_1px,transparent_1px)] [background-size:44px_44px] [mask-image:radial-gradient(circle_at_center,black_15%,transparent_72%)]" aria-hidden="true" />
+                <div className="absolute inset-x-[12%] top-[10%] aspect-square rounded-full border border-primary/20" aria-hidden="true" />
+                <div className="absolute inset-x-[20%] top-[18%] aspect-square rounded-full border border-primary/12" aria-hidden="true" />
+
+                <div className="relative z-10 flex h-full min-h-[28rem] flex-col items-center justify-center px-6 py-8 text-center sm:min-h-[34rem] lg:min-h-full">
+                  <div className="grid size-36 place-items-center rounded-[2rem] border border-primary/20 bg-background/72 text-5xl font-black tracking-[-0.06em] text-primary shadow-[0_28px_80px_-38px_color-mix(in_oklab,var(--primary)_70%,transparent)] backdrop-blur-sm sm:size-44 sm:text-6xl">
+                    AS
+                  </div>
+                  <p className="mt-7 max-w-xs text-sm font-bold leading-7 text-foreground/80">
+                    {copy.annotation}
+                  </p>
+                  <p className="mt-2 max-w-xs text-xs leading-6 text-muted-foreground">
+                    {copy.portraitStatus}
+                  </p>
+                </div>
+              </VisualFrame>
+            </div>
           </div>
         </div>
       </section>
