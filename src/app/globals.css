@@ -583,24 +583,26 @@ html {
   fill: none;
   stroke: var(--primary);
   stroke-width: 2;
-  stroke-dasharray: 0.08 0.02;
-  animation: operational-path 3.2s linear infinite;
+  stroke-linecap: round;
+  transition: d 280ms ease, opacity 180ms ease;
 }
 
 .operational-scene__node circle {
   fill: var(--background);
   stroke: var(--primary);
   stroke-width: 2;
+  transition: r 220ms ease, fill 220ms ease, stroke-width 220ms ease;
+}
+
+.operational-scene__node.is-active circle {
+  fill: color-mix(in oklab, var(--primary) 18%, var(--background));
+  stroke-width: 3;
 }
 
 .operational-scene__node text {
   fill: var(--foreground);
   font-size: 13px;
   font-weight: 700;
-}
-
-@keyframes operational-path {
-  to { stroke-dashoffset: -0.1; }
 }
 
 [dir="rtl"] .headline-tight {
@@ -691,6 +693,8 @@ html {
   }
 
   .operational-scene__path {
-    animation: none !important;
+    transition: none !important;
   }
+
+  .operational-scene__node circle { transition: none !important; }
 }
