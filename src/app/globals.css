@@ -579,6 +579,30 @@ html {
   line-height: var(--heading-line-height);
 }
 
+.operational-scene__path {
+  fill: none;
+  stroke: var(--primary);
+  stroke-width: 2;
+  stroke-dasharray: 0.08 0.02;
+  animation: operational-path 3.2s linear infinite;
+}
+
+.operational-scene__node circle {
+  fill: var(--background);
+  stroke: var(--primary);
+  stroke-width: 2;
+}
+
+.operational-scene__node text {
+  fill: var(--foreground);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+@keyframes operational-path {
+  to { stroke-dashoffset: -0.1; }
+}
+
 [dir="rtl"] .headline-tight {
   letter-spacing: 0;
 }
@@ -664,5 +688,9 @@ html {
     transform: none !important;
     opacity: 1 !important;
     transition: none !important;
+  }
+
+  .operational-scene__path {
+    animation: none !important;
   }
 }
