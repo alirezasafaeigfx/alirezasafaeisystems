@@ -48,21 +48,28 @@ This ledger records state and evidence. It does not create work independently. I
 | R0-03 | `DONE-FAILED-SAFE` | SRE/QA | exact candidate `41a80235...` | deploy/health PASS; public smoke DNS resolution timeout; live verification skipped; exact rollback PASS | feeds R0-03A; do not classify as app failure |
 | R0-03A | `REUSED-DONE` | SRE/QA | runs `33303771900` + `33298314611` | transient VPS resolver-path incident; exact sublayer absent from instrumentation | no repeat diagnosis; preserve uncertainty |
 | R0-03B | `DONE` | SRE/QA/REVIEW | PR #20 head `6a00220...` → merge `d1592ac...` | exact three-file scope; current-main ancestry; protected router, quality, smoke, Lighthouse and security checks green | proceed to R0-03C |
-| R0-03C | `READY — APPROVED` | SRE/QA | immutable `GITHUB_MAIN@d1592ac749ad5113f72655c78622e67cbc86516e` | staging approval literal granted in current session | execute exactly one governed staging attempt; record health, two public passes or failed-safe rollback |
+| R0-03C | `DONE` | SRE/QA | immutable `GITHUB_MAIN@39c09b43191822d70c30f7fa8ae51dadb36d37b7` | governed run `33329913543`; quality, deploy, internal smoke and two public browser passes passed | staging accepted; continue R0-05/R0-06 |
 | R0-04 | `REUSED-DONE` | REVIEW | exact app SHA `41a80235...` | existing exact-SHA evidence + PR #21 report | do not repeat unless inputs change |
-| R0-05 | `BLOCKED` | ORCH/SRE | actual public release truth | source/main and public observation disagree | R0-03C; observe exact production identity/release path rather than infer |
-| R0-05A | `READY — EXISTS-UNMERGED` | ORCH/QA | `main@39c686d4...` → PR #21 `dc77060afea987bdfde45538b43ca5fef1feaf8e` | six-file bounded diff; hosted Router, quality, smoke, Lighthouse, security and CodeQL checks green; local focused 7/7, type-check and lint 0 errors | remains draft during incident freeze; no merge or settings mutation |
+| R0-05 | `DONE — READ-ONLY OBSERVED` | ORCH/SRE | public production observation | production `/`, `/api/ready`, `/services`, `/discover`, `/en/discover` healthy; no production identity inferred from `main` | production release remains separately gated |
+| R0-05A | `DONE` | ORCH/QA | PR #21 `dc77060afea987bdfde45538b43ca5fef1feaf8e` → merge `308c2753eabab74d1dc0031fd0e2b76a4fabee39` | accepted bounded guard and same-SHA evidence | reused |
 | R0-05B | `DONE` | ORCH | ruleset `21861412` | active `main`-scoped ruleset; zero approvals; deletion/non-fast-forward blocks; no bypass; stable exact check contexts verified | continue R0-03B |
-| R0-06 | `BLOCKED` | ORCH | actual accepted post-release base | none yet | R0-05 |
-| S1-* | `BLOCKED BY R0` | UX/EVID/FE/QA | post-R0 base | roadmap/spec ready | R0-06 |
-| S2-* | `BLOCKED BY S1` | EVID/UX/FE/QA | accepted S1 head | roadmap/spec ready | S1 exit gate |
-| S3-* | `BLOCKED BY S1` | FE/UX/QA | accepted S1 head | roadmap/spec ready | S1 contracts |
-| S4-* | `BLOCKED BY S1–S3` | UX/FE/QA | accepted product head | roadmap + immersive spec ready | S1–S3 exit gates; Gate A only initially |
+| R0-06 | `DONE` | ORCH | `GITHUB_MAIN@39c09b43191822d70c30f7fa8ae51dadb36d37b7` | accepted staging candidate establishes clean V3.2 implementation base | S1 |
+| S1-* | `DONE` | UX/EVID/FE/QA | merge `a7dc295c93efafbf1f37248009283b3dab5bc365` | positioning, typed provenance, proof and Audit conversion | S2 |
+| S2-* | `DONE` | EVID/UX/FE/QA | merge `7d331132fc019a63772a5ce7094fb3d1a8c8853b` | flagship documentary and accepted quantitative evidence only | S3 |
+| S3-* | `DONE` | FE/UX/QA | merge `23edc4fb7bd506125127c1eba577996cabe44ec1` | Discover surface integrity and stable first-row media | S4 |
+| S4-* | `DONE — GATE A` | UX/FE/QA | merge `39c09b43191822d70c30f7fa8ae51dadb36d37b7` | semantic operational scene; DOM/SVG/CSS only; reduced-motion equivalent | S5 |
 | S5-* | `BLOCKED BY S1–S4` | QA/REVIEW/SRE/ORCH | final candidate | roadmap ready | S1–S4 |
 
 ## Immediate dependency order
 
 `R0-05A → R0-05B → R0-03B → R0-03C → R0-05 → R0-06 → S1`
+
+## V3.2 accepted staging and UI delivery
+
+- UTC `2026-08-30`: R0-03C replacement run `33329913543` completed successfully for immutable `GITHUB_MAIN@39c09b43191822d70c30f7fa8ae51dadb36d37b7`; quality gate, build/type safety, Prisma safety, remote startup, internal smoke, and two consecutive real-hostname browser passes passed. Deployment record `6170189078`; staging release `20260830T190829Z`; prior retained staging release `20260830T170634Z` is the rollback candidate.
+- Proven transport finding: the earlier `33324172327` upload was slow but progressing; IRAN_PROD_SERVER had healthy SSH/sshd, capacity, permissions, load, and active transfer growth. No server mutation was required. The bounded replacement completed without overlap.
+- S1–S4 accepted on GITHUB_MAIN: PR #22 merge `a7dc295c93efafbf1f37248009283b3dab5bc365`; PR #23 merge `7d331132fc019a63772a5ce7094fb3d1a8c8853b`; PR #24 merge `23edc4fb7bd506125127c1eba577996cabe44ec1`; PR #25 merge `39c09b43191822d70c30f7fa8ae51dadb36d37b7`. Exact-main hosted CI, E2E, Lighthouse, security, and CodeQL signals passed at the final UI SHA.
+- S5 release acceptance remains blocked by the missing production approval literal; production was observed read-only and no production identity was inferred from GITHUB_MAIN. Main's non-required semantic-release job also failed at `33329600579` during GitHub API TLS handshake timeout and was not used as release evidence.
 
 - R0-01, R0-02, R0-03A and R0-04 are terminal/reusable and must not be dispatched again.
 - PR #20 and PR #21 are `EXISTS-UNMERGED`, not `DONE`; continue the existing work rather than create parallel implementations.
