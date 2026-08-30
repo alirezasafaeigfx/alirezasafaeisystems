@@ -1,5 +1,11 @@
 # Decision Log
 
+## 2026-08-30 — Public-experience acceptance and execution correction
+
+Owner explicitly requested direct roadmap/agent/rule/engineering-guide updates, practical task/sprint cards, advanced interaction, plain Persian and independent checking of every Codex report. Successful Production release remains historical fact; it is not complete design/motion acceptance. Reconcile state in the [ledger](../execution/V3_2_WORK_LEDGER.md); use only the [canonical roadmap](../roadmaps/ASDEV_PUBLIC_EXPERIENCE_EXECUTION.md).
+
+Replace the old Gate-A-only ceiling with a complete native foundation plus admitted bounded Anime.js evaluation and one deferred Three.js signature prototype, with measured adoption and no blanket runtime/dependency permission. Required quality is the smallest complete solution, not the fewest lines. Preserve current app stack/SQLite/deploy architecture and normal protected PR flow. Missing visual/source/performance evidence cannot be called PASS. The new [engineering guide](../engineering/PUBLIC_EXPERIENCE_ENGINEERING.md) and [report review protocol](../governance/CODEX_REPORT_REVIEW.md) define implementation and inspection. No code/dependency/runtime/settings mutation is performed by this docs decision. Older conflicting public-site task priorities below are historical.
+
 Append-only. Newest first.
 
 ---

@@ -1,5 +1,9 @@
 # ASDEV Autonomous Loop Governance Policy
 
+## Public-experience scope override — 2026-08-30
+
+For `alirezasafaeigfx/alirezasafaeisystems` public-site work, the owner-approved [AGENTS.md](../../AGENTS.md), [project rules](../governance/REPOSITORY_RULES.md) and [single public-experience roadmap](../roadmaps/ASDEV_PUBLIC_EXPERIENCE_EXECUTION.md) supersede conflicting loop priorities below. Execute the admitted UI/copy/motion tasks; do not prioritize control-plane housekeeping, invent autonomous tasks, update other repositories, require periodic posts, or create another queue. Only ORCH writes the public-experience ledger. Safe routine implementation continues automatically; runtime/data/security gates remain applicable. The ecosystem policy below is retained for its original scope, not as an alternative public-site queue.
+
 **Status:** ACTIVE — Official control-plane policy  
 **Authority:** Supersedes informal chat-only loop instructions  
 **Last Updated:** 2026-07-09  
