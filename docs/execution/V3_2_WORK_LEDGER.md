@@ -31,8 +31,8 @@ This ledger records state and evidence. It does not create work independently. I
 |---|---|---|
 | PR #19 | merge `4a02127bfdc2ed37956803c113b635700a930efe` | workflow-fix branch inherited V3.1 candidate ancestry and carried it into `main`; governance incident |
 | Current observed `main` | `39c686d4b977e7122a6a2ca889878a43fea3f1f9` | semantic-release v1.1.0 source state; not proof of production deployment |
-| `main` protection | disabled in latest read | process-only controls are insufficient |
-| repository rulesets | `[]` in latest read | no ruleset enforcement observed |
+| `main` protection API | `404 Branch not protected` | classic branch-protection endpoint remains unused; ruleset enforcement is the active control |
+| repository ruleset | `protect-main-release-governance`, ID `21861412`, `target=branch`, `enforcement=active`, empty ref include/exclude (therefore includes `main`) | active repository ruleset targets `main`; current user bypass is `never`; bypass actors `[]` |
 | PR #18 | canonical V3.2 documentation PR; original head `48eb38afe66ab80bbd1767e5240f06bd81d7450a` | supporting docs source; must not become a competing roadmap |
 | immersive documentation branch | `docs/v3-2-immersive-interaction-spec` | isolated docs-only continuation from PR #18 head |
 | PR #20 | draft, CI-green, bounded three-file staging-smoke change | existing R0-03B implementation; review/accept it instead of reimplementing |
@@ -52,7 +52,7 @@ This ledger records state and evidence. It does not create work independently. I
 | R0-04 | `REUSED-DONE` | REVIEW | exact app SHA `41a80235...` | existing exact-SHA evidence + PR #21 report | do not repeat unless inputs change |
 | R0-05 | `BLOCKED` | ORCH/SRE | actual public release truth | source/main and public observation disagree | R0-03C; observe exact production identity/release path rather than infer |
 | R0-05A | `READY — EXISTS-UNMERGED` | ORCH/QA | `main@39c686d4...` → PR #21 `dc77060afea987bdfde45538b43ca5fef1feaf8e` | six-file bounded diff; hosted Router, quality, smoke, Lighthouse, security and CodeQL checks green; local focused 7/7, type-check and lint 0 errors | remains draft during incident freeze; no merge or settings mutation |
-| R0-05B | `BLOCKED — ADMIN GATE` | ORCH | repository settings | read-only GitHub API: `main` unprotected (404), rulesets `[]` | repository administrator must explicitly authorize and activate the smallest protection/ruleset contract: required CI Router + quality/security checks, approving review, no direct push/bypass where feasible |
+| R0-05B | `BLOCKED — ADMIN GATE` | ORCH | repository settings | active ruleset `21861412` enforces pull request, one approval, deletion/non-fast-forward blocks and no bypass; however required contexts include `CI Router`, `Security Audit`, and `Code scanning results`, which do not match actual PR check names | administrator must correct required contexts to actual checks (`safe-checks`, `CI`, `E2E Smoke`, `lighthouse`, `Dependency review (PR)`, `pnpm audit (high/critical gate)`, `Secret scan (repo)`, `CodeQL` as applicable), then re-verify merge feasibility |
 | R0-06 | `BLOCKED` | ORCH | actual accepted post-release base | none yet | R0-05 |
 | S1-* | `BLOCKED BY R0` | UX/EVID/FE/QA | post-R0 base | roadmap/spec ready | R0-06 |
 | S2-* | `BLOCKED BY S1` | EVID/UX/FE/QA | accepted S1 head | roadmap/spec ready | S1 exit gate |
@@ -67,6 +67,18 @@ This ledger records state and evidence. It does not create work independently. I
 - R0-01, R0-02, R0-03A and R0-04 are terminal/reusable and must not be dispatched again.
 - PR #20 and PR #21 are `EXISTS-UNMERGED`, not `DONE`; continue the existing work rather than create parallel implementations.
 - R0-05B repository settings and R0-03C staging are external side effects with separate literal gates.
+
+## R0-05B read-only protection verification
+
+- Verified at `2026-08-30T14:16:05Z` through the GitHub API; no repository settings were mutated.
+- Active rule: repository ruleset `protect-main-release-governance` (`21861412`), `target=branch`, `enforcement=active`, empty ref include/exclude. GitHub’s empty ref filters apply the rule broadly, including `main`; the rule is not limited to `main`.
+- Direct-change control: pull-request rule is active with `required_approving_review_count=1`; direct pushes are therefore not an allowed governed merge path for a protected matching ref.
+- Review control: one approving review required; stale reviews dismissed on push; `bypass_actors=[]`, `current_user_can_bypass=never`.
+- Destructive-history controls: `deletion` and `non_fast_forward` rules active, blocking branch deletion and force-push/non-fast-forward updates.
+- Required checks configured by the ruleset: `CI Router`, `lighthouse` (GitHub Actions integration `15368`), `Security Audit`, `CodeQL` (integration `57789`), `CI`, `E2E Smoke`, and `Code scanning results`.
+- Actual PR #21 head `dc77060afea987bdfde45538b43ca5fef1feaf8e` check contexts: `safe-checks`, `lighthouse`, `Hosted quality gate`, `smoke`, `pnpm audit (high/critical gate)`, `Secret scan (repo)`, `analyze (javascript-typescript)`, `CodeQL`, and `CodeRabbit` (draft skip). PR #20 head `b39e354cc39934b153bbc690bf6e0ff4ccf46921` exposes the same workflow-specific names, with its accepted same-SHA checks already recorded.
+- Effectiveness verdict: **incomplete / merge-blocking configuration**. `CI Router`, `Security Audit`, and `Code scanning results` are not exact contexts on the governed PRs; the ruleset therefore cannot be accepted as a legitimate governed merge contract until the administrator aligns required contexts with the actual check-run names or changes workflows to emit the required names.
+- PR #21 remains `OPEN`, `DRAFT`, `MERGEABLE`, `CLEAN`, with no approving review. PR #20 remains `OPEN`, `DRAFT`, `MERGEABLE`, with no approving review. Neither was merged or bypassed.
 
 ## R0-05A admission and acceptance evidence
 
