@@ -23,22 +23,54 @@ Conclusion: the application candidate entered `GITHUB_MAIN` through the incorrec
 
 ## R0-03 authoritative run
 
-Run `33303771900`, attempt 1, is the only authorized staging dispatch. GitHub reports:
+Run `33303771900`, attempt 1, is the only authorized staging dispatch. It reached a terminal `failure` state at `2026-08-30T09:59:20Z`. No cancellation, rerun, or second staging dispatch was issued.
 
-- created `2026-08-30T09:19:37Z`, head SHA `4a02127bfdc2ed37956803c113b635700a930efe`;
-- Quality gate job `99236569461`: completed successfully at `09:29:58Z`;
-- Deploy job `99237723156`: started `09:36:23Z`; `Upload release source` was still in progress at the last poll;
-- no cancellation, rerun, or second dispatch was issued.
+Primary job evidence:
 
-The workflow definition resolves an immutable deployment SHA from its `ref` input. The requested target remains `41a80235...`; the run’s deploy logs must be consumed before asserting the resolved target, archive checksum, release ID, health, smoke, or live-verification results.
+- workflow-run/head identity: `4a02127bfdc2ed37956803c113b635700a930efe` because the workflow definition was dispatched from `main`;
+- Quality gate job `99236569461`: `success`;
+- Quality gate checkout and resolved immutable deployment SHA: `41a80235c83ec6949d518bd7fa034814d6e43fef`;
+- Deploy job `99237723156` checkout and `TARGET_REF`: the same exact `41a80235...` candidate;
+- source archive: `alirezasafaeisystems-41a80235c83ec6949d518bd7fa034814d6e43fef.tar.gz`;
+- source archive SHA-256: `349a8f6ec2dfa4486867b0a8c765e40534432629daf865216835f3c742398acd`;
+- compressed archive size observed in rsync: `79,731,634` bytes;
+- archive transfer completed in approximately `18:57`, materially below the previous raw-tar transfer that consumed roughly 40 minutes;
+- remote staging build completed successfully;
+- Prisma reported 11 migrations, no pending migrations, and no schema drift;
+- staging process started successfully and local deploy health passed on port `3003`;
+- the deploy script reported completion of a new staging release whose exact seconds are masked in the connector log as `20260830T0937***Z`;
+- post-deploy smoke then failed with `curl: (28) Resolving timed out after 10000 milliseconds` while the VPS attempted to resolve `staging.alirezasafaeisystems.ir` for the first canonical HTTPS edge check;
+- live browser verification was therefore skipped and no live-verification artifact was produced;
+- rollback executed successfully, restored the failed-release database snapshot, restarted staging, and reported exact rollback target `/var/www/my-portfolio/releases/staging/20260830T070559Z`.
 
-Important reconciliation discrepancy: GitHub deployment record `6165237045` for this run reports environment `staging`, ref `main`, and SHA `4a02127bfdc2ed37956803c113b635700a930efe`, with deployment status `in_progress` at `2026-08-30T09:36:24Z`. This conflicts with the supplied handoff’s assertion that the deploy target is immutable SHA `41a80235...`. The deployment API record and the run’s primary log output must be treated as the source of truth; no target SHA is accepted until that discrepancy is resolved.
+### Deployment API SHA discrepancy — resolved
+
+GitHub deployment record `6165237045` reported environment `staging`, ref `main`, and SHA `4a02127bfdc2ed37956803c113b635700a930efe`. The run's primary logs establish that this SHA identifies the workflow/run source on `main`, while the workflow's quality gate resolved and both jobs checked out/deployed immutable application SHA `41a80235c83ec6949d518bd7fa034814d6e43fef`.
+
+Therefore the deployment API record is not accepted as the application payload identity for this parameterized workflow. Application deployment identity is proven by the resolved `TARGET_REF`, checkout log, archive filename, and source checksum. There is no remaining conflict about which application source was attempted.
+
+### R0-03 failure classification
+
+R0-03 is **terminal FAIL — smoke-network/DNS contract**, not an application build failure and not an archive-transport failure.
+
+The same-host application health check succeeded on `127.0.0.1:3003`. The failing boundary was the next layer: canonical HTTPS edge smoke from inside the VPS depended on the VPS resolver. This is isolated from the later live-browser verifier, which must continue to exercise real public DNS/routing from the GitHub-hosted runner.
+
+A separate TDD lane was opened as draft PR #20 from exact `main@39c686d4...`. Its RED-phase test requires same-host edge smoke to preserve the canonical HTTPS hostname/SNI while bypassing only VPS DNS with `curl --resolve <host>:443:127.0.0.1`. No merge or second staging dispatch is authorized by that PR.
 
 ## Production truth reconciliation
 
-Read-only SSH to `IRAN_PROD_SERVER` (`pt-production`) timed out while connecting to `193.93.169.32:22` on 2026-08-30. No server identity, release symlink, process status, health response, deployment record, or migration record was obtained. Therefore production is `UNKNOWN / NOT VERIFIED`, not “unchanged”. No rollback or other production mutation was attempted.
+Read-only SSH to `IRAN_PROD_SERVER` (`pt-production`) timed out while connecting to `193.93.169.32:22` on 2026-08-30. Exact production release identity and symlink target therefore remain `UNKNOWN / NOT VERIFIED`.
 
-Repository evidence alone does not imply a production deployment. Semantic-release `1.1.0` and membership in main are not production evidence.
+The R0-03 primary logs do provide bounded evidence about this run only:
+
+- `TARGET_ENV=staging` throughout the deploy job;
+- the production-only SQLite relocation step was skipped;
+- the existing `my-portfolio-production` PM2 process remained online while staging was stopped, replaced, and rolled back;
+- no production rollback step was invoked by this staging run.
+
+These facts prove Run `33303771900` did not intentionally execute its production path. They do not establish the exact production release identity and do not substitute for read-only server identity evidence.
+
+Repository evidence alone also does not imply a production deployment. Semantic-release `1.1.0` and membership in main are not production evidence.
 
 ## R0-04 candidate review status
 
@@ -58,10 +90,14 @@ Administrative hardening proposal, pending explicit repository administrator act
 
 ## R0-05 reclassification
 
-R0-05 is now **GOVERNANCE + RELEASE-IDENTITY RECONCILIATION**. It may proceed only after Run `33303771900` reaches a truthful terminal state, R0-04 is green, and production identity is observed. It must preserve the accidental source merge fact and must not manufacture a cleaner graph by reverting, force-pushing, re-merging PR #17, or altering approved application semantics.
+R0-05 is now **GOVERNANCE + RELEASE-IDENTITY RECONCILIATION**. It may proceed only after the R0-03 smoke-network defect is corrected through governance, a permitted staging verification reaches the required live evidence, R0-04 is green, and production identity is observed. It must preserve the accidental source merge fact and must not manufacture a cleaner graph by reverting, force-pushing, re-merging PR #17, or altering approved application semantics.
 
-PR #18 (`docs/v3-2-evidence-conversion-roadmap`, head `48eb38afe66ab80bbd1767e5240f06bd81d7450a`) is open against stale base `ac08d123...`; its GitHub mergeability is not treated as safe until it is reconciled against current main without force-push.
+PR #18 (`docs/v3-2-evidence-conversion-roadmap`, head `48eb38afe66ab80bbd1767e5240f06bd81d7450a`) remains stale against current main and must not be integrated during the incident freeze.
 
 ## Next safe actions
 
-Poll Run `33303771900` without changing it; obtain primary deploy logs and artifacts. Retry authorized read-only `IRAN_PROD_SERVER` inspection only when connectivity permits. Complete exact-SHA R0-04 review, then reconcile PR #18 and update the canonical V3.2 ledger in a post-freeze branch. Establish R0-06 only from the accepted post-release base.
+1. complete PR #20 TDD RED → GREEN for the isolated smoke-network contract without merging it;
+2. complete exact-SHA R0-04 review and reproduce/classify the Windows-only backup timeout in an environment-compatible lane;
+3. retry authorized read-only production identity inspection only when connectivity permits;
+4. keep `main`, PR #18 integration, production mutation, and any second staging dispatch frozen until the incident decision permits them;
+5. once R0 truth is stable, update the canonical V3.2 ledger on a post-freeze branch and establish R0-06 only from the accepted post-release base.
