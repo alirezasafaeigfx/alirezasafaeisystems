@@ -29,6 +29,17 @@ jobs:
           echo "Changed files:"
           cat /tmp/asdev_changed_files.txt
 
+      - name: R0 infrastructure base and scope preflight
+        if: startsWith(github.head_ref, 'fix/r0-')
+        run: |
+          set -euo pipefail
+          git fetch origin main --depth=1
+          node scripts/ci/validate-r0-pr.mjs \
+            --base "${{ github.event.pull_request.base.sha }}" \
+            --head "${{ github.event.pull_request.head.sha }}" \
+            --main "$(git rev-parse FETCH_HEAD)" \
+            --scope r0-infrastructure
+
       - name: Syntax-check changed shell scripts
         run: |
           scripts=$(grep -E '\.sh$' /tmp/asdev_changed_files.txt || true)
