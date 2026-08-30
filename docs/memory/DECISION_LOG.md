@@ -4,6 +4,12 @@ Append-only. Newest first.
 
 ---
 
+## 2026-08-30 — Compress deploy source archive for VPS transfer
+
+- **Decision:** `deploy-vps.yml` now emits `.tar.gz` source archives and extracts them with `tar -xzf`.
+- **Why:** The previous raw tar transfer was too large for the pass-2 budget.
+- **Effect:** Keeps the immutable SHA + resumable rsync contract while shrinking transfer size.
+
 ## 2026-07-09 — Autonomous Loop Governance installed in GitHub
 
 - **Decision:** Official policy path `docs/automation/ASDEV_AUTONOMOUS_LOOP_POLICY.md`; AGENTS.md + control-plane README + agent rules point here.  
