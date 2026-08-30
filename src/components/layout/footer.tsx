@@ -13,7 +13,6 @@ const footerLinks = [
   { key: 'services', href: '/services' },
   { key: 'caseStudies', href: '/case-studies' },
   { key: 'discover', href: '/discover' },
-  { key: 'blog', href: '/blog' },
 ] as const
 
 export function Footer() {
@@ -55,8 +54,8 @@ export function Footer() {
 
           <div className="flex flex-col gap-3 sm:flex-row md:justify-end">
             <Button asChild size="lg" className="min-h-12 rounded-xl px-6 font-extrabold">
-              <Link href={withLocale('/qualification', language)}>
-                {isFa ? 'شروع همکاری' : 'Start collaboration'}
+              <Link href={withLocale('/qualification?source=portfolio&placement=footer&offer=request_assessment', language)}>
+                {isFa ? 'درخواست ارزیابی Audit' : 'Request an ASDEV Audit'}
                 <ArrowUpLeft aria-hidden="true" className={isFa ? 'size-4' : 'size-4 rotate-90'} />
               </Link>
             </Button>

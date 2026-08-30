@@ -10,7 +10,7 @@ vi.mock('@/lib/analytics/client', () => ({
   trackEvent: trackEventMock,
 }))
 
-describe('Homepage V3.1', () => {
+describe('Homepage V3.2 positioning and proof', () => {
   beforeEach(() => {
     trackEventMock.mockReset()
     trackEventMock.mockResolvedValue(undefined)
@@ -20,11 +20,14 @@ describe('Homepage V3.1', () => {
     render(<HomePageV3 language="fa" />)
 
     const hero = screen.getByRole('region', { name: 'معرفی علیرضا صفایی' })
-    expect(within(hero).getByRole('heading', { level: 1, name: 'مهندس نرم‌افزار' })).toBeInTheDocument()
+    expect(within(hero).getByRole('heading', { level: 1, name: 'سیستم‌های عملیاتی را قابل دیدن می‌کنم' })).toBeInTheDocument()
 
     const actions = within(hero).getByRole('group', { name: 'اقدام‌های اصلی' })
     expect(within(actions).getAllByRole('link')).toHaveLength(2)
-    expect(within(actions).getByRole('link', { name: 'شروع همکاری' })).toHaveAttribute('href', '/qualification')
+    expect(within(actions).getByRole('link', { name: 'درخواست ارزیابی Audit' })).toHaveAttribute(
+      'href',
+      '/qualification?source=portfolio&placement=hero&offer=request_assessment',
+    )
     expect(within(actions).getByRole('link', { name: 'مشاهده پروژه‌ها' })).toHaveAttribute('href', '/case-studies')
 
     const portraitFrame = within(hero).getByTestId('owner-portrait-frame')
@@ -74,7 +77,7 @@ describe('Homepage V3.1', () => {
     render(<HomePageV3 language="fa" />)
 
     const hero = screen.getByRole('region', { name: 'معرفی علیرضا صفایی' })
-    fireEvent.click(within(hero).getByRole('link', { name: 'شروع همکاری' }))
+    fireEvent.click(within(hero).getByRole('link', { name: 'درخواست ارزیابی Audit' }))
     fireEvent.click(within(hero).getByRole('link', { name: 'مشاهده پروژه‌ها' }))
 
     expect(trackEventMock).toHaveBeenCalledWith({

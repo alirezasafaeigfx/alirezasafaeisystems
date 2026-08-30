@@ -20,7 +20,6 @@ vi.mock('@/lib/i18n-context', () => ({
       'nav.services': 'Services',
       'nav.caseStudies': 'Case Studies',
       'nav.discover': 'Discover',
-      'nav.blog': 'Blog',
       'nav.contact': 'Contact',
       'ui.changeLanguage': 'Change language',
       'ui.openMenu': 'Open menu',
@@ -68,15 +67,15 @@ describe('V3.1 global public shell', () => {
     render(<Header />)
 
     const primaryNav = screen.getByRole('navigation', { name: 'Primary navigation' })
-    expect(within(primaryNav).getAllByRole('link')).toHaveLength(5)
+    expect(within(primaryNav).getAllByRole('link')).toHaveLength(4)
     expect(within(primaryNav).getByRole('link', { name: 'Home' })).toBeInTheDocument()
     expect(within(primaryNav).getByRole('link', { name: 'Services' })).toBeInTheDocument()
     expect(within(primaryNav).getByRole('link', { name: 'Case Studies' })).toBeInTheDocument()
     expect(within(primaryNav).getByRole('link', { name: 'Discover' })).toBeInTheDocument()
-    expect(within(primaryNav).getByRole('link', { name: 'Blog' })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Start collaboration' })).toHaveAttribute(
+    expect(within(primaryNav).queryByRole('link', { name: 'Blog' })).not.toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Request an ASDEV Audit' })).toHaveAttribute(
       'href',
-      '/en/qualification',
+      '/en/qualification?source=portfolio&placement=header&offer=request_assessment',
     )
   })
 

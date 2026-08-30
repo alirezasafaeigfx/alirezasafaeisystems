@@ -26,7 +26,6 @@ const navItems = [
   { key: 'services', name: 'nav.services', href: '/services' },
   { key: 'caseStudies', name: 'nav.caseStudies', href: '/case-studies' },
   { key: 'discover', name: 'nav.discover', href: '/discover' },
-  { key: 'blog', name: 'nav.blog', href: '/blog' },
 ] as const
 
 export function Header() {
@@ -49,7 +48,7 @@ export function Header() {
     router.refresh()
   }
 
-  const collaborationLabel = language === 'fa' ? 'شروع همکاری' : 'Start collaboration'
+  const collaborationLabel = language === 'fa' ? 'درخواست ارزیابی Audit' : 'Request an ASDEV Audit'
   const primaryNavLabel = language === 'fa' ? 'ناوبری اصلی' : 'Primary navigation'
   const mobileNavLabel = language === 'fa' ? 'ناوبری موبایل' : 'Mobile navigation'
 
@@ -131,7 +130,7 @@ export function Header() {
             </DropdownMenu>
 
             <Button asChild className="hidden min-h-10 rounded-xl px-4 font-bold sm:inline-flex">
-              <Link href={withLocale('/qualification', language)} aria-label={collaborationLabel}>
+              <Link href={withLocale('/qualification?source=portfolio&placement=header&offer=request_assessment', language)} aria-label={collaborationLabel}>
                 {collaborationLabel}
                 <ArrowUpLeft
                   aria-hidden="true"
@@ -183,7 +182,7 @@ export function Header() {
                   <div className="mt-auto space-y-3 border-t border-border/70 pt-5">
                     <Button asChild size="lg" className="w-full rounded-xl font-bold">
                       <Link
-                        href={withLocale('/qualification', language)}
+                        href={withLocale('/qualification?source=portfolio&placement=header_mobile&offer=request_assessment', language)}
                         onClick={() => setMobileMenuOpen(false)}
                       >
                         {collaborationLabel}
