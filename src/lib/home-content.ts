@@ -13,6 +13,8 @@ type HomeCard = HomeLink & {
 type ProjectCard = HomeCard & {
   role: string
   technologies: string[]
+  imageSrc?: string
+  imageAlt?: string
 }
 
 export type HomeContent = {
@@ -47,8 +49,8 @@ const content: Record<Language, HomeContent> = {
     hero: {
       name: 'علیرضا صفایی',
       title: 'مهندس نرم‌افزار',
-      description: 'سیستم‌ها و محصولات وبی می‌سازم که سریع، پایدار، امن و آماده استفاده واقعی در Production باشند.',
-      detail: 'از طراحی معماری و توسعه نرم‌افزار تا بهینه‌سازی، استقرار و نجات پروژه‌های نیمه‌کاره.',
+      description: 'سیستم‌های وبی طراحی و می‌سازم که از اولین تصمیم معماری تا استفاده واقعی در Production سریع، قابل نگهداری و قابل اتکا بمانند.',
+      detail: 'تمرکز من روی معماری نرم‌افزار، توسعه محصول، پایدارسازی و نجات پروژه‌هایی است که باید واقعاً کار کنند؛ نه فقط در دمو خوب به نظر برسند.',
       primaryCta: 'شروع همکاری',
       secondaryCta: 'مشاهده پروژه‌ها',
     },
@@ -78,22 +80,28 @@ const content: Record<Language, HomeContent> = {
         description: 'پلتفرم ابزارهای فارسی local-first با تجربه کاربری ساده و عملیات انتشار پایدار.',
         role: 'معماری، طراحی سیستم Frontend و آمادگی استقرار عملیاتی',
         technologies: ['Next.js', 'TypeScript'],
+        imageSrc: '/images/portfolio/persiantoolbox-showcase.png',
+        imageAlt: 'اسکرین‌شات صفحه اصلی PersianToolbox',
         label: 'مشاهده مطالعه موردی',
         href: '/case-studies/asdev-persiantoolbox-platform',
       },
       {
-        title: 'هشدار قیمت Novax',
-        description: 'بات تلگرام و TWA برای هشدار قیمت بازار ایران با جریان مرحله‌ای و سخت‌سازی قابلیت اعتماد.',
-        role: 'مهندسی محصول کامل: معماری، Backend، TWA و عملیات',
-        technologies: ['FastAPI', 'Telegram'],
+        title: 'نجات بومی‌سازی زیرساخت',
+        description: 'مطالعه موردی یک مسیر استقرار و حاکمیت که برای محدودیت‌های local-first و ریسک‌های عملیاتی بازطراحی شد.',
+        role: 'حاکمیت زیرساخت، بازطراحی انتشار و تقویت مسیر rollback',
+        technologies: ['Next.js', 'TypeScript', 'Nginx'],
+        imageSrc: '/images/portfolio/infrastructure-localization-rescue.png',
+        imageAlt: 'اسکرین‌شات مطالعه موردی نجات بومی‌سازی زیرساخت',
         label: 'مشاهده مطالعه موردی',
-        href: '/case-studies/novax-price-alert',
+        href: '/case-studies/infrastructure-localization-rescue',
       },
       {
         title: 'پلتفرم Audit Systems',
         description: 'گردش‌کار ارزیابی سایت برای عملکرد، امنیت و سئو فنی با خروجی عملی و قابل اجرا.',
         role: 'طراحی و راه‌اندازی محصول ارزیابی فنی',
         technologies: ['Next.js', 'Prisma'],
+        imageSrc: '/images/portfolio/audit-systems-home.png',
+        imageAlt: 'اسکرین‌شات صفحه اصلی Audit Systems',
         label: 'مشاهده مطالعه موردی',
         href: '/case-studies',
       },
@@ -103,13 +111,13 @@ const content: Record<Language, HomeContent> = {
       description: 'هر همکاری با زمینه مسئله، تصمیم‌های فنی و خروجی قابل بررسی توضیح داده می‌شود.',
     },
     principles: [
-      'تصمیم‌های معماری بر اساس مسئله واقعی کسب‌وکار',
-      'کیفیت و قابلیت نگهداری از ابتدای مسیر توسعه',
-      'تحویل شفاف با شواهد قابل بررسی',
+      'اول مسئله و محدودیت واقعی را روشن می‌کنم، بعد تکنولوژی و معماری را انتخاب می‌کنم.',
+      'کیفیت، قابلیت نگهداری و مسیر انتشار را از ابتدای توسعه جزئی از محصول می‌بینم.',
+      'تحویل برای من یعنی سیستم قابل بررسی، مستند و قابل ادامه؛ نه صرفاً کدی که یک‌بار اجرا شده است.',
     ],
     about: {
       title: 'درباره من',
-      description: 'علیرضا صفایی، مهندس نرم‌افزار و سازنده سیستم‌های وب در ASDEV است.',
+      description: 'من علیرضا صفایی‌ام؛ مهندس نرم‌افزار و سازنده سیستم‌های وب. بیشتر از اضافه‌کردن تکنولوژی، به کم‌کردن ابهام، انتخاب معماری درست و رساندن محصول به وضعیتی فکر می‌کنم که تیم بتواند با اطمینان آن را ادامه دهد.',
     },
     contact: {
       title: 'برای همکاری آماده‌اید؟',
@@ -121,8 +129,8 @@ const content: Record<Language, HomeContent> = {
     hero: {
       name: 'Alireza Safaei',
       title: 'Software Engineer',
-      description: 'I design and build web systems that are fast, reliable, secure, and ready for real production use.',
-      detail: 'From software architecture and development to optimization, deployment, and rescuing incomplete projects.',
+      description: 'I design and build web systems that stay fast, maintainable, and dependable from the first architecture decision through real production use.',
+      detail: 'My work spans software architecture, product delivery, stabilization, and rescuing projects that need to work reliably—not just look good in a demo.',
       primaryCta: 'Start collaboration',
       secondaryCta: 'View projects',
     },
@@ -152,22 +160,28 @@ const content: Record<Language, HomeContent> = {
         description: 'A local-first Persian utility platform engineered to be fast, reliable, and intentionally simple for everyday users.',
         role: 'Product engineering lead: architecture, frontend system design, QA governance, and operational deployment readiness.',
         technologies: ['Next.js', 'TypeScript'],
+        imageSrc: '/images/portfolio/persiantoolbox-showcase.png',
+        imageAlt: 'PersianToolbox homepage screenshot',
         label: 'View case study',
         href: '/case-studies/asdev-persiantoolbox-platform',
       },
       {
-        title: 'Novax Price Alert',
-        description: 'A production Telegram bot and rich TWA for real-time price alerts on Iranian markets with explicit staged flows and reliability hardening.',
-        role: 'Full-stack product engineering: architecture, backend, TWA, and operations.',
-        technologies: ['FastAPI', 'Telegram'],
+        title: 'Infrastructure Localization Rescue',
+        description: 'A case study for a localized release and governance path redesigned around operational risk and local-first constraints.',
+        role: 'Infrastructure governance, release redesign, and rollback hardening.',
+        technologies: ['Next.js', 'TypeScript', 'Nginx'],
+        imageSrc: '/images/portfolio/infrastructure-localization-rescue.png',
+        imageAlt: 'Infrastructure Localization Rescue case study screenshot',
         label: 'View case study',
-        href: '/case-studies/novax-price-alert',
+        href: '/case-studies/infrastructure-localization-rescue',
       },
       {
         title: 'Audit Systems Platform',
         description: 'Production audit workflow for performance, security, and technical SEO with actionable outputs.',
         role: 'Technical audit product design and delivery.',
         technologies: ['Next.js', 'Prisma'],
+        imageSrc: '/images/portfolio/audit-systems-home.png',
+        imageAlt: 'Audit Systems homepage screenshot',
         label: 'View case study',
         href: '/case-studies',
       },
@@ -177,13 +191,13 @@ const content: Record<Language, HomeContent> = {
       description: 'Each engagement is explained through its problem context, technical decisions, and reviewable outcome.',
     },
     principles: [
-      'Architecture decisions grounded in the real business problem',
-      'Quality and maintainability from the start of delivery',
-      'Clear handover with reviewable evidence',
+      'Clarify the real problem and constraints first; choose technology and architecture second.',
+      'Treat maintainability, quality, and the release path as product concerns from the beginning.',
+      'A handoff should leave a system that is reviewable, documented, and safe to continue—not code that merely ran once.',
     ],
     about: {
       title: 'About me',
-      description: 'Alireza Safaei is a Software Engineer and web systems builder at ASDEV.',
+      description: 'I am Alireza Safaei, a Software Engineer and web-systems builder. I care less about adding technology for its own sake and more about reducing ambiguity, choosing the right architecture, and leaving teams with a product they can continue with confidence.',
     },
     contact: {
       title: 'Ready to collaborate?',

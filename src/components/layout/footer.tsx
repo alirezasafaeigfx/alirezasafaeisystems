@@ -1,142 +1,145 @@
 'use client'
 
 import Link from 'next/link'
-import { Linkedin, Mail, Instagram, Send } from 'lucide-react'
+import { usePathname } from 'next/navigation'
+import { ArrowUpLeft, Github, Instagram, Linkedin, Mail, Send } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useI18n } from '@/lib/i18n-context'
 import { brand } from '@/lib/brand'
-import { PROFILE_SUMMARY_EN, PROFILE_SUMMARY_FA } from '@/lib/profile-copy'
 import { withLocale } from '@/lib/locale-utils'
 
-const quickLinks = [
-  { key: 'quickHome', href: '/' },
-  { key: 'quickServices', href: '/services' },
-  { key: 'quickCaseStudies', href: '/case-studies' },
-  { key: 'quickDiscover', href: '/discover' },
-  { key: 'quickAudit', href: '/audit-readiness' },
-  { key: 'quickBrand', href: '/about-brand' },
-  { key: 'quickContact', href: '/qualification' },
-]
+const footerLinks = [
+  { key: 'home', href: '/' },
+  { key: 'services', href: '/services' },
+  { key: 'caseStudies', href: '/case-studies' },
+  { key: 'discover', href: '/discover' },
+  { key: 'blog', href: '/blog' },
+] as const
 
 export function Footer() {
   const { t, language } = useI18n()
+  const pathname = usePathname()
   const currentYear = new Date().getFullYear()
+  const isFa = language === 'fa'
+
+  if (pathname === '/admin' || pathname.startsWith('/admin/')) {
+    return null
+  }
+
   const socialLinks = [
-    {
-      name: 'LinkedIn',
-      href: brand.linkedinUrl,
-      icon: Linkedin,
-    },
-    {
-      name: 'Telegram',
-      href: brand.telegramUrl,
-      icon: Send,
-    },
-    {
-      name: 'Instagram',
-      href: brand.instagramUrl,
-      icon: Instagram,
-    },
-  ].filter((social) => social.href)
-  const summaryText =
-    language === 'fa' ? PROFILE_SUMMARY_FA : PROFILE_SUMMARY_EN
+    { name: 'GitHub', href: brand.githubUrl, icon: Github },
+    { name: 'LinkedIn', href: brand.linkedinUrl, icon: Linkedin },
+    { name: 'Telegram', href: brand.telegramUrl, icon: Send },
+    { name: 'Instagram', href: brand.instagramUrl, icon: Instagram },
+  ].filter((item) => Boolean(item.href))
 
   return (
-    <footer className="border-t bg-muted/30 mt-auto">
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* Brand Section */}
-          <div className="space-y-4">
-            <h2 className="text-xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-              {brand.brandName}
+    <footer className="public-dark-surface mt-auto border-t border-white/10" data-public-footer>
+      <div className="public-shell py-12 md:py-16">
+        <section className="grid gap-8 border-b border-white/12 pb-10 md:grid-cols-[minmax(0,1.35fr)_minmax(18rem,0.65fr)] md:items-end md:pb-12">
+          <div className="max-w-3xl">
+            <p className="text-sm font-bold text-blue-300">
+              {isFa ? 'پروژه بعدی' : 'Next project'}
+            </p>
+            <h2 className="mt-3 text-3xl font-black leading-tight text-white md:text-5xl">
+              {isFa
+                ? 'اگر مسئله مهمی برای ساختن یا نجات‌دادن دارید، از اینجا شروع کنیم.'
+                : 'If you have something important to build or rescue, start here.'}
             </h2>
-            <p className="text-sm text-muted-foreground text-copy">{summaryText}</p>
-            <p className="text-xs text-muted-foreground">
-              {t('footer.location')}
+            <p className="mt-4 max-w-2xl text-base leading-8 text-white/68 md:text-lg">
+              {isFa
+                ? 'مسئله، محدودیت‌ها و وضعیت فعلی را بگویید؛ مسیر فنی بعدی را شفاف و عملی مشخص می‌کنیم.'
+                : 'Share the problem, constraints, and current state. We will turn it into a clear, practical technical path.'}
             </p>
           </div>
 
-          {/* Quick Links */}
-          <div className="space-y-4">
-            <h3 className="font-semibold">{t('footer.quickLinks')}</h3>
-            <ul className="space-y-2">
-              {quickLinks.map((link) => (
-                <li key={link.key}>
-                  <Link
-                    href={withLocale(link.href, language)}
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1 group"
-                  >
-                    {t(`footer.${link.key}`)}
-                    <span className="opacity-0 group-hover:opacity-100 transition-opacity">
-                      →
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
+          <div className="flex flex-col gap-3 sm:flex-row md:justify-end">
+            <Button asChild size="lg" className="min-h-12 rounded-xl px-6 font-extrabold">
+              <Link href={withLocale('/qualification', language)}>
+                {isFa ? 'شروع همکاری' : 'Start collaboration'}
+                <ArrowUpLeft aria-hidden="true" className={isFa ? 'size-4' : 'size-4 rotate-90'} />
+              </Link>
+            </Button>
+            <Button
+              asChild
+              size="lg"
+              variant="outline"
+              className="min-h-12 rounded-xl border-white/20 bg-white/5 px-6 font-bold text-white hover:bg-white/10 hover:text-white"
+            >
+              <a href={`mailto:${brand.contactEmail}`}>
+                <Mail className="size-4" />
+                {isFa ? 'ایمیل مستقیم' : 'Email directly'}
+              </a>
+            </Button>
+          </div>
+        </section>
+
+        <div className="grid gap-10 py-10 md:grid-cols-[1.2fr_0.8fr_0.8fr] md:py-12">
+          <div className="max-w-md">
+            <Link
+              href={withLocale('/', language)}
+              className="inline-flex items-center gap-3 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
+            >
+              <span className="grid size-11 place-items-center rounded-xl bg-white text-sm font-black text-slate-950">
+                AS
+              </span>
+              <span>
+                <span className="block font-extrabold text-white">{brand.ownerName}</span>
+                <span className="block text-sm text-white/55">
+                  {isFa ? 'مهندس نرم‌افزار' : 'Software Engineer'}
+                </span>
+              </span>
+            </Link>
+            <p className="mt-5 text-sm leading-7 text-white/58">
+              {isFa
+                ? 'طراحی و ساخت سیستم‌های وب، معماری نرم‌افزار، پایدارسازی و تحویل مطمئن برای استفاده واقعی.'
+                : 'Web systems, software architecture, stabilization, and reliable delivery for real production use.'}
+            </p>
           </div>
 
-          {/* Social Links */}
-          <div className="space-y-4">
-            <h3 className="font-semibold leading-snug">{t('footer.social')}</h3>
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3 max-w-full">
+          <div>
+            <h3 className="text-sm font-bold text-white">{isFa ? 'دسترسی سریع' : 'Navigate'}</h3>
+            <nav aria-label={isFa ? 'لینک‌های فوتر' : 'Footer navigation'} className="mt-4 grid gap-2">
+              {footerLinks.map((item) => (
+                <Link
+                  key={item.key}
+                  href={withLocale(item.href, language)}
+                  className="w-fit rounded-md py-1 text-sm font-medium text-white/58 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
+                >
+                  {t(`nav.${item.key}`)}
+                </Link>
+              ))}
+            </nav>
+          </div>
+
+          <div>
+            <h3 className="text-sm font-bold text-white">{isFa ? 'ارتباط' : 'Connect'}</h3>
+            <a
+              href={`mailto:${brand.contactEmail}`}
+              className="mt-4 block break-all text-sm font-medium text-white/68 underline decoration-white/25 underline-offset-4 hover:text-white"
+            >
+              {brand.contactEmail}
+            </a>
+            <div className="mt-5 flex flex-wrap gap-2">
               {socialLinks.map((social) => (
-                <div key={social.name}>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="rounded-full hover:bg-primary/10 h-10 w-10 sm:h-12 sm:w-12 card-hover relative overflow-hidden group"
-                    asChild
-                  >
-                    <Link
-                      href={social.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label={social.name}
-                    >
-                      <social.icon className="h-4 w-4 sm:h-5 sm:w-5" />
-                    </Link>
-                  </Button>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Contact Info */}
-          <div className="space-y-4">
-            <h3 className="font-semibold">{t('footer.getInTouch')}</h3>
-            <p className="text-sm text-muted-foreground">
-              {t('footer.haveProject')}
-            </p>
-            <div>
-              <Button
-                variant="default"
-                className="w-full card-hover shine-effect gap-2"
-                asChild
-              >
-                <a href={`mailto:${brand.contactEmail}`}>
-                  <Mail className="h-4 w-4" />
-                  {t('contact.sendMessage')}
+                <a
+                  key={social.name}
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={social.name}
+                  className="grid size-10 place-items-center rounded-xl border border-white/12 bg-white/5 text-white/68 transition-colors hover:border-white/22 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
+                >
+                  <social.icon className="size-4" />
                 </a>
-              </Button>
+              ))}
             </div>
           </div>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="mt-8 pt-5 border-t text-xs text-muted-foreground flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col gap-2 border-t border-white/10 pt-5 text-xs text-white/42 sm:flex-row sm:items-center sm:justify-between">
           <span>{`© ${currentYear} ${brand.ownerName}. ${t('footer.allRights')}`}</span>
-          <span>
-            {t('footer.designedBy')}
-            <Link
-              href="https://alirezasafaeisystems.ir/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline underline-offset-4 hover:text-primary"
-            >
-              {`${brand.ownerName}, ${language === 'fa' ? 'مهندس سیستم‌های وب' : 'Web Systems Engineer'}`}
-            </Link>
-          </span>
+          <span>{isFa ? 'طراحی و توسعه با تمرکز بر وضوح، کارایی و قابلیت اتکا.' : 'Designed and engineered for clarity, performance, and reliability.'}</span>
         </div>
       </div>
     </footer>

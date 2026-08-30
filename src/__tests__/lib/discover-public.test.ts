@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
+import { buildDiscoverWhere } from '@/lib/discover-query'
 
 function source(path: string): string {
   return readFileSync(path, 'utf8')
@@ -8,8 +9,14 @@ function source(path: string): string {
 describe('Discover public data contract', () => {
   it('queries only published items for the landing and exposes a bounded public card shape', () => {
     const landing = source('src/app/discover/page.tsx')
+    const publicWhere = buildDiscoverWhere(
+      { q: '', category: '', type: '', platform: '', sort: 'featured', page: 1 },
+      'fa',
+    )
 
-    expect(landing).toContain('where: { published: true }')
+    expect(publicWhere).toMatchObject({ published: true })
+    expect(landing).toContain('const where = buildDiscoverWhere(query, locale)')
+    expect(landing).toContain('where,')
     expect(landing).toContain('slug: true')
     expect(landing).toContain('title: true')
     expect(landing).toContain('description: true')

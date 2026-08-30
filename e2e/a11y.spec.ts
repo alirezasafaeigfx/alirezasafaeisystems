@@ -3,9 +3,13 @@ import AxeBuilder from '@axe-core/playwright'
 
 const PAGES = [
   { name: 'Home', path: '/fa/' },
+  { name: 'English Home', path: '/en/' },
   { name: 'Services', path: '/fa/services' },
   { name: 'Case Studies', path: '/fa/case-studies' },
   { name: 'Discover', path: '/fa/discover' },
+  { name: 'English Discover', path: '/en/discover' },
+  { name: 'Blog', path: '/fa/blog' },
+  { name: 'English Blog', path: '/en/blog' },
   { name: 'Qualification', path: '/fa/qualification' },
   { name: 'About Brand', path: '/fa/about-brand' },
   { name: 'Profile', path: '/fa/profile' },
