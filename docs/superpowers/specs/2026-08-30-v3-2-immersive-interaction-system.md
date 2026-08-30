@@ -1,6 +1,6 @@
 # V3.2 — Immersive Interaction System
 
-**Status:** Proposed design specification; documentation only  
+**Status:** Final architecture decision; Gate A only is admitted by the canonical roadmap  
 **Date:** 2026-08-30  
 **Branch intent:** Isolated design documentation; no application, dependency, workflow, deployment, database, content-publication, or production mutation  
 **Program:** ASDEV Public Experience V3.2  
@@ -17,25 +17,28 @@ The visual identity target is:
 
 > **Operational systems made visible.**
 
-The implementation model is deliberately gated:
+The technology decision model is deliberately gated:
 
 1. **Gate A — Semantic Scene Logic:** prove the experience with semantic DOM/SVG/CSS and code-native operational diagrams.
 2. **Gate B — Advanced Motion:** introduce a dedicated animation runtime only where CSS/WAAPI is objectively insufficient for a meaningful interaction.
 3. **Gate C — GPU Signature Scene:** introduce Three.js/WebGL/WebGPU only if a measured prototype demonstrates material narrative value without violating performance, accessibility, reliability, and mobile budgets.
 
-No gate authorizes the next gate automatically.
+Gate A is the only active V3.2 implementation direction. Gate B and Gate C are not roadmap tasks; each requires a new evidence-backed canonical-roadmap admission. No gate authorizes the next gate automatically.
 
 ## 2. Relationship to the approved V3.2 roadmap
 
 This specification does not replace S1–S5 and does not create an independent visual-redesign program.
 
-It refines the existing S4 direction:
+It refines the canonical S4 direction:
 
 - S4-01: reduce equal-weight card surfaces;
 - S4-02: establish distinctive bilingual editorial rhythm;
 - S4-03: author mobile composition instead of stacking desktop sections;
-- S4-04: introduce one meaningful operational visualization where it explains the work;
 - S4-05: add purposeful motion with complete reduced-motion behavior.
+- S4-06: combine the operational visualization and Scene Logic into one Gate A system.
+- S4-07: issue the evidence-based Gate A STOP/admission verdict.
+
+Former S4-08/S4-09 are removed from the active queue. This specification cannot recreate them as a parallel queue.
 
 The immersive track is evaluated only after the release/governance state in R0 is reconciled and only after the V3.2 implementation base is established.
 
@@ -46,10 +49,10 @@ Traditional page logic treats each section as an isolated vertical block. ASDEV 
 The Home page target flow is:
 
 ```text
-Hero Positioning
+Header / Navigation
       │
       ▼
-Operational System Scene
+Hero Positioning + Operational System Scene
       │
       ├── unstable
       ├── diagnosing
@@ -66,7 +69,16 @@ Quantitative Proof
 Flagship Case Study
       │
       ▼
-ASDEV Audit
+Services
+      │
+      ▼
+Selected Work / Discover
+      │
+      ▼
+Founder Credibility
+      │
+      ▼
+ASDEV Audit → Footer
 ```
 
 Scrolling may advance narrative state, but information hierarchy must never depend on animation execution.
@@ -74,11 +86,8 @@ Scrolling may advance narrative state, but information hierarchy must never depe
 If JavaScript, animation, GPU rendering, or advanced interaction is unavailable, the information order remains:
 
 ```text
-Hero
-→ System Diagram
-→ Proof
-→ Flagship Evidence
-→ Audit CTA
+Header → Hero/System Diagram → Proof → Flagship Evidence → Services
+→ Selected Work/Discover → Founder → Audit CTA → Footer
 ```
 
 This fallback is a first-class experience, not an error mode.
@@ -146,8 +155,9 @@ The operational scene should transition conceptually into the evidence layer ins
 Candidate sourced metrics remain governed by the parent V3.2 evidence registry, for example:
 
 - MTTR: `180 min → 55 min`;
-- deployment failure: `−58%`;
-- emergency rollback: `0 / 30 days`.
+- emergency rollback: `0 rollback / 21 days`.
+
+These examples remain hidden until the registry records source, period, method, verification date and accepted review state. The unsupported fixed claims `−58%` and `0 / 30 days` are not part of this specification.
 
 The animation cannot make a metric valid. Provenance makes it valid.
 
@@ -176,10 +186,9 @@ exit
 reveal
 shift
 focus
-system-pulse
-evidence-reveal
-state-transition
-topology-change
+systemPulse
+evidenceReveal
+stateTransition
 ```
 
 Every animation must map to one of these semantics or justify a new semantic token.
@@ -190,9 +199,9 @@ Initial timing bands for prototype evaluation:
 
 ```text
 instant      80–120ms
-response     140–180ms
-transition   240–360ms
-narrative    500–900ms
+response     120–180ms
+transition   180–320ms
+narrative    400–700ms
 ```
 
 These are design budgets, not hard-coded universal values. Human review determines whether a particular interaction feels slow, distracting, or ambiguous.
@@ -212,7 +221,7 @@ Simple opacity, hover, navigation, focus, and small translations should not gain
 
 ## 7. Gate B — Advanced Motion Runtime
 
-A dedicated animation dependency may be introduced only when a concrete Gate A prototype proves that CSS/WAAPI cannot provide the required interaction cleanly.
+A dedicated animation dependency is outside the active queue. It may be proposed only when a concrete Gate A implementation proves that CSS/WAAPI cannot provide one named interaction cleanly and a new canonical-roadmap admission is approved.
 
 ### Entry criteria
 
@@ -244,7 +253,7 @@ A library is not approved because it is popular, award-winning, or visually impr
 
 ## 8. Gate C — GPU Signature Scene
 
-Three.js/WebGL/WebGPU is optional, not a V3.2 requirement.
+Three.js/WebGL/WebGPU is disabled for the active V3.2 queue. It is neither a requirement nor a pre-authorized prototype.
 
 The only currently recommended 3D concept is a single **System Core** scene that visualizes architecture under pressure and then resolves into a normal technical diagram/evidence surface.
 
@@ -276,7 +285,7 @@ The key value is the semantic `3D → 2D` continuity. The 3D object must become 
 
 ### 8.2 GPU entry criteria
 
-Gate C may proceed only if all are true:
+A Gate C roadmap-admission request may be considered only if all are true:
 
 1. Gate A experience is already complete and understandable without GPU rendering.
 2. A prototype demonstrates a clear comprehension or brand-memory benefit.
@@ -343,6 +352,11 @@ The implementation must enforce or verify:
 - route transitions dispose geometry, textures, listeners, observers, and animation timelines;
 - no long-running animation causes repeated main-thread long tasks;
 - mobile experience remains useful when advanced rendering is disabled.
+- Gate A adds no more than `30 KiB` gzip of route-specific initial JavaScript;
+- Gate A introduces no single main-thread long task over `50ms` on the acceptance profile;
+- Gate A uses no texture, model, video, Canvas, WebGL or WebGPU asset;
+- no autoplay, continuous ambient loop or background rendering is permitted;
+- low-capability and reduced-motion decisions occur before optional interaction initialization.
 
 ### Prototype evidence
 
@@ -455,9 +469,13 @@ Could the visitor's system have a related failure mode?
 
 The narrative may animate transitions between these states, but every state must remain independently readable and link to truthful provenance.
 
-## 15. Candidate Home blueprint
+## 15. Final Home blueprint
 
-This is a design direction, not implementation authorization.
+This is the accepted structure; implementation authorization still comes only from the canonical roadmap.
+
+### Home / 00 — Header / navigation
+
+Purpose: orient without competing with the evidence narrative. Keep Work / Services / Discover / About and one dominant Audit action; Blog remains outside primary navigation until its publication gate.
 
 ### Home / 01 — Hero
 
@@ -471,7 +489,7 @@ Required information:
 - secondary evidence CTA;
 - optional operational scene that does not delay the above.
 
-### Home / 02 — Operational proof
+### Home / 02 — Operational scene and verified proof
 
 Purpose: visually explain that ASDEV works on systems under real pressure.
 
@@ -494,19 +512,21 @@ Purpose: make the case study feel like inspectable engineering work rather than 
 
 Use a dominant editorial layout, architecture preview, one or two verified outcomes, and a direct evidence route.
 
-### Home / 05 — Selected systems/work
+### Home / 05 — Services
 
-Purpose: supporting evidence only.
+Purpose: explain the bounded intervention types supported by the preceding evidence.
 
-Avoid returning to a dense wall of equal-weight bordered cards.
+### Home / 06 — Selected Work / Discover
 
-### Home / 06 — Services / Audit bridge
+Purpose: offer supporting systems and useful resources without returning to an equal-weight card wall.
 
-Purpose: connect what was shown to a concrete technical assessment.
+### Home / 07 — Founder credibility
 
-### Home / 07 — Final Audit CTA
+Purpose: connect the operational evidence to the responsible engineer. Reuse the existing portrait and About content; do not create a second identity system.
 
-Purpose: close the narrative with one dominant action and an explicit expectation of what the assessment provides.
+### Home / 08 — Final Audit CTA
+
+Purpose: close the narrative with one dominant action and an explicit expectation of what the assessment provides, followed by the normal Footer.
 
 ## 16. Interaction state model
 
@@ -657,7 +677,7 @@ This section defines future ownership only. It does not authorize execution whil
 
 ### FE-GPU
 
-- dormant unless Gate C is explicitly approved;
+- disabled unless a new Gate C roadmap admission is explicitly approved;
 - owns renderer lifecycle, assets, quality tiers, and static fallback.
 
 ### EVID
@@ -689,7 +709,7 @@ Allowed when:
 - no regression to conversion hierarchy;
 - human review confirms motion improves comprehension.
 
-### Gate B PASS
+### Gate B admission
 
 Allowed when:
 
@@ -698,7 +718,7 @@ Allowed when:
 - dependency budget is acceptable;
 - tests and fallback are complete.
 
-### Gate C PASS
+### Gate C admission
 
 Allowed when:
 
@@ -758,4 +778,4 @@ Creating or merging this document does **not** authorize:
 - merge to `main` during an active release/governance freeze;
 - bypass of R0, S1–S5, or repository approval gates.
 
-The next valid step after this document is accepted is to translate **Gate A only** into a bounded implementation plan and prototype task set against the actual accepted V3.2 base. Gate B and Gate C remain explicitly conditional.
+The next valid immersive step is the canonical S4-05/S4-06 Gate A work, only after R0–S3 dependencies are terminal and the accepted V3.2 base exists. Supporting plans may elaborate those canonical tasks but must not create a second queue. Gate B and Gate C remain disabled until separately admitted.

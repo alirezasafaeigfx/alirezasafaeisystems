@@ -1,6 +1,6 @@
 # V3.2 — Evidence-Led Positioning and Conversion Design
 
-**Status:** Approved direction; implementation begins only after V3.1 release reconciliation  
+**Status:** Final approved product direction; implementation remains governed by the canonical roadmap  
 **Date:** 2026-08-30  
 **Authority:** Post-V3.1 public-experience design, subordinate to `docs/strategy/FOCUS_POLICY.md`, `AGENTS.md`, and all release/approval gates
 
@@ -72,11 +72,12 @@ The single dominant navigation CTA is the ASDEV Audit assessment. Blog remains d
 
 ## Evidence contract
 
-Quantitative proof may appear only when a stable source is recorded. The initial candidate set is:
+Quantitative proof may appear only when a stable source is recorded. Values currently present in product material are candidates, not automatically publishable facts:
 
 - MTTR: `180 min → 55 min`;
-- deployment failure: `−58%`;
-- emergency rollback: `0 / 30 days`.
+- emergency rollback: `0 rollback / 21 days`.
+
+The earlier fixed claims `−58%` and `0 / 30 days` are removed from the V3.2 contract because current repository evidence does not establish them. Do not preserve a metric for visual symmetry.
 
 Each metric must have:
 
@@ -85,22 +86,26 @@ Each metric must have:
 - a source route or repository evidence reference;
 - a verification date;
 - a short scope/measurement note.
+- an explicit review state (`draft`, `verified`, `rejected`, or `expired`).
 
 If provenance cannot be verified, remove or downgrade the claim. Do not replace it with a fabricated metric.
 
 ## Flagship case-study contract
 
-`infrastructure-localization-rescue` becomes the reference implementation and includes:
+`infrastructure-localization-rescue` becomes the only reference implementation in S2 and follows:
 
-1. concise context and constraints;
-2. Before architecture;
-3. After architecture;
-4. measurable impact table;
-5. timeline of decisive changes;
-6. decisions and trade-offs;
-7. sanitized evidence/provenance notes;
-8. role and stack;
-9. ASDEV Audit CTA.
+1. Incident;
+2. Constraint;
+3. Architecture Before;
+4. Diagnosis;
+5. Intervention;
+6. Architecture After;
+7. Evidence;
+8. Trade-offs;
+9. Verification;
+10. ASDEV Audit CTA.
+
+Reusable primitives are limited to the evidence registry, semantic impact table, code-native Before/After diagram shell, timeline, verification/provenance blocks and Audit CTA. Incident facts, constraints, diagnosis, intervention narrative and trade-offs remain case-specific. Do not migrate every case study during S2.
 
 Diagrams must be semantic, responsive, RTL/LTR-safe, and code-native. No generated fake dashboard, fabricated log, or unverifiable client artifact may be used.
 
@@ -126,11 +131,22 @@ Diagrams must be semantic, responsive, RTL/LTR-safe, and code-native. No generat
 Direction: **Engineering Editorial + Operational Interface**.
 
 - Preserve the restrained blue/navy palette and whitespace.
-- Reduce equal-weight bordered cards by roughly 40–50% on the affected Home and Case Study surfaces.
+- Reduce equal-weight bordered cards where a before/after inventory proves hierarchy improves; no arbitrary percentage is a release target.
 - Prefer typography, spacing, dividers, large media, and composition for grouping.
 - Introduce at most one signature operational visualization per major page.
-- Motion must explain system state or hierarchy, use CSS, and fully respect reduced motion.
+- Motion must explain system state or hierarchy, use CSS/WAAPI within Gate A, and fully respect reduced motion.
 - Body typography target: 17–18px desktop, 16–17px mobile, with bounded reading measure.
+
+## Home narrative contract
+
+Home uses one authored sequence:
+
+`Header → Hero + Operational Scene → Verified Proof → Flagship Documentary → Services → Selected Work / Discover → Founder Credibility → ASDEV Audit CTA → Footer`.
+
+- Scene Logic is useful only across Hero → system state → verified evidence. It must show `constraint → diagnosis → intervention → outcome`, remain understandable without motion and never resemble a decorative dashboard.
+- Reuse the existing Hero/CTA foundations. Move the existing founder portrait into the founder/About credibility moment rather than rebuilding identity assets.
+- Services, Discover, Founder and Footer change only when positioning, proof, comprehension, conversion or credibility improves.
+- Mobile is authored in this narrative order; it is not desktop sections stacked narrowly.
 
 ## Testing and evidence
 
@@ -154,6 +170,8 @@ Automated gates are necessary but do not replace human review. Reuse green evide
 - no new product or standalone Discover expansion;
 - no work on frozen repositories;
 - no dependency churn unrelated to the program;
+- no broad Home rewrite, all-case-study migration, Discover query/admin rewrite, or parallel evidence component system;
+- no Gate B/C implementation without a new canonical-roadmap admission;
 - no AI identity replacement, fake client logos, fake screenshots, testimonials, or metrics;
 - no production deploy, migration, content publication, force-push, or destructive action without its valid gate.
 
@@ -161,7 +179,7 @@ Automated gates are necessary but do not replace human review. Reuse green evide
 
 - the generic job-title H1 is gone;
 - the primary path is ASDEV Audit and is attributable;
-- the top of Home shows sourced quantitative proof;
+- the top of Home shows only provenance-admitted quantitative proof;
 - the flagship Case Study reads as a technical documentary, not stacked cards;
 - incomplete Blog content does not weaken primary navigation;
 - Discover first-viewport media is useful under a throttled connection;
