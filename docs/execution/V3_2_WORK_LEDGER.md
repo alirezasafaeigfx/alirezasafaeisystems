@@ -56,7 +56,7 @@ These are source/report findings, not a claim that this review workspace complet
 
 | Scope | State | Next action |
 |---|---|---|
-| DOCS-01 | REVIEW — documentation alignment | Independent consistency review and governed integration; resulting commit identified by PR metadata |
+| DOCS-01 | INTEGRATED — independent review evidence UNVERIFIED | PR #18 merged into `GITHUB_MAIN` at `2fe4988841a36c7f4eaf1da47fb5bffe22d00547`; implementation dependencies are ready. GitHub reports no submitted PR reviews, so independent documentation acceptance remains an explicit evidence gap. |
 | S1-01/03 | REOPENED — provenance gap | Inspect real sources, strengthen publication contract |
 | S1-08 | PENDING — DOCS-01 integration | Plain-language FA/EN public surfaces |
 | S1-02/04/05/07 | IMPLEMENTED / ACCEPTANCE REVIEW REQUIRED | Reuse satisfactory parts; close copy/action/analytics evidence gaps |
@@ -81,6 +81,16 @@ Do not overwrite all S1–S5 rows with DONE based on one release. The roadmap de
 - Reused evidence: actual main/source/workflow/PR metadata; prior reports explicitly labeled where not independently reproduced.
 - Acceptance: complete diff limited to intended docs; internal links/actual source paths and task dependencies checked; contradiction/permission review; independent reviewer findings addressed; current hosted checks and remote readback. Actual results belong in PR evidence, not invented here before execution.
 - Rollback: normal revert of the coherent documentation integration; no runtime rollback or data operation.
+
+### DOCS-01 integration reconciliation — 2026-08-30
+
+- Repository/environment: `alirezasafaeigfx/alirezasafaeisystems`, `GITHUB_MAIN`.
+- PR: [#18](https://github.com/alirezasafaeigfx/alirezasafaeisystems/pull/18), merged `2026-08-30T22:04:39Z`.
+- Original head: `d6798ec2fabe22f04cda64f00b9cfee6d1bd92d8`; merge: `2fe4988841a36c7f4eaf1da47fb5bffe22d00547`.
+- Hosted results observed from PR metadata: Hosted quality gate, safe-checks, CodeQL, smoke, lighthouse, dependency review, high/critical audit, secret scan and CodeRabbit status all reported success.
+- Review limitation: GitHub PR metadata returned an empty submitted-review list. The successful CodeRabbit status is not substituted for a retrievable independent documentation-review disposition; that criterion remains `UNVERIFIED`.
+- Repository rule observation: the active main-governance ruleset is `protect-main-release-governance`; the legacy branch-protection endpoint returned no classic protection object. No settings were changed.
+- Runtime/data effect: none. This reconciliation makes `DOCS-01` integration-dependent tasks ready; it does not establish application experience acceptance.
 
 ## Update protocol
 
