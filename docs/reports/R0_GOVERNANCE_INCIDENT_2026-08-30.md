@@ -32,6 +32,8 @@ Run `33303771900`, attempt 1, is the only authorized staging dispatch. GitHub re
 
 The workflow definition resolves an immutable deployment SHA from its `ref` input. The requested target remains `41a80235...`; the run’s deploy logs must be consumed before asserting the resolved target, archive checksum, release ID, health, smoke, or live-verification results.
 
+Important reconciliation discrepancy: GitHub deployment record `6165237045` for this run reports environment `staging`, ref `main`, and SHA `4a02127bfdc2ed37956803c113b635700a930efe`, with deployment status `in_progress` at `2026-08-30T09:36:24Z`. This conflicts with the supplied handoff’s assertion that the deploy target is immutable SHA `41a80235...`. The deployment API record and the run’s primary log output must be treated as the source of truth; no target SHA is accepted until that discrepancy is resolved.
+
 ## Production truth reconciliation
 
 Read-only SSH to `IRAN_PROD_SERVER` (`pt-production`) timed out while connecting to `193.93.169.32:22` on 2026-08-30. No server identity, release symlink, process status, health response, deployment record, or migration record was obtained. Therefore production is `UNKNOWN / NOT VERIFIED`, not “unchanged”. No rollback or other production mutation was attempted.
