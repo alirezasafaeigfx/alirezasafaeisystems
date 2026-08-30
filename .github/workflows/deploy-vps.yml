@@ -221,14 +221,16 @@ jobs:
           set -euo pipefail
           if [ "$TARGET_ENV" = "production" ]; then
             PORT="3002"
-            BASE_URL="https://alirezasafaeisystems.ir"
+            BASE_HOST="alirezasafaeisystems.ir"
           else
             PORT="3003"
-            BASE_URL="https://staging.alirezasafaeisystems.ir"
+            BASE_HOST="staging.alirezasafaeisystems.ir"
           fi
+          BASE_URL="https://${BASE_HOST}"
           echo "BASE_URL=$BASE_URL" >> "$GITHUB_ENV"
 
-          # Run smoke checks from inside the VPS to avoid public-route CI network variance.
+          # Run same-host smoke through the canonical HTTPS vhost/SNI while bypassing only the VPS resolver.
+          # The later live browser verifier intentionally keeps real public DNS/routing coverage.
           ssh -F ~/.ssh/config deploy-target "\
             set -euo pipefail; \
             GET_CODE=\$(curl --connect-timeout 10 --max-time 30 -fsS -o /tmp/portfolio-ready-get.json -w '%{http_code}' http://127.0.0.1:${PORT}/api/ready); \
@@ -236,15 +238,15 @@ jobs:
             test \"\${GET_CODE}\" = \"200\"; \
             test \"\${HEAD_CODE}\" = \"\${GET_CODE}\"; \
             grep -q '\"status\":\"ready\"' /tmp/portfolio-ready-get.json; \
-            curl --connect-timeout 10 --max-time 30 -fsS '${BASE_URL}/api/ready' >/dev/null; \
-            curl --connect-timeout 10 --max-time 30 -fsS -o /tmp/portfolio-home.html '${BASE_URL}/'; \
+            curl --connect-timeout 10 --max-time 30 -fsS --resolve '${BASE_HOST}:443:127.0.0.1' '${BASE_URL}/api/ready' >/dev/null; \
+            curl --connect-timeout 10 --max-time 30 -fsS --resolve '${BASE_HOST}:443:127.0.0.1' -o /tmp/portfolio-home.html '${BASE_URL}/'; \
             grep -Eq 'lang=\"fa\"|dir=\"rtl\"' /tmp/portfolio-home.html; \
-            curl --connect-timeout 10 --max-time 30 -fsS '${BASE_URL}/services' >/dev/null; \
-            curl --connect-timeout 10 --max-time 30 -fsS '${BASE_URL}/discover' >/dev/null; \
-            curl --connect-timeout 10 --max-time 30 -fsS -o /tmp/portfolio-discover-en.html '${BASE_URL}/en/discover'; \
+            curl --connect-timeout 10 --max-time 30 -fsS --resolve '${BASE_HOST}:443:127.0.0.1' '${BASE_URL}/services' >/dev/null; \
+            curl --connect-timeout 10 --max-time 30 -fsS --resolve '${BASE_HOST}:443:127.0.0.1' '${BASE_URL}/discover' >/dev/null; \
+            curl --connect-timeout 10 --max-time 30 -fsS --resolve '${BASE_HOST}:443:127.0.0.1' -o /tmp/portfolio-discover-en.html '${BASE_URL}/en/discover'; \
             grep -q 'lang=\"en\"' /tmp/portfolio-discover-en.html; \
             grep -q 'dir=\"ltr\"' /tmp/portfolio-discover-en.html; \
-            curl --connect-timeout 10 --max-time 30 -fsS -o /tmp/portfolio-profile.html '${BASE_URL}/profile'; \
+            curl --connect-timeout 10 --max-time 30 -fsS --resolve '${BASE_HOST}:443:127.0.0.1' -o /tmp/portfolio-profile.html '${BASE_URL}/profile'; \
             grep -q 'alireza_safaei_network' /tmp/portfolio-profile.html; \
           "
 
