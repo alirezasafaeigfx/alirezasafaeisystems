@@ -31,4 +31,12 @@ describe('Deploy VPS SSH transport contract', () => {
     expect(workflow).toContain('test "$REMOTE_SHA256" = "$SOURCE_SHA256"')
     expect(workflow).toContain("tar -xzf '$REMOTE_ARCHIVE'")
   })
+
+  it('does not reintroduce the explicit gzip pipeline dependency', () => {
+    const workflow = readFileSync(resolve(process.cwd(), '.github/workflows/deploy-vps.yml'), 'utf8')
+
+    expect(workflow).not.toContain('gzip -n')
+    expect(workflow).not.toContain('rsync -az')
+    expect(workflow).not.toContain('--compress')
+  })
 })
