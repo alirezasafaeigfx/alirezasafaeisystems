@@ -7,9 +7,20 @@ describe('Gate A operational scene', () => {
     render(<OperationalScene isFa={false} />)
 
     expect(screen.getByTestId('operational-scene')).toBeInTheDocument()
+    expect(screen.getByTestId('operational-scene')).toHaveAttribute('data-motion-engine', 'animejs')
     expect(screen.getByRole('img', { name: /See the problem, then follow the repair/ })).toBeInTheDocument()
     expect(screen.getAllByText('The system is under pressure')).not.toHaveLength(0)
     expect(screen.queryByText('WebGL')).not.toBeInTheDocument()
+  })
+
+  it('keeps rapid state selection deterministic while the finite morph is active', () => {
+    render(<OperationalScene isFa={false} />)
+    const scene = screen.getByTestId('operational-scene')
+    fireEvent.click(within(scene).getByRole('button', { name: /Inspect the evidence/ }))
+    fireEvent.click(within(scene).getByRole('button', { name: /We isolate the cause/ }))
+    fireEvent.click(within(scene).getByRole('button', { name: /The path is stable again/ }))
+    expect(scene).toHaveAttribute('data-state', 'stable')
+    expect(within(scene).getByTestId('operational-scene-path')).toHaveAttribute('d', 'M48 56 H592')
   })
 
   it('changes geometry and explanatory meaning across five selectable states', () => {
@@ -23,7 +34,7 @@ describe('Gate A operational scene', () => {
     fireEvent.click(within(scene).getByRole('button', { name: /We isolate the cause/ }))
     expect(scene).toHaveAttribute('data-state', 'diagnosis')
     expect(path.getAttribute('d')).not.toBe(pressurePath)
-    expect(within(scene).getByText(/We isolate the part causing the failure/)).toBeInTheDocument()
+    expect(within(scene).getAllByText(/We isolate the part causing the failure/)).not.toHaveLength(0)
 
     fireEvent.click(within(scene).getByRole('button', { name: 'Next state' }))
     expect(scene).toHaveAttribute('data-state', 'intervention')

@@ -19,9 +19,10 @@ type ProofStripProps = {
 }
 
 export function ProofStrip({ ariaLabel, eyebrow, title, description, items, language }: ProofStripProps) {
+  const publishableItems = items.filter((item) => isPublishableEvidence(item.evidence))
   const provenance = language === 'fa'
-    ? { summary: 'منشأ شواهد', source: 'منبع', period: 'بازه', method: 'روش', verified: 'تاریخ بررسی' }
-    : { summary: 'Evidence provenance', source: 'Source', period: 'Period', method: 'Method', verified: 'Reviewed' }
+    ? { summary: 'منشأ شواهد', source: 'منبع', period: 'بازه', method: 'روش', verified: 'تاریخ بررسی', reviewer: 'بازبین', reviewedAt: 'تاریخ تأیید', pending: 'این شواهد هنوز تأیید مستقل نشده‌اند.' }
+    : { summary: 'Evidence provenance', source: 'Source', period: 'Period', method: 'Method', verified: 'Verified', reviewer: 'Reviewer', reviewedAt: 'Review date', pending: 'This evidence has not yet received independent approval.' }
 
   return (
     <section aria-label={ariaLabel} className="public-surface overflow-hidden rounded-[2rem]">
@@ -32,7 +33,7 @@ export function ProofStrip({ ariaLabel, eyebrow, title, description, items, lang
           <p className="mt-4 max-w-lg text-base leading-8 text-muted-foreground">{description}</p>
         </div>
         <div className="grid gap-3 sm:grid-cols-3">
-          {items.filter((item) => isPublishableEvidence(item.evidence)).map((item) => (
+          {publishableItems.map((item) => (
             <div key={item.title} className="rounded-2xl border border-border/70 bg-background/72 p-5">
               <CheckCircle2 aria-hidden="true" className="size-5 text-primary" />
               <p className="mt-5 text-lg font-black">{item.title}</p>
@@ -53,10 +54,17 @@ export function ProofStrip({ ariaLabel, eyebrow, title, description, items, lang
                   <div><dt className="inline font-semibold">{provenance.period}: </dt><dd className="inline">{item.evidence.period}</dd></div>
                   <div><dt className="inline font-semibold">{provenance.method}: </dt><dd className="inline">{item.evidence.method}</dd></div>
                   <div><dt className="inline font-semibold">{provenance.verified}: </dt><dd className="inline">{item.evidence.verificationDate}</dd></div>
+                  <div><dt className="inline font-semibold">{provenance.reviewer}: </dt><dd className="inline">{item.evidence.reviewedBy}</dd></div>
+                  <div><dt className="inline font-semibold">{provenance.reviewedAt}: </dt><dd className="inline">{item.evidence.reviewedAt}</dd></div>
                 </dl>
               </details>
             </div>
           ))}
+          {publishableItems.length === 0 ? (
+            <p className="sm:col-span-3 rounded-2xl border border-dashed border-border/80 bg-background/60 p-5 text-sm leading-7 text-muted-foreground" role="status">
+              {provenance.pending}
+            </p>
+          ) : null}
         </div>
       </div>
     </section>

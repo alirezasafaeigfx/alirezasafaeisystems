@@ -25,12 +25,10 @@ export async function generateMetadata(): Promise<Metadata> {
 function getEvidence(lang: 'fa' | 'en'): EvidenceRecord[] {
   return lang === 'en'
     ? [
-        { id: 'ilr-release-path', label: 'Documented release path', value: 'Health, build and public verification steps are recorded', source: 'Public release workflow and verification record', sourceUrl: 'https://github.com/alirezasafaeigfx/alirezasafaeisystems/actions/runs/33332174608', period: 'Public workflow review on 2026-08-30', method: 'Workflow summary and verification markers', verificationDate: '2026-08-30', reviewedBy: 'Independent public-content reviewer', reviewedAt: '2026-08-30', reviewState: 'accepted' },
-        { id: 'ilr-rollback-path', label: 'Rollback path', value: 'A retained release is identified for safe recovery', source: 'Public release workflow and verification record', sourceUrl: 'https://github.com/alirezasafaeigfx/alirezasafaeisystems/actions/runs/33332174608', period: 'Public workflow review on 2026-08-30', method: 'Release identity and rollback-target review', verificationDate: '2026-08-30', reviewedBy: 'Independent public-content reviewer', reviewedAt: '2026-08-30', reviewState: 'accepted' },
+        { id: 'ilr-release-path', label: 'Documented release path', value: 'Health, build and public verification steps are recorded', source: 'Public release workflow and verification record', sourceUrl: 'https://github.com/alirezasafaeigfx/alirezasafaeisystems/actions/runs/33332174608', period: 'Public workflow review on 2026-08-30', method: 'Workflow summary and verification markers', verificationDate: '2026-08-30', reviewState: 'draft' },
       ]
     : [
-        { id: 'ilr-release-path', label: 'مسیر انتشار مستند', value: 'مراحل سلامت، ساخت و راستی‌آزمایی عمومی ثبت شده‌اند', source: 'گردش‌کار عمومی انتشار و رکورد راستی‌آزمایی', sourceUrl: 'https://github.com/alirezasafaeigfx/alirezasafaeisystems/actions/runs/33332174608', period: 'بررسی گردش‌کار عمومی در ۲۰۲۶-۰۸-۳۰', method: 'بررسی خلاصه گردش‌کار و نشانگرهای راستی‌آزمایی', verificationDate: '2026-08-30', reviewedBy: 'بازبینی مستقل محتوای عمومی', reviewedAt: '2026-08-30', reviewState: 'accepted' },
-        { id: 'ilr-rollback-path', label: 'مسیر بازگشت', value: 'یک نسخه قبلی برای بازیابی امن مشخص شده است', source: 'گردش‌کار عمومی انتشار و رکورد راستی‌آزمایی', sourceUrl: 'https://github.com/alirezasafaeigfx/alirezasafaeisystems/actions/runs/33332174608', period: 'بررسی گردش‌کار عمومی در ۲۰۲۶-۰۸-۳۰', method: 'بررسی هویت انتشار و هدف بازگشت', verificationDate: '2026-08-30', reviewedBy: 'بازبینی مستقل محتوای عمومی', reviewedAt: '2026-08-30', reviewState: 'accepted' },
+        { id: 'ilr-release-path', label: 'مسیر انتشار مستند', value: 'مراحل سلامت، ساخت و راستی‌آزمایی عمومی ثبت شده‌اند', source: 'گردش‌کار عمومی انتشار و رکورد راستی‌آزمایی', sourceUrl: 'https://github.com/alirezasafaeigfx/alirezasafaeisystems/actions/runs/33332174608', period: 'بررسی گردش‌کار عمومی در ۲۰۲۶-۰۸-۳۰', method: 'بررسی خلاصه گردش‌کار و نشانگرهای راستی‌آزمایی', verificationDate: '2026-08-30', reviewState: 'draft' },
       ]
 }
 
@@ -38,6 +36,7 @@ export default async function InfrastructureLocalizationRescueCaseStudyPage() {
   const lang = await getRequestLanguage()
   const withLocale = (path: string) => (lang === 'fa' ? path : `/${lang}${path}`)
   const evidence = getEvidence(lang)
+  const publishableEvidence = evidence.filter(isPublishableEvidence)
   const copy = {
     breadcrumbHome: lang === 'en' ? 'Home' : 'خانه',
     breadcrumbCases: lang === 'en' ? 'Case Studies' : 'مطالعات موردی',
@@ -90,10 +89,10 @@ export default async function InfrastructureLocalizationRescueCaseStudyPage() {
         ? 'Local-first resilience required tighter operational discipline and more explicit ownership, but dramatically reduced outage exposure and release anxiety.'
         : 'تاب‌آوری local-first نیاز به نظم عملیاتی سخت‌گیرانه‌تر و مالکیت صریح‌تر داشت، اما ریسک قطعی و استرس انتشار را به شکل چشمگیر کاهش داد.',
     back: lang === 'en' ? 'Back to case studies' : 'بازگشت به مطالعات موردی',
-    ctaAudit: lang === 'en' ? 'Start Free Audit' : 'شروع Audit رایگان',
+    ctaAudit: lang === 'en' ? 'Request a website review' : 'درخواست بررسی سایت',
     ctaAuditDesc: lang === 'en'
-      ? 'Want a similar assessment for your site? Start with a free audit.'
-      : 'ارزیابی مشابهی برای سایت خود می‌خواهید؟ با یک Audit رایگان شروع کنید.',
+      ? 'Want a similar assessment for your site? Send its address for review.'
+      : 'برای بررسی مشابه، آدرس سایت خود را بفرستید.',
   }
 
   const pageUrl = `${siteUrl}/${lang}/case-studies/infrastructure-localization-rescue`
@@ -173,13 +172,18 @@ export default async function InfrastructureLocalizationRescueCaseStudyPage() {
         <section className="space-y-3 rounded-xl border bg-card p-6 card-hover">
           <h2 className="text-xl font-semibold">{copy.hOutcomes}</h2>
           <div className="grid gap-3 md:grid-cols-2">
-            {evidence.filter(isPublishableEvidence).map((item) => (
+            {publishableEvidence.map((item) => (
               <div key={item.id} className="rounded-lg border p-4">
                 <p className="text-sm font-semibold">{item.label}</p>
                 <p className="mt-2 text-lg font-bold text-primary">{item.value}</p>
                 <details className="mt-3 text-xs leading-6 text-muted-foreground"><summary className="cursor-pointer font-semibold text-foreground">{lang === 'en' ? 'Provenance' : 'منشأ شواهد'}</summary><p className="mt-2">{item.source} · {item.period} · {item.method} · {item.verificationDate}</p></details>
               </div>
             ))}
+            {publishableEvidence.length === 0 ? (
+              <p className="md:col-span-2 rounded-lg border border-dashed p-4 text-sm leading-7 text-muted-foreground" role="status">
+                {lang === 'en' ? 'No outcome evidence is published until independent review is complete.' : 'تا پایان بازبینی مستقل، هیچ شاهدی برای نتیجه منتشر نمی‌شود.'}
+              </p>
+            ) : null}
           </div>
         </section>
 

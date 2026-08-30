@@ -97,7 +97,7 @@ export function Hero() {
         detail: 'از Audit Systems گزارش عملی بگیرید و مهم‌ترین ایرادها را در اسپرینت ثابت ۵-۷ روزه برطرف کنید (با before/after واقعی).',
         href: withLocale('/qualification?source=portfolio&placement=hero_intent&offer=request_assessment', language),
         external: false,
-        cta: 'درخواست ارزیابی Audit',
+        cta: 'درخواست بررسی سایت',
       },
       toolbox: {
         key: 'toolbox',

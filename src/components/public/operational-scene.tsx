@@ -1,7 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
+import { animate } from 'animejs/animation'
+import { morphTo } from 'animejs/svg'
 import { transitionScene, SYSTEM_SCENE_STATES, type SystemSceneState } from '@/lib/system-scene'
+import { SystemCore3dLauncher } from './system-core-3d-launcher'
 
 type OperationalSceneProps = { isFa: boolean }
 
@@ -10,11 +13,12 @@ const sceneData: Record<SystemSceneState, { path: string; activeNodes: number[] 
   diagnosis: { path: 'M48 56 H229 M229 56 C286 56 314 26 370 26', activeNodes: [1, 2] },
   intervention: { path: 'M48 56 C170 56 164 22 286 22 S410 56 592 56', activeNodes: [1, 2, 3] },
   stable: { path: 'M48 56 H592', activeNodes: [0, 1, 2, 3] },
-  evidence: { path: 'M48 56 H592', activeNodes: [0, 1, 2, 3] },
+  evidence: { path: 'M48 56 H500 M516 56 l14 14 30 -32', activeNodes: [0, 1, 2, 3] },
 }
 
 export function OperationalScene({ isFa }: OperationalSceneProps) {
   const [state, setState] = useState<SystemSceneState>('pressure')
+  const interactive = useSyncExternalStore(() => () => undefined, () => true, () => false)
   const copy = isFa
     ? {
         label: 'نمونهٔ آموزشی مسیر تحویل',
@@ -39,22 +43,42 @@ export function OperationalScene({ isFa }: OperationalSceneProps) {
 
   const currentIndex = SYSTEM_SCENE_STATES.indexOf(state)
   const data = sceneData[state]
+  const motionPathRef = useRef<SVGPathElement>(null)
+  const targetPathRef = useRef<SVGPathElement>(null)
   const move = (event: Parameters<typeof transitionScene>[1]) => setState((current) => transitionScene(current, event))
 
+  useEffect(() => {
+    const motionPath = motionPathRef.current
+    const targetPath = targetPathRef.current
+    if (!motionPath || !targetPath) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      motionPath.setAttribute('d', data.path)
+      return
+    }
+    const motion = animate(motionPath, {
+      d: morphTo(targetPath, 0.28),
+      duration: 420,
+      ease: 'inOut(3)',
+    })
+    return () => {
+      motion.cancel()
+    }
+  }, [data.path])
+
   return (
-    <figure className="operational-scene mt-8 rounded-2xl border border-primary/15 bg-primary/[0.04] p-4 sm:p-5" aria-labelledby="operational-scene-title" data-testid="operational-scene" data-state={state} data-scene-mode="native" data-topology="delivery-network">
+    <figure className="operational-scene rounded-2xl border border-primary/15 bg-primary/[0.04] p-4 sm:p-5" aria-labelledby="operational-scene-title" data-testid="operational-scene" data-state={state} data-scene-mode="native" data-motion-engine="animejs" data-topology="delivery-network">
       <figcaption>
         <p className="public-kicker">{copy.label}</p>
         <h2 id="operational-scene-title" className="mt-2 text-lg font-black sm:text-xl">{copy.title}</h2>
         <p className="mt-2 text-sm leading-7 text-muted-foreground">{copy.descriptions[currentIndex]}</p>
       </figcaption>
 
-      <div className="mt-4 flex flex-wrap gap-2" role="group" aria-label={isFa ? 'انتخاب مرحلهٔ مسیر' : 'Choose a delivery-path state'}>
+      <div hidden={!interactive} className="mt-4 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap" role="group" aria-label={isFa ? 'انتخاب مرحلهٔ مسیر' : 'Choose a delivery-path state'}>
         {SYSTEM_SCENE_STATES.map((sceneState, index) => (
           <button
             key={sceneState}
             type="button"
-            className="min-h-11 rounded-full border border-border/70 px-3 text-xs font-bold transition-colors hover:border-primary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring data-[selected=true]:border-primary data-[selected=true]:bg-primary data-[selected=true]:text-primary-foreground"
+            className="min-h-11 rounded-xl border border-border/70 px-3 text-xs font-bold leading-5 transition-colors last:col-span-2 hover:border-primary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring data-[selected=true]:border-primary data-[selected=true]:bg-primary data-[selected=true]:text-primary-foreground sm:rounded-full"
             data-selected={state === sceneState}
             aria-pressed={state === sceneState}
             onClick={() => move({ type: 'select', state: sceneState })}
@@ -64,18 +88,18 @@ export function OperationalScene({ isFa }: OperationalSceneProps) {
         ))}
       </div>
 
-      <noscript>
-        <div className="mt-4 rounded-xl border border-border/70 bg-background/70 p-4">
+      <div hidden={interactive} data-testid="operational-scene-fallback" className="mt-4 rounded-xl border border-border/70 bg-background/70 p-4">
           <p className="text-sm font-semibold">{copy.noScript}</p>
           <ol className="mt-3 grid gap-2 text-sm text-muted-foreground sm:grid-cols-2">
             {copy.states.map((label, index) => <li key={label}><span className="font-bold text-primary">0{index + 1}.</span> {label} — {copy.descriptions[index]}</li>)}
           </ol>
-        </div>
-      </noscript>
+      </div>
 
-      <svg className="mt-5 h-auto w-full overflow-visible" viewBox="0 0 640 112" role="img" aria-labelledby="operational-scene-title operational-scene-description">
+      <svg className={`${interactive ? '' : 'hidden '}mt-5 h-auto w-full overflow-visible`} viewBox="0 0 640 112" role="img" aria-labelledby="operational-scene-title operational-scene-description">
         <desc id="operational-scene-description">{copy.topology.join(' → ')} · {copy.states[currentIndex]}</desc>
-        <path data-testid="operational-scene-path" className="operational-scene__path" d={data.path} pathLength="1" />
+        <path data-testid="operational-scene-path" className="operational-scene__path opacity-0" d={data.path} pathLength="1" />
+        <path ref={motionPathRef} aria-hidden="true" className="operational-scene__path" d={sceneData.pressure.path} pathLength="1" />
+        <path ref={targetPathRef} aria-hidden="true" className="opacity-0" d={data.path} />
         {copy.topology.map((node, index) => {
           const x = 48 + index * 181.3
           const active = data.activeNodes.includes(index)
@@ -88,13 +112,14 @@ export function OperationalScene({ isFa }: OperationalSceneProps) {
         })}
       </svg>
 
-      <div className="mt-3 flex items-center justify-between gap-3">
+      <div hidden={!interactive} className="mt-3 flex items-center justify-between gap-3">
         <p className="text-xs font-semibold text-muted-foreground" aria-live="polite">{copy.states[currentIndex]}</p>
         <div className="flex gap-2">
           <button type="button" className="min-h-11 rounded-lg border border-border/70 px-3 text-xs font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" onClick={() => move({ type: 'previous' })} disabled={currentIndex === 0}>{copy.previous}</button>
           <button type="button" className="min-h-11 rounded-lg bg-primary px-3 text-xs font-bold text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" onClick={() => move({ type: 'next' })} disabled={currentIndex === SYSTEM_SCENE_STATES.length - 1}>{copy.next}</button>
         </div>
       </div>
+      {interactive && <SystemCore3dLauncher state={state} isFa={isFa} />}
     </figure>
   )
 }

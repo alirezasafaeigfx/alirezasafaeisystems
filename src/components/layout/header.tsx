@@ -48,7 +48,7 @@ export function Header() {
     router.refresh()
   }
 
-  const collaborationLabel = language === 'fa' ? 'درخواست ارزیابی Audit' : 'Request an ASDEV Audit'
+  const collaborationLabel = language === 'fa' ? 'درخواست بررسی سایت' : 'Request a website review'
   const primaryNavLabel = language === 'fa' ? 'ناوبری اصلی' : 'Primary navigation'
   const mobileNavLabel = language === 'fa' ? 'ناوبری موبایل' : 'Mobile navigation'
 

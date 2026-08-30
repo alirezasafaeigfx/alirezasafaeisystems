@@ -5,6 +5,7 @@ import { Search } from 'lucide-react'
 import { useTransition } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import type { DiscoverPublicQuery } from '@/lib/discover-query'
+import { discoverCategoryLabel, discoverPlatformLabel } from '@/lib/discover-labels'
 
 type DiscoverControlsProps = {
   query: DiscoverPublicQuery
@@ -21,6 +22,7 @@ export function DiscoverControls({
   resourceTypes,
   isEn,
 }: DiscoverControlsProps) {
+  const locale = isEn ? 'en' : 'fa'
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -136,7 +138,7 @@ export function DiscoverControls({
           >
             <option value="">{copy.allCategories}</option>
             {categories.map((category) => (
-              <option key={category} value={category}>{category}</option>
+              <option key={category} value={category}>{discoverCategoryLabel(category, locale)}</option>
             ))}
           </select>
         </label>
@@ -166,7 +168,7 @@ export function DiscoverControls({
           >
             <option value="">{copy.allPlatforms}</option>
             {platforms.map((platform) => (
-              <option key={platform} value={platform}>{platform}</option>
+              <option key={platform} value={platform}>{discoverPlatformLabel(platform, locale)}</option>
             ))}
           </select>
         </label>

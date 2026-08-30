@@ -72,12 +72,15 @@ describe('DiscoverGrid', () => {
     const regular = screen.getByRole('article', { name: 'منبع: Canva' })
 
     expect(within(featured).getByText('ابزار هوش مصنوعی')).toBeInTheDocument()
-    expect(within(featured).getByText('Web')).toBeInTheDocument()
+    expect(within(featured).getByText('هوش مصنوعی')).toBeInTheDocument()
+    expect(within(featured).getByText('وب')).toBeInTheDocument()
     expect(within(featured).getByText('رایگان')).toBeInTheDocument()
     expect(within(featured).getAllByRole('link')).toHaveLength(1)
 
     expect(within(regular).getByText('اپلیکیشن')).toBeInTheDocument()
-    expect(within(regular).getByText('Android')).toBeInTheDocument()
+    expect(within(regular).getByText('طراحی')).toBeInTheDocument()
+    expect(within(regular).getByText('اندروید')).toBeInTheDocument()
+    expect(within(regular).getByLabelText('پلتفرم‌های Canva')).toBeInTheDocument()
     expect(within(regular).getByText('رایگان با امکانات بیشتر')).toBeInTheDocument()
     expect(within(regular).queryByText('منتخب')).not.toBeInTheDocument()
     expect(within(regular).getAllByRole('link')).toHaveLength(1)

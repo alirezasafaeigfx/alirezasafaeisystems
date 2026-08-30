@@ -9,6 +9,7 @@ import {
   extractDiscoverAttribution,
 } from '@/lib/discover'
 import { env } from '@/lib/env'
+import { discoverCategoryLabel } from '@/lib/discover-labels'
 import { getRequestLanguage } from '@/lib/i18n/server'
 import { generateBreadcrumbSchema } from '@/lib/seo'
 import { getSiteUrl } from '@/lib/site-config'
@@ -123,9 +124,9 @@ export default async function DiscoverDetailPage({ params, searchParams }: Disco
         related: 'موارد مشابه در Discover',
         featured: 'منتخب',
         asdev: 'ادامه در ASDEV',
-        asdevDescription: 'اگر این منبع برایت مفید بود، می‌توانی سیستم‌هایی که می‌سازم، Case Studyها و مسیر بررسی فنی سایت را هم ببینی.',
-        audit: 'بررسی آمادگی سایت برای Audit',
-        cases: 'دیدن Case Studyها',
+        asdevDescription: 'اگر این منبع برایت مفید بود، می‌توانی پروژه‌ها و مسیر بررسی فنی سایت را هم ببینی.',
+        audit: 'بررسی آمادگی سایت',
+        cases: 'دیدن پروژه‌ها',
         qualify: 'شروع درخواست همکاری',
         disclosure: 'مالکیت سرویس خارجی متعلق به ارائه‌دهندهٔ آن است. این صفحه فقط توضیح تحریری و لینک مقصد رسمی را ارائه می‌کند.',
       }
@@ -158,7 +159,7 @@ export default async function DiscoverDetailPage({ params, searchParams }: Disco
           ) : null}
           <div className="space-y-5 p-6 md:p-10">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="rounded-full border px-3 py-1 text-xs text-muted-foreground">{item.category}</span>
+              <span className="rounded-full border px-3 py-1 text-xs text-muted-foreground">{discoverCategoryLabel(item.category, locale)}</span>
               {item.featured ? (
                 <span className="inline-flex items-center gap-1 text-xs font-semibold text-primary">
                   <Sparkles className="h-3.5 w-3.5" /> {copy.featured}

@@ -38,7 +38,7 @@ test.describe('smoke', () => {
     const hero = page.getByLabel('معرفی علیرضا صفایی')
     await expect(hero.getByRole('heading', { level: 1 })).toContainText('سیستم‌های عملیاتی را قابل دیدن می‌کنم')
     await expect(hero.getByRole('link')).toHaveCount(2)
-    await expect(hero.getByRole('link', { name: 'درخواست ارزیابی Audit' })).toBeVisible()
+    await expect(hero.getByRole('link', { name: 'درخواست بررسی سایت' })).toBeVisible()
     await expect(page.getByLabel('خدمات اصلی').getByRole('article')).toHaveCount(3)
     expect(pageErrors).toEqual([])
     expect(failedRequests).toEqual([])

@@ -16,7 +16,7 @@ describe('Homepage V3.2 positioning and proof', () => {
     trackEventMock.mockResolvedValue(undefined)
   })
 
-  it('renders the personal Persian hero with exactly two actions and a real owner portrait', () => {
+  it('keeps the first mobile viewport focused on the problem, action, and interactive scene', () => {
     render(<HomePageV3 language="fa" />)
 
     const hero = screen.getByRole('region', { name: 'معرفی علیرضا صفایی' })
@@ -30,12 +30,32 @@ describe('Homepage V3.2 positioning and proof', () => {
     )
     expect(within(actions).getByRole('link', { name: 'مشاهده پروژه‌ها' })).toHaveAttribute('href', '/case-studies')
 
-    const portraitFrame = within(hero).getByTestId('owner-portrait-frame')
+    expect(within(hero).getByTestId('operational-scene')).toBeInTheDocument()
+    expect(within(hero).queryByTestId('owner-portrait-frame')).not.toBeInTheDocument()
+
+    const founder = screen.getByLabelText('درباره علیرضا صفایی')
+    const portraitFrame = within(founder).getByTestId('owner-portrait-frame')
     expect(portraitFrame).toBeInTheDocument()
     expect(portraitFrame).not.toHaveAttribute('aria-hidden', 'true')
     expect(portraitFrame).not.toHaveAttribute('data-asset-status', 'pending-owner-portrait')
     expect(within(portraitFrame).getByRole('img', { name: 'پرتره حرفه‌ای علیرضا صفایی' })).toBeInTheDocument()
     expect(within(portraitFrame).queryByText('AS')).not.toBeInTheDocument()
+  })
+
+  it('uses the authored roadmap reading order and makes one flagship project dominant', () => {
+    render(<HomePageV3 language="fa" />)
+
+    const hero = screen.getByLabelText('معرفی علیرضا صفایی')
+    const proof = screen.getByLabelText('شواهد واقعی')
+    const projects = screen.getByLabelText('پروژه‌های منتخب')
+    const services = screen.getByLabelText('خدمات اصلی')
+    const founder = screen.getByLabelText('درباره علیرضا صفایی')
+
+    expect(hero.compareDocumentPosition(proof) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(proof.compareDocumentPosition(projects) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(projects.compareDocumentPosition(services) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(services.compareDocumentPosition(founder) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(within(projects).getByTestId('flagship-project')).toContainElement(within(projects).getByRole('heading', { name: /PersianToolbox/ }))
   })
 
   it('renders three differentiated services and three visual project showcases', () => {
@@ -61,13 +81,12 @@ describe('Homepage V3.2 positioning and proof', () => {
     ).toBeInTheDocument()
   })
 
-  it('renders evidence and personal-trust surfaces instead of generic filler sections', () => {
+  it('does not publish evidence records while independent review remains pending', () => {
     render(<HomePageV3 language="fa" />)
 
     const proof = screen.getByLabelText('شواهد واقعی')
-    expect(within(proof).getByText('PersianToolbox')).toBeInTheDocument()
-    expect(within(proof).getByText('Infrastructure Localization Rescue')).toBeInTheDocument()
-    expect(within(proof).getByText('Audit Systems')).toBeInTheDocument()
+    expect(within(proof).getByText('این شواهد هنوز تأیید مستقل نشده‌اند.')).toBeInTheDocument()
+    expect(within(proof).queryByText('PersianToolbox')).not.toBeInTheDocument()
 
     const about = screen.getByLabelText('درباره علیرضا صفایی')
     expect(within(about).getByRole('heading', { level: 2, name: 'درباره من' })).toBeInTheDocument()

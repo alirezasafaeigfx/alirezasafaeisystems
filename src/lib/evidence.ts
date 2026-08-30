@@ -17,6 +17,13 @@ export type EvidenceRecord = {
 
 const isoDatePattern = /^\d{4}-\d{2}-\d{2}$/
 
+function isValidIsoDate(value: string): boolean {
+  if (!isoDatePattern.test(value)) return false
+  const [year, month, day] = value.split('-').map(Number)
+  const date = new Date(Date.UTC(year, month - 1, day))
+  return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day
+}
+
 function isRetrievableSource(sourceUrl: string): boolean {
   if (sourceUrl.startsWith('/')) return !sourceUrl.startsWith('//')
   try {
@@ -28,8 +35,8 @@ function isRetrievableSource(sourceUrl: string): boolean {
 }
 
 function hasSupportedPeriod(record: EvidenceRecord): boolean {
-  if (/published reference|accepted .*record/i.test(`${record.source} ${record.period}`)) return false
-  if (!/\d/.test(record.value)) return true
+  if (/published reference|accepted .*record|رکورد پذیرفته[‌ -]?شده|مرجع منتشر[‌ -]?شده/i.test(`${record.source} ${record.period}`)) return false
+  if (!/[0-9۰-۹]/.test(record.value)) return true
   if (!record.quantitativeSourceUrl || record.quantitativeSourceUrl !== record.sourceUrl || !isRetrievableSource(record.quantitativeSourceUrl)) return false
   if (!/(day|week|month|window|روز|هفته|ماه|بازه|20\d{2})/i.test(record.period)) return false
 
@@ -44,9 +51,11 @@ export function isPublishableEvidence(record: EvidenceRecord): boolean {
     isRetrievableSource(record.sourceUrl?.trim() ?? '') &&
     Boolean(record.reviewedBy?.trim()) &&
     !/^(self|author|owner)$/i.test(record.reviewedBy?.trim() ?? '') &&
-    isoDatePattern.test(record.reviewedAt?.trim() ?? '') &&
+    !/^(independent .*reviewer|بازبینی مستقل.*)$/i.test(record.reviewedBy?.trim() ?? '') &&
+    isValidIsoDate(record.reviewedAt?.trim() ?? '') &&
+    isValidIsoDate(record.verificationDate.trim()) &&
     hasSupportedPeriod(record) &&
-    !/accepted .*evidence .*record/i.test(record.source) &&
+    !/accepted .*evidence .*record|رکورد پذیرفته[‌ -]?شده.*شواهد/i.test(record.source) &&
     [
       record.id,
       record.label,

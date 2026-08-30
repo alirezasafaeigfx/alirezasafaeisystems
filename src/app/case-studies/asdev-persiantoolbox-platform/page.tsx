@@ -78,10 +78,10 @@ export default async function AsdevPersianToolboxPlatformPage() {
         ? 'Keeping the UI simple while expanding scope required strict component discipline and continuous removal of unnecessary complexity.'
         : 'حفظ سادگی UI در کنار گستردگی قابلیت‌ها نیازمند discipline بالا در طراحی کامپوننت و حذف مداوم پیچیدگی غیرضروری است.',
     back: lang === 'en' ? 'Back to case studies' : 'بازگشت به مطالعات موردی',
-    ctaAudit: lang === 'en' ? 'Start Free Audit' : 'شروع Audit رایگان',
+    ctaAudit: lang === 'en' ? 'Request a website review' : 'درخواست بررسی سایت',
     ctaAuditDesc: lang === 'en'
-      ? 'Want a similar assessment for your site? Start with a free audit.'
-      : 'ارزیابی مشابهی برای سایت خود می‌خواهید؟ با یک Audit رایگان شروع کنید.',
+      ? 'Want a similar assessment for your site? Send its address for review.'
+      : 'برای بررسی مشابه، آدرس سایت خود را بفرستید.',
   }
 
   const pageUrl = `${siteUrl}/${lang}/case-studies/asdev-persiantoolbox-platform`

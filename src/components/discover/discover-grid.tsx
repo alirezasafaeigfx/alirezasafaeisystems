@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { ArrowUpRight, Sparkles } from 'lucide-react'
 import { appendDiscoverAttribution, type DiscoverAttribution } from '@/lib/discover'
+import { discoverCategoryLabel, discoverPlatformLabel } from '@/lib/discover-labels'
 
 export type DiscoverGridItem = {
   slug: string
@@ -24,6 +25,7 @@ type DiscoverGridProps = {
 }
 
 export function DiscoverGrid({ items, attribution, isEn }: DiscoverGridProps) {
+  const locale = isEn ? 'en' : 'fa'
   const resourceTypeLabels: Record<string, string> = isEn
     ? { tool: 'Tool', 'ai-tool': 'AI tool', app: 'App', 'web-service': 'Web service', 'developer-tool': 'Developer tool', productivity: 'Productivity', guide: 'Guide', resource: 'Resource', other: 'Other' }
     : { tool: 'ابزار', 'ai-tool': 'ابزار هوش مصنوعی', app: 'اپلیکیشن', 'web-service': 'سرویس وب', 'developer-tool': 'ابزار توسعه', productivity: 'بهره‌وری', guide: 'راهنما', resource: 'منبع', other: 'سایر' }
@@ -97,7 +99,7 @@ export function DiscoverGrid({ items, attribution, isEn }: DiscoverGridProps) {
 
             <div className="flex flex-1 flex-col p-5">
               <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
-                <span>{item.category}</span>
+                <span>{discoverCategoryLabel(item.category, locale)}</span>
                 <span aria-hidden="true">·</span>
                 <span>{resourceTypeLabels[item.resourceType] ?? (isEn ? 'Type not specified' : 'نوع منبع اعلام نشده')}</span>
                 <span aria-hidden="true">·</span>
@@ -108,9 +110,9 @@ export function DiscoverGrid({ items, attribution, isEn }: DiscoverGridProps) {
               <p className="mt-2 line-clamp-3 text-sm leading-7 text-muted-foreground">{item.description}</p>
 
               {item.platforms.length > 0 ? (
-                <div className="mt-4 flex flex-wrap gap-x-3 gap-y-1 text-xs font-medium text-foreground/75" aria-label={`${item.title} platforms`}>
+                <div className="mt-4 flex flex-wrap gap-x-3 gap-y-1 text-xs font-medium text-foreground/75" aria-label={isEn ? `${item.title} platforms` : `پلتفرم‌های ${item.title}`}>
                   {item.platforms.slice(0, 3).map((platform) => (
-                    <span key={platform}>{platform}</span>
+                    <span key={platform}>{discoverPlatformLabel(platform, locale)}</span>
                   ))}
                 </div>
               ) : null}

@@ -43,13 +43,13 @@
   },
   {
     "route": "/fa/case-studies",
-    "lastModified": "2026-06-15T16:34:52-04:00",
+    "lastModified": "2026-08-30T14:42:56-04:00",
     "priority": 0.85,
     "changeFrequency": "monthly"
   },
   {
     "route": "/fa/discover",
-    "lastModified": "2026-08-28T03:27:30-04:00",
+    "lastModified": "2026-08-29T07:47:30-04:00",
     "priority": 0.86,
     "changeFrequency": "weekly"
   },
@@ -61,7 +61,7 @@
   },
   {
     "route": "/fa/case-studies/infrastructure-localization-rescue",
-    "lastModified": "2026-07-09T14:54:52-04:00",
+    "lastModified": "2026-08-30T18:29:39-04:00",
     "priority": 0.8,
     "changeFrequency": "monthly"
   },

@@ -74,10 +74,10 @@ export default async function CiCdGovernanceHardeningPage() {
         ? 'Stricter gates slightly increased pre-release effort but removed far larger post-release firefighting costs.'
         : 'گیت‌های سخت‌گیرانه کمی هزینه قبل از انتشار را بالا برد اما هزینه‌های بسیار بزرگ‌تر بعد از انتشار را حذف کرد.',
     back: lang === 'en' ? 'Back to case studies' : 'بازگشت به مطالعات موردی',
-    ctaAudit: lang === 'en' ? 'Start Free Audit' : 'شروع Audit رایگان',
+    ctaAudit: lang === 'en' ? 'Request a website review' : 'درخواست بررسی سایت',
     ctaAuditDesc: lang === 'en'
-      ? 'Want a similar assessment for your site? Start with a free audit.'
-      : 'ارزیابی مشابهی برای سایت خود می‌خواهید؟ با یک Audit رایگان شروع کنید.',
+      ? 'Want a similar assessment for your site? Send its address for review.'
+      : 'برای بررسی مشابه، آدرس سایت خود را بفرستید.',
   }
 
   const pageUrl = `${siteUrl}/${lang}/case-studies/ci-cd-governance-hardening`

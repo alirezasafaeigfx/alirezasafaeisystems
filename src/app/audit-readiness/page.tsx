@@ -40,7 +40,7 @@ export default async function AuditReadinessPage() {
       { label: 'حالت تعمیر و نگهداری فعال نیست', description: 'اگر سایت در حالت تعمیر باشد، Audit محتوای واقعی را نمی‌بیند.' },
       { label: 'Sitemap یا robots.txt وجود دارد', description: 'به auditor کمک می‌کند ساختار سایت شما را درک کند.' },
     ],
-    cta: lang === 'en' ? 'Start Free Audit' : 'دریافت Audit رایگان',
+    cta: lang === 'en' ? 'Request a website review' : 'درخواست بررسی سایت',
     sampleReport: lang === 'en' ? 'View Sample Report' : 'مشاهده نمونه گزارش',
   }
 
