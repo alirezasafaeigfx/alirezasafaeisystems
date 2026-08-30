@@ -16,6 +16,7 @@ import { ProjectShowcase } from '@/components/public/project-showcase'
 import { ProofStrip } from '@/components/public/proof-strip'
 import { SectionHeading } from '@/components/public/section-heading'
 import { VisualFrame } from '@/components/public/visual-frame'
+import { OperationalScene } from '@/components/public/operational-scene'
 import { trackEvent } from '@/lib/analytics/client'
 import { getHomeContent } from '@/lib/home-content'
 import { withLocale, type Locale } from '@/lib/locale-utils'
@@ -145,6 +146,7 @@ export function HomePageV3({ language }: HomePageV3Props) {
                   {isFa ? 'تصمیم‌های فنی قابل توضیح و قابل بررسی' : 'Reviewable, explainable engineering decisions'}
                 </span>
               </div>
+              <OperationalScene isFa={isFa} />
             </div>
 
             <div className="order-1 lg:order-2" data-testid="owner-portrait-frame" data-asset-status="owner-portrait">
