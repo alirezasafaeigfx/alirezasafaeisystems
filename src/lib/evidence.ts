@@ -9,11 +9,44 @@ export type EvidenceRecord = {
   method: string
   verificationDate: string
   reviewState: EvidenceReviewState
+  sourceUrl?: string
+  reviewedBy?: string
+  reviewedAt?: string
+  quantitativeSourceUrl?: string
+}
+
+const isoDatePattern = /^\d{4}-\d{2}-\d{2}$/
+
+function isRetrievableSource(sourceUrl: string): boolean {
+  if (sourceUrl.startsWith('/')) return !sourceUrl.startsWith('//')
+  try {
+    const url = new URL(sourceUrl)
+    return url.protocol === 'https:' && url.hostname.length > 0
+  } catch {
+    return false
+  }
+}
+
+function hasSupportedPeriod(record: EvidenceRecord): boolean {
+  if (/published reference|accepted .*record/i.test(`${record.source} ${record.period}`)) return false
+  if (!/\d/.test(record.value)) return true
+  if (!record.quantitativeSourceUrl || record.quantitativeSourceUrl !== record.sourceUrl || !isRetrievableSource(record.quantitativeSourceUrl)) return false
+  if (!/(day|week|month|window|روز|هفته|ماه|بازه|20\d{2})/i.test(record.period)) return false
+
+  const before = record.period.match(/before\s*:\s*(\d{4}-\d{2}-\d{2})/i)?.[1]
+  const after = record.period.match(/after\s*:\s*(\d{4}-\d{2}-\d{2})/i)?.[1]
+  return !(before && after && before >= after)
 }
 
 export function isPublishableEvidence(record: EvidenceRecord): boolean {
   return (
     record.reviewState === 'accepted' &&
+    isRetrievableSource(record.sourceUrl?.trim() ?? '') &&
+    Boolean(record.reviewedBy?.trim()) &&
+    !/^(self|author|owner)$/i.test(record.reviewedBy?.trim() ?? '') &&
+    isoDatePattern.test(record.reviewedAt?.trim() ?? '') &&
+    hasSupportedPeriod(record) &&
+    !/accepted .*evidence .*record/i.test(record.source) &&
     [
       record.id,
       record.label,

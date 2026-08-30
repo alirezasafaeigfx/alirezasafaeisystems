@@ -139,7 +139,7 @@ export function HomePageV3({ language }: HomePageV3Props) {
               <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted-foreground">
                 <span className="inline-flex items-center gap-2">
                   <CheckCircle2 className="size-4 text-primary" aria-hidden="true" />
-                  {isFa ? 'تمرکز روی استفاده واقعی در Production' : 'Built for real production use'}
+                  {isFa ? 'برای استفاده واقعی و قابل اتکا ساخته شده' : 'Built for dependable real-world use'}
                 </span>
                 <span className="inline-flex items-center gap-2">
                   <Code2 className="size-4 text-primary" aria-hidden="true" />
@@ -243,6 +243,7 @@ export function HomePageV3({ language }: HomePageV3Props) {
             eyebrow={copy.proofEyebrow}
             title={copy.proofTitle}
             description={copy.proofDescription}
+            language={language}
             items={
               isFa
                   ? content.proof.items.map((item) => ({ title: item.label, description: item.value, evidence: item }))

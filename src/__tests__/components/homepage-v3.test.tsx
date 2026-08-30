@@ -24,7 +24,7 @@ describe('Homepage V3.2 positioning and proof', () => {
 
     const actions = within(hero).getByRole('group', { name: 'اقدام‌های اصلی' })
     expect(within(actions).getAllByRole('link')).toHaveLength(2)
-    expect(within(actions).getByRole('link', { name: 'درخواست ارزیابی Audit' })).toHaveAttribute(
+    expect(within(actions).getByRole('link', { name: 'درخواست بررسی سایت' })).toHaveAttribute(
       'href',
       '/qualification?source=portfolio&placement=hero&offer=request_assessment',
     )
@@ -77,7 +77,7 @@ describe('Homepage V3.2 positioning and proof', () => {
     render(<HomePageV3 language="fa" />)
 
     const hero = screen.getByRole('region', { name: 'معرفی علیرضا صفایی' })
-    fireEvent.click(within(hero).getByRole('link', { name: 'درخواست ارزیابی Audit' }))
+    fireEvent.click(within(hero).getByRole('link', { name: 'درخواست بررسی سایت' }))
     fireEvent.click(within(hero).getByRole('link', { name: 'مشاهده پروژه‌ها' }))
 
     expect(trackEventMock).toHaveBeenCalledWith({

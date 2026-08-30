@@ -8,7 +8,7 @@ describe('home content', () => {
     expect(content.hero).toMatchObject({
       name: 'مهندسی تحریریه + رابط عملیاتی',
       title: 'سیستم‌های عملیاتی را قابل دیدن می‌کنم',
-      primaryCta: 'درخواست ارزیابی Audit',
+      primaryCta: 'درخواست بررسی سایت',
       secondaryCta: 'مشاهده پروژه‌ها',
     })
   })
@@ -19,7 +19,7 @@ describe('home content', () => {
     expect(content.hero).toMatchObject({
       name: 'Engineering Editorial + Operational Interface',
       title: 'Operational systems made visible',
-      primaryCta: 'Request an ASDEV Audit',
+      primaryCta: 'Request a website review',
       secondaryCta: 'View projects',
     })
   })

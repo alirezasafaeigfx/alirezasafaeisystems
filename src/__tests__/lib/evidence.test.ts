@@ -10,6 +10,9 @@ const acceptedEvidence: EvidenceRecord = {
   method: 'Governed workflow, internal smoke, and two public browser passes',
   verificationDate: '2026-08-30',
   reviewState: 'accepted',
+  sourceUrl: 'https://github.com/alirezasafaeigfx/alirezasafaeisystems/actions/runs/33332174608',
+  reviewedBy: 'Independent release reviewer',
+  reviewedAt: '2026-08-30',
 }
 
 describe('typed public evidence', () => {
@@ -20,5 +23,18 @@ describe('typed public evidence', () => {
   it('rejects unreviewed or incomplete evidence', () => {
     expect(isPublishableEvidence({ ...acceptedEvidence, reviewState: 'draft' })).toBe(false)
     expect(isPublishableEvidence({ ...acceptedEvidence, method: '' })).toBe(false)
+  })
+
+  it('rejects an accepted claim without a retrievable source or independent review identity', () => {
+    expect(isPublishableEvidence({ ...acceptedEvidence, sourceUrl: '' })).toBe(false)
+    expect(isPublishableEvidence({ ...acceptedEvidence, reviewedBy: '' })).toBe(false)
+    expect(isPublishableEvidence({ ...acceptedEvidence, reviewedAt: 'not-a-date' })).toBe(false)
+    expect(isPublishableEvidence({ ...acceptedEvidence, source: 'Accepted infrastructure rescue evidence record' })).toBe(false)
+  })
+
+  it('rejects unsupported quantitative claims with malformed or conflicting periods', () => {
+    expect(isPublishableEvidence({ ...acceptedEvidence, value: '180m → 55m', period: 'Published reference' })).toBe(false)
+    expect(isPublishableEvidence({ ...acceptedEvidence, value: '0 in final 21 days', period: 'Six-week intervention window' })).toBe(false)
+    expect(isPublishableEvidence({ ...acceptedEvidence, value: '55m', period: 'before: 2026-08-30; after: 2026-08-01' })).toBe(false)
   })
 })

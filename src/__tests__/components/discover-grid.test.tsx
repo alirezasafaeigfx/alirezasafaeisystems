@@ -71,14 +71,14 @@ describe('DiscoverGrid', () => {
     const featured = screen.getByRole('article', { name: 'منبع منتخب: NotebookLM' })
     const regular = screen.getByRole('article', { name: 'منبع: Canva' })
 
-    expect(within(featured).getByText('ai-tool')).toBeInTheDocument()
+    expect(within(featured).getByText('ابزار هوش مصنوعی')).toBeInTheDocument()
     expect(within(featured).getByText('Web')).toBeInTheDocument()
-    expect(within(featured).getByText('free')).toBeInTheDocument()
+    expect(within(featured).getByText('رایگان')).toBeInTheDocument()
     expect(within(featured).getAllByRole('link')).toHaveLength(1)
 
-    expect(within(regular).getByText('app')).toBeInTheDocument()
+    expect(within(regular).getByText('اپلیکیشن')).toBeInTheDocument()
     expect(within(regular).getByText('Android')).toBeInTheDocument()
-    expect(within(regular).getByText('freemium')).toBeInTheDocument()
+    expect(within(regular).getByText('رایگان با امکانات بیشتر')).toBeInTheDocument()
     expect(within(regular).queryByText('منتخب')).not.toBeInTheDocument()
     expect(within(regular).getAllByRole('link')).toHaveLength(1)
   })

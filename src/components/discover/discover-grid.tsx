@@ -24,6 +24,12 @@ type DiscoverGridProps = {
 }
 
 export function DiscoverGrid({ items, attribution, isEn }: DiscoverGridProps) {
+  const resourceTypeLabels: Record<string, string> = isEn
+    ? { tool: 'Tool', 'ai-tool': 'AI tool', app: 'App', 'web-service': 'Web service', 'developer-tool': 'Developer tool', productivity: 'Productivity', guide: 'Guide', resource: 'Resource', other: 'Other' }
+    : { tool: 'ابزار', 'ai-tool': 'ابزار هوش مصنوعی', app: 'اپلیکیشن', 'web-service': 'سرویس وب', 'developer-tool': 'ابزار توسعه', productivity: 'بهره‌وری', guide: 'راهنما', resource: 'منبع', other: 'سایر' }
+  const pricingLabels: Record<string, string> = isEn
+    ? { free: 'Free', freemium: 'Free with paid options', paid: 'Paid', 'open-source': 'Open source', unknown: 'Pricing not specified' }
+    : { free: 'رایگان', freemium: 'رایگان با امکانات بیشتر', paid: 'پولی', 'open-source': 'متن‌باز', unknown: 'وضعیت قیمت اعلام نشده' }
   const copy = isEn
     ? {
         featured: 'Featured',
@@ -93,9 +99,9 @@ export function DiscoverGrid({ items, attribution, isEn }: DiscoverGridProps) {
               <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
                 <span>{item.category}</span>
                 <span aria-hidden="true">·</span>
-                <span>{item.resourceType}</span>
+                <span>{resourceTypeLabels[item.resourceType] ?? (isEn ? 'Type not specified' : 'نوع منبع اعلام نشده')}</span>
                 <span aria-hidden="true">·</span>
-                <span>{item.pricingModel}</span>
+                <span>{pricingLabels[item.pricingModel] ?? (isEn ? 'Pricing not specified' : 'وضعیت قیمت اعلام نشده')}</span>
               </div>
 
               <h2 className="mt-3 text-xl font-semibold leading-8 tracking-tight">{item.title}</h2>

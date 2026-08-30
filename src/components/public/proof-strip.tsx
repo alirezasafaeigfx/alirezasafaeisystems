@@ -1,5 +1,7 @@
 import { CheckCircle2 } from 'lucide-react'
+import Link from 'next/link'
 import { isPublishableEvidence, type EvidenceRecord } from '@/lib/evidence'
+import type { Locale } from '@/lib/locale-utils'
 
 export type ProofItem = {
   title: string
@@ -13,9 +15,14 @@ type ProofStripProps = {
   title: string
   description: string
   items: ProofItem[]
+  language: Locale
 }
 
-export function ProofStrip({ ariaLabel, eyebrow, title, description, items }: ProofStripProps) {
+export function ProofStrip({ ariaLabel, eyebrow, title, description, items, language }: ProofStripProps) {
+  const provenance = language === 'fa'
+    ? { summary: 'منشأ شواهد', source: 'منبع', period: 'بازه', method: 'روش', verified: 'تاریخ بررسی' }
+    : { summary: 'Evidence provenance', source: 'Source', period: 'Period', method: 'Method', verified: 'Reviewed' }
+
   return (
     <section aria-label={ariaLabel} className="public-surface overflow-hidden rounded-[2rem]">
       <div className="grid gap-8 p-6 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] md:p-8 lg:p-10">
@@ -31,12 +38,21 @@ export function ProofStrip({ ariaLabel, eyebrow, title, description, items }: Pr
               <p className="mt-5 text-lg font-black">{item.title}</p>
               <p className="mt-2 text-sm leading-7 text-muted-foreground">{item.description}</p>
               <details className="mt-4 text-xs leading-6 text-muted-foreground">
-                <summary className="cursor-pointer font-semibold text-foreground">Evidence provenance</summary>
+                <summary className="cursor-pointer font-semibold text-foreground">{provenance.summary}</summary>
                 <dl className="mt-2 space-y-1">
-                  <div><dt className="inline font-semibold">Source: </dt><dd className="inline">{item.evidence.source}</dd></div>
-                  <div><dt className="inline font-semibold">Period: </dt><dd className="inline">{item.evidence.period}</dd></div>
-                  <div><dt className="inline font-semibold">Method: </dt><dd className="inline">{item.evidence.method}</dd></div>
-                  <div><dt className="inline font-semibold">Verified: </dt><dd className="inline">{item.evidence.verificationDate}</dd></div>
+                  <div>
+                    <dt className="inline font-semibold">{provenance.source}: </dt>
+                    <dd className="inline">
+                      {item.evidence.sourceUrl ? (
+                        <Link href={item.evidence.sourceUrl} className="underline underline-offset-2">
+                          {item.evidence.source}
+                        </Link>
+                      ) : item.evidence.source}
+                    </dd>
+                  </div>
+                  <div><dt className="inline font-semibold">{provenance.period}: </dt><dd className="inline">{item.evidence.period}</dd></div>
+                  <div><dt className="inline font-semibold">{provenance.method}: </dt><dd className="inline">{item.evidence.method}</dd></div>
+                  <div><dt className="inline font-semibold">{provenance.verified}: </dt><dd className="inline">{item.evidence.verificationDate}</dd></div>
                 </dl>
               </details>
             </div>
