@@ -35,7 +35,7 @@ This ledger records state and evidence. It does not create work independently. I
 | repository ruleset | `protect-main-release-governance`, ID `21861412`, `target=branch`, `enforcement=active`, include `refs/heads/main` | active repository ruleset targets `main`; current user bypass is `never`; bypass actors `[]`; zero approvals and stable required checks enforced |
 | PR #18 | canonical V3.2 documentation PR; original head `48eb38afe66ab80bbd1767e5240f06bd81d7450a` | supporting docs source; must not become a competing roadmap |
 | immersive documentation branch | `docs/v3-2-immersive-interaction-spec` | isolated docs-only continuation from PR #18 head |
-| PR #20 | draft, CI-green, bounded three-file staging-smoke change | existing R0-03B implementation; review/accept it instead of reimplementing |
+| PR #20 | `MERGED` as `d1592ac749ad5113f72655c78622e67cbc86516e` | head `6a00220da048a772ab0a950b1362f56741c7a2c9`; exact three-file same-VPS smoke/DNS-separation fix; fresh protected checks green | R0-03B accepted; proceed to one governed staging attempt |
 | PR #21 | `MERGED` as `308c2753eabab74d1dc0031fd0e2b76a4fabee39` | head `dc77060afea987bdfde45538b43ca5fef1feaf8e`; all hosted checks green; guard covers sensitive paths, declarations, ancestry and fail-closed categories | reuse merged governance correction |
 | Public production sample | Home content did not match `main@39c686d4...`; `/discover`, `/blog`, and flagship samples returned `502` during review | exact production identity and current route health are unresolved until fresh R0-05 observation |
 
@@ -47,8 +47,8 @@ This ledger records state and evidence. It does not create work independently. I
 | R0-02 | `REUSED-DONE` | QA/SRE | workflow fix + exact candidate deployment | compressed archive contract proved by run `33303771900` | reuse; do not redesign transport |
 | R0-03 | `DONE-FAILED-SAFE` | SRE/QA | exact candidate `41a80235...` | deploy/health PASS; public smoke DNS resolution timeout; live verification skipped; exact rollback PASS | feeds R0-03A; do not classify as app failure |
 | R0-03A | `REUSED-DONE` | SRE/QA | runs `33303771900` + `33298314611` | transient VPS resolver-path incident; exact sublayer absent from instrumentation | no repeat diagnosis; preserve uncertainty |
-| R0-03B | `BLOCKED — EXISTS-UNMERGED` | SRE/QA/REVIEW | draft PR #20 | bounded same-VPS smoke correction; CI green | R0-05B, then scope/contract review and governed acceptance of existing PR |
-| R0-03C | `BLOCKED` | SRE/QA | exact accepted R0-03B head | none yet | literal `APPROVE_PHASE_2_STAGING_DEPLOY`; one governed rerun only |
+| R0-03B | `DONE` | SRE/QA/REVIEW | PR #20 head `6a00220...` → merge `d1592ac...` | exact three-file scope; current-main ancestry; protected router, quality, smoke, Lighthouse and security checks green | proceed to R0-03C |
+| R0-03C | `READY — APPROVED` | SRE/QA | immutable `GITHUB_MAIN@d1592ac749ad5113f72655c78622e67cbc86516e` | staging approval literal granted in current session | execute exactly one governed staging attempt; record health, two public passes or failed-safe rollback |
 | R0-04 | `REUSED-DONE` | REVIEW | exact app SHA `41a80235...` | existing exact-SHA evidence + PR #21 report | do not repeat unless inputs change |
 | R0-05 | `BLOCKED` | ORCH/SRE | actual public release truth | source/main and public observation disagree | R0-03C; observe exact production identity/release path rather than infer |
 | R0-05A | `READY — EXISTS-UNMERGED` | ORCH/QA | `main@39c686d4...` → PR #21 `dc77060afea987bdfde45538b43ca5fef1feaf8e` | six-file bounded diff; hosted Router, quality, smoke, Lighthouse, security and CodeQL checks green; local focused 7/7, type-check and lint 0 errors | remains draft during incident freeze; no merge or settings mutation |
