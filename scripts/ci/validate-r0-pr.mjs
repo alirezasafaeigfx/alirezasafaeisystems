@@ -35,11 +35,11 @@ export function validateR0PullRequest({
   mainSha,
   changedFiles,
   scope,
-  taskId,
-  intendedBaseSha,
-  primaryConcern,
-  expectedCategories,
-  mergeBaseSha,
+  taskId = '',
+  intendedBaseSha = '',
+  primaryConcern = '',
+  expectedCategories = /** @type {string[]} */ ([]),
+  mergeBaseSha = '',
   headIsDescendant = true,
 }) {
   const errors = []
