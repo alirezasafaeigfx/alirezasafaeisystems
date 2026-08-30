@@ -58,19 +58,19 @@ function getCases(lang: 'fa' | 'en'): CaseStudyItem[] {
       {
         title: 'Infrastructure Localization Rescue',
         sector: 'B2B SaaS',
-        outcome: 'MTTR reduced from 180 minutes to 55 minutes in 6 weeks',
+        outcome: 'Documented release-governance and recovery evidence',
         href: '/case-studies/infrastructure-localization-rescue',
       },
       {
         title: 'Legacy Next.js Replatform',
         sector: 'FinTech',
-        outcome: 'Release failure rate reduced by 58% in 5 weeks',
+        outcome: 'Documented replatform and release evidence',
         href: '/case-studies/legacy-nextjs-replatform',
       },
       {
         title: 'CI/CD Governance Hardening',
         sector: 'Enterprise B2B',
-        outcome: 'Zero emergency rollback over 30 days',
+        outcome: 'Documented rollback-readiness evidence',
         href: '/case-studies/ci-cd-governance-hardening',
       },
     ]
@@ -105,19 +105,19 @@ function getCases(lang: 'fa' | 'en'): CaseStudyItem[] {
     {
       title: 'نجات بومی‌سازی زیرساخت',
       sector: 'SaaS سازمانی',
-      outcome: 'کاهش MTTR از ۱۸۰ دقیقه به ۵۵ دقیقه در ۶ هفته',
+      outcome: 'شواهد مستند حاکمیت انتشار و بازیابی',
       href: '/case-studies/infrastructure-localization-rescue',
     },
     {
       title: 'بازپلتفرم Next.js قدیمی',
       sector: 'فین‌تک',
-      outcome: 'کاهش نرخ شکست انتشار به میزان ۵۸٪ در ۵ هفته',
+      outcome: 'شواهد مستند بازپلتفرم و انتشار',
       href: '/case-studies/legacy-nextjs-replatform',
     },
     {
       title: 'سخت‌سازی حاکمیت CI/CD',
       sector: 'B2B سازمانی',
-      outcome: 'صفر rollback اضطراری در ۳۰ روز',
+      outcome: 'شواهد مستند آمادگی rollback',
       href: '/case-studies/ci-cd-governance-hardening',
     },
   ]
