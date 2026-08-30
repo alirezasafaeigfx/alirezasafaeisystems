@@ -1,6 +1,6 @@
 # Agent Governance — ASDEV (AlirezaSafaeiSystems Mother Repo)
 
-**Last Updated**: 2026-07-10
+**Last Updated**: 2026-08-30
 **Status**: Active
 
 ## Autonomous Loop Governance (mandatory)
@@ -76,6 +76,11 @@ Prompt/policy/queue files committed to GitHub must become discoverable on `AUTOM
 ## ASDEV Focus Rule (mandatory)
 
 > The current strategic focus is ASDEV Audit Platform. Agents must not start unrelated product work, create new product scopes, revive frozen projects, or make DevAtlas standalone unless the task directly supports ASDEV Audit acquisition, conversion, retention, report quality, reliability, or revenue.
+
+**Active public-experience execution:** [`docs/roadmaps/ASDEV_PUBLIC_EXPERIENCE_EXECUTION.md`](docs/roadmaps/ASDEV_PUBLIC_EXPERIENCE_EXECUTION.md)  
+**Codex execution prompt:** [`prompts/codex/V3_2_YOLO_LOOP.md`](prompts/codex/V3_2_YOLO_LOOP.md)
+
+The prompt file is inert until the owner/user explicitly invokes it. Once invoked, its dependency loop governs that execution inside all existing approval, security, and release gates.
 
 Every agent task must answer:
 

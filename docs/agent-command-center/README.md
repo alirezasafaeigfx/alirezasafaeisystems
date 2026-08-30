@@ -8,9 +8,16 @@ Primary product: **ASDEV Audit Platform**.
 
 1. `docs/strategy/ASDEV_AUDIT_MASTER_ROADMAP.md`
 2. `docs/strategy/FOCUS_POLICY.md`
-3. `AGENTS.md`
-4. `docs/agent-command-center/NEXT_AGENT_PROMPT.md`
-5. `docs/agent-command-center/REPORT_TEMPLATE.md`
+3. `docs/roadmaps/ASDEV_PUBLIC_EXPERIENCE_EXECUTION.md`
+4. `docs/execution/V3_2_AGENT_SPRINTS.md`
+5. `docs/execution/V3_2_WORK_LEDGER.md`
+6. `AGENTS.md`
+7. `docs/agent-command-center/NEXT_AGENT_PROMPT.md`
+8. `docs/agent-command-center/REPORT_TEMPLATE.md`
+
+## V3.2 autonomous execution
+
+`prompts/codex/V3_2_YOLO_LOOP.md` is a copy-ready execution prompt, not an automatic queue trigger. It becomes active only when the owner/user explicitly invokes it. For that invocation, the dependency loop replaces the single-task stop pattern below; approval, security, production, and destructive-action gates remain unchanged.
 
 ## Workflow
 

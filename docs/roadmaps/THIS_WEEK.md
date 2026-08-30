@@ -1,17 +1,12 @@
-# THIS WEEK — ASDEV
+# Historical Roadmap Compatibility Pointer
 
-**Period:** 2026-07-08 → 2026-07-15  
-**Also:** `NEXT_WEEK_ROADMAP.md`, `docs/roadmaps/NEXT_7_DAYS.md`
+**Status:** Superseded — do not select tasks from this file  
+**Superseded:** 2026-08-30
 
-## Focus
+Active execution is dependency-driven:
 
-1. Merge control-plane + production ops PRs  
-2. Keep CRITICAL_SITE app-layer stable (edge gated)  
-3. Control plane queue + health as daily habit  
-4. No micro-task thrash on AUTOMATION_HOST  
+- `docs/roadmaps/ASDEV_PUBLIC_EXPERIENCE_EXECUTION.md`
+- `docs/execution/V3_2_AGENT_SPRINTS.md`
+- `docs/execution/V3_2_WORK_LEDGER.md`
 
-## Gates
-
-- `APPROVE_CRITICAL_SITE_PUBLIC_EDGE`
-- `APPROVE_MONITORING_LIVE_TIMERS`
-- `APPROVE_CRITICAL_SITE_MIGRATION`
+Calendar day/week/month/quarter planning was frozen by `docs/strategy/FROZEN_BACKLOG.md`. Git history preserves the former contents.

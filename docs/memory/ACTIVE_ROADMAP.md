@@ -1,35 +1,28 @@
 # Active Roadmap (Memory Control Center)
 
-**Updated:** 2026-07-08  
-**Canonical files also:** `/roadmap/*`, `docs/roadmaps/*`
+**Updated:** 2026-08-30  
+**Canonical execution file:** `docs/roadmaps/ASDEV_PUBLIC_EXPERIENCE_EXECUTION.md`
 
----
+## Now
 
-## Now (OS factory)
+R0 — repair the verified deployment-workflow timeout without changing the owner-approved application candidate `41a80235c83ec6949d518bd7fa034814d6e43fef`. Run `33298314611` deployed staging release `20260830T070559Z`; health, smoke and live pass 1 passed, while pass 2 was cancelled after the uncompressed source transfer consumed most of the 45-minute job budget.
 
-1. Finish Operating System docs + control-plane maturity (this loop)  
-2. Project registry completeness  
-3. Universal deployment model  
-4. Observability architecture (no live install)  
-5. Security baseline docs  
+## Next dependency path
 
-## Next (still safe)
+1. S1 — evidence-led positioning, quantitative proof, Audit-first CTA, focused IA.
+2. S2 — flagship technical-documentary Case Study and provenance contract.
+3. S3 — Discover slow-network media integrity and honest Blog navigation/readiness.
+4. S4 — Engineering Editorial visual system, card reduction, mobile authorship, purposeful motion.
+5. S5 — independent review, full verification, staging, live verification, governed release.
 
-- Standardize each site to project.yaml + health/rollback docs  
-- Deploy engine zero-downtime tests (dry)  
-- Agent heartbeat + stale task automation  
+## Hard constraints
 
-## Gated later
+- V3 remains frozen; V3.2 is a separate post-release program.
+- ASDEV Audit is the primary business; portfolio work must improve trust, acquisition, conversion, or reliability.
+- Stale unchecked V3.1 plan boxes do not authorize repeat work.
+- Production, migration, content publication, force-push, and destructive actions remain gated.
+- GitHub exact SHA and primary evidence override chat summaries.
 
-| Order | Item | Phrase |
-|-------|------|--------|
-| 1 | Public edge CRITICAL_SITE | `APPROVE_CRITICAL_SITE_PUBLIC_EDGE` |
-| 2 | Live monitoring timers | `APPROVE_MONITORING_LIVE_TIMERS` |
-| 3 | Second prod release (rollback history) | `APPROVE_CRITICAL_SITE_PRODUCTION_DEPLOY` |
-| 4 | Migrations if needed | `APPROVE_CRITICAL_SITE_MIGRATION` |
-| 5 | Other sites staging/prod | respective phrases |
+## Legacy roadmap note
 
-## Not now
-
-- Manual one-off site hacks without standards  
-- SaaS lock-in for monitoring  
+Day/week/month/quarter queues are historical pointers only. Dependency-driven task selection in the canonical execution roadmap controls agent work.

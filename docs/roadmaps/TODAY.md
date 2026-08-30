@@ -1,24 +1,12 @@
-# TODAY — ASDEV
+# Historical Roadmap Compatibility Pointer
 
-**Date:** 2026-07-08  
-**Also:** `/TODAY_ROADMAP.md`
+**Status:** Superseded — do not select tasks from this file  
+**Superseded:** 2026-08-30
 
-## Done
+Active execution is dependency-driven:
 
-- CRITICAL_SITE app-layer STABLE  
-- Post-prod stabilization  
-- **AUTOMATION_HOST control plane transform v1**
+- `docs/roadmaps/ASDEV_PUBLIC_EXPERIENCE_EXECUTION.md`
+- `docs/execution/V3_2_AGENT_SPRINTS.md`
+- `docs/execution/V3_2_WORK_LEDGER.md`
 
-## Now
-
-- Land control-plane PR  
-- Use queue + health check in daily ops  
-
-## Stop / gated
-
-- Public edge · live timers · migrations  
-
-## Do not
-
-- Scatter micro-tasks on AUTOMATION_HOST  
-- Mutate production without phrase  
+Calendar day/week/month/quarter planning was frozen by `docs/strategy/FROZEN_BACKLOG.md`. Git history preserves the former contents.
