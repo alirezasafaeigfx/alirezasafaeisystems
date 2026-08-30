@@ -1,12 +1,35 @@
-# Historical Roadmap Compatibility Pointer
+# MONTHLY_ROADMAP — ASDEV
 
-**Status:** Superseded — do not select tasks from this file  
-**Superseded:** 2026-08-30
+**Period:** July 2026 (rolling 30 days)
 
-Active execution is dependency-driven:
+---
 
-- `docs/roadmaps/ASDEV_PUBLIC_EXPERIENCE_EXECUTION.md`
-- `docs/execution/V3_2_AGENT_SPRINTS.md`
-- `docs/execution/V3_2_WORK_LEDGER.md`
+## Theme
 
-Calendar day/week/month/quarter planning was frozen by `docs/strategy/FROZEN_BACKLOG.md`. Git history preserves the former contents.
+Turn CRITICAL_SITE first app-layer success into a **repeatable multi-site production platform**.
+
+## Outcomes
+
+| Outcome | Measure |
+|---------|---------|
+| Public CRITICAL_SITE | HTTPS 200 on domain via nginx→3100 |
+| Backup discipline | Freshness check green ≤ 36h; restore drill logged |
+| Platform standard | New site onboarded via `templates/site-standard` only |
+| Agent continuity | `AGENT_MEMORY` + handoff always current |
+| Rollback maturity | ≥2 production releases → symlink rollback proven |
+
+## Workstreams
+
+1. **Edge & launch** — public edge, DNS/SSL, smoke  
+2. **Resilience** — backup encrypt, offsite, quarterly drill  
+3. **Observability** — timers, deploy status, disk, backup age  
+4. **Multi-site** — registry rows, port isolation, template  
+5. **Automation host** — optional workers/runners without fragility  
+
+## Stop rules
+
+- No production/edge/migration without exact phrase  
+- No secrets in git or reports  
+- Prefer one PR per major phase  
+
+Also: `docs/roadmaps/NEXT_30_DAYS.md`

@@ -1,12 +1,10 @@
-# Historical Roadmap Compatibility Pointer
+# QUARTER — ASDEV
 
-**Status:** Superseded — do not select tasks from this file  
-**Superseded:** 2026-08-30
+**Also:** `docs/roadmaps/NEXT_90_DAYS.md`
 
-Active execution is dependency-driven:
+## Themes
 
-- `docs/roadmaps/ASDEV_PUBLIC_EXPERIENCE_EXECUTION.md`
-- `docs/execution/V3_2_AGENT_SPRINTS.md`
-- `docs/execution/V3_2_WORK_LEDGER.md`
-
-Calendar day/week/month/quarter planning was frozen by `docs/strategy/FROZEN_BACKLOG.md`. Git history preserves the former contents.
+1. Production-grade multi-site platform  
+2. Agent OS: registry, queue, memory, loops  
+3. IRAN_PROD reliability + edge  
+4. Reduce manual orchestration to phrase-gated exceptions  

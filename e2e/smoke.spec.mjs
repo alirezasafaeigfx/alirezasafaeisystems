@@ -27,7 +27,7 @@ test.describe('smoke', () => {
     await expect(page.getByLabel('پروژه‌های منتخب')).toBeVisible()
   })
 
-  test('Homepage V3 keeps its FA mobile CTA and service contract', async ({ page }) => {
+  test('Homepage V3.2 keeps its FA mobile Audit CTA and service contract', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 })
     const pageErrors = []
     const failedRequests = []
@@ -36,9 +36,9 @@ test.describe('smoke', () => {
 
     await page.goto('/')
     const hero = page.getByLabel('معرفی علیرضا صفایی')
-    await expect(hero.getByRole('heading', { level: 1 })).toContainText('مهندس نرم‌افزار')
+    await expect(hero.getByRole('heading', { level: 1 })).toContainText('سیستم‌های عملیاتی را قابل دیدن می‌کنم')
     await expect(hero.getByRole('link')).toHaveCount(2)
-    await expect(hero.getByRole('link', { name: 'شروع همکاری' })).toBeVisible()
+    await expect(hero.getByRole('link', { name: 'درخواست ارزیابی Audit' })).toBeVisible()
     await expect(page.getByLabel('خدمات اصلی').getByRole('article')).toHaveCount(3)
     expect(pageErrors).toEqual([])
     expect(failedRequests).toEqual([])
@@ -47,16 +47,21 @@ test.describe('smoke', () => {
   test('language switch sets english direction', async ({ page }) => {
     await page.goto('/en')
     await expect.poll(async () => page.evaluate(() => document.documentElement.dir)).toBe('ltr')
-    await expect(page.locator('h1')).toContainText('Software Engineer')
+    await expect(page.locator('h1')).toContainText('Operational systems made visible')
   })
 
-  test('Discover keeps English locale and presents the Resource Hub contract', async ({ page }) => {
+  test('Discover keeps English locale and presents the search-first Resource Hub contract', async ({ page }) => {
     await page.goto('/en/discover')
     await expect.poll(async () => page.evaluate(() => document.documentElement.lang)).toBe('en')
     await expect.poll(async () => page.evaluate(() => document.documentElement.dir)).toBe('ltr')
-    await expect(page.locator('h1')).toContainText('Find the tools and resources I mention on Instagram')
-    await expect(page.getByText('Search a name, open its real official destination, read the quick guide, and use the full Telegram resource when one is available.')).toBeVisible()
-    await expect(page.getByText('Use this page as the single link in my Instagram bio; no DM automation is required.')).toBeVisible()
+    await expect(page.getByRole('heading', { level: 1, name: 'Find the tool. Get the real source.' })).toBeVisible()
+    await expect(page.getByRole('search', { name: 'Search resources' })).toBeVisible()
+    await expect(page.getByRole('searchbox', { name: 'Search resources' })).toBeVisible()
+    await expect(page.getByRole('group', { name: 'Resource filters' })).toBeVisible()
+    await expect(page.getByRole('combobox', { name: 'Category' })).toBeVisible()
+    await expect(page.getByRole('combobox', { name: 'Resource type' })).toBeVisible()
+    await expect(page.getByRole('combobox', { name: 'Platform' })).toBeVisible()
+    await expect(page.getByRole('combobox', { name: 'Sort' })).toBeVisible()
   })
 
   test('Discover resource detail preserves the exact Telegram guide link without campaign leakage', async ({ page }) => {

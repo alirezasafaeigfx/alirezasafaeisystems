@@ -1,12 +1,15 @@
-# Historical Roadmap Compatibility Pointer
+# TODAY — Control Center
 
-**Status:** Superseded — do not select tasks from this file  
-**Superseded:** 2026-08-30
+**Focus:** Product quality toward 8–10 · OS already on main
 
-Active execution is dependency-driven:
+## Done
+- OS v2 on main
+- Product quality pack + SEO content factory (persiantoolbox `0c16bec`)
+- Edge prep checklist (no apply)
 
-- `docs/roadmaps/ASDEV_PUBLIC_EXPERIENCE_EXECUTION.md`
-- `docs/execution/V3_2_AGENT_SPRINTS.md`
-- `docs/execution/V3_2_WORK_LEDGER.md`
+## Now
+- Safe product depth / a11y
+- Wait phrases for public edge / timers / prod redeploy
 
-Calendar day/week/month/quarter planning was frozen by `docs/strategy/FROZEN_BACKLOG.md`. Git history preserves the former contents.
+## Not 10/10 yet
+Public edge OFF · IRAN app-layer only · no verified reviews at scale

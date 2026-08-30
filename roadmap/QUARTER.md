@@ -1,12 +1,10 @@
-# Historical Roadmap Compatibility Pointer
+# QUARTER — Control Center
 
-**Status:** Superseded — do not select tasks from this file  
-**Superseded:** 2026-08-30
+**Theme:** ASDEV as multi-project, multi-agent operating system.
 
-Active execution is dependency-driven:
+Outcomes:
 
-- `docs/roadmaps/ASDEV_PUBLIC_EXPERIENCE_EXECUTION.md`
-- `docs/execution/V3_2_AGENT_SPRINTS.md`
-- `docs/execution/V3_2_WORK_LEDGER.md`
-
-Calendar day/week/month/quarter planning was frozen by `docs/strategy/FROZEN_BACKLOG.md`. Git history preserves the former contents.
+1. Any new site deploys via same engine  
+2. Agents share memory, queue, gates, registry  
+3. Observability + DR are boring and reliable  
+4. CRITICAL_SITE public + others follow factory pattern  

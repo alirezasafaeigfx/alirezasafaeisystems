@@ -1,12 +1,47 @@
-# Historical Roadmap Compatibility Pointer
+# NEXT 7 DAYS — ASDEV Roadmap
 
-**Status:** Superseded — do not select tasks from this file  
-**Superseded:** 2026-08-30
+**Period:** 2026-07-08 to 2026-07-15  
+**Source of Truth:** GitHub  
+**Canonical also:** `/NEXT_WEEK_ROADMAP.md`
 
-Active execution is dependency-driven:
+---
 
-- `docs/roadmaps/ASDEV_PUBLIC_EXPERIENCE_EXECUTION.md`
-- `docs/execution/V3_2_AGENT_SPRINTS.md`
-- `docs/execution/V3_2_WORK_LEDGER.md`
+## 1. CRITICAL_SITE production path
 
-Calendar day/week/month/quarter planning was frozen by `docs/strategy/FROZEN_BACKLOG.md`. Git history preserves the former contents.
+- [x] Staging live + health  
+- [x] Production app-layer on 3100  
+- [ ] Public edge after `APPROVE_CRITICAL_SITE_PUBLIC_EDGE`  
+- [ ] External smoke green  
+- [ ] Optional staging rebind 3200  
+
+---
+
+## 2. Backup & DR
+
+- [x] DR runbook for CRITICAL_SITE  
+- [ ] Onsite backup path under `/srv/asdev/backups`  
+- [ ] Restore drill report  
+
+---
+
+## 3. Monitoring
+
+- [x] Foundation scripts + standard  
+- [x] App-layer + deploy-status probes  
+- [ ] Live timers only with `APPROVE_MONITORING_LIVE_TIMERS`  
+
+---
+
+## 4. Platform standardization
+
+- [x] Universal site-standard template  
+- [x] Clean root standard  
+- [ ] Second site onboard dry-run using template only  
+
+---
+
+## 5. CI
+
+- [x] Classify multi-workflow fail as infra-class  
+- [ ] Confirm green when GHA recovers  
+- [ ] Prefer local CI Router for mission merges when infra-red  

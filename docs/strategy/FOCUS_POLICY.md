@@ -1,5 +1,9 @@
 # ASDEV Focus Policy
 
+## Approved public-experience scope — 2026-08-30
+
+The owner explicitly admits the [ASDEV public-experience roadmap](../roadmaps/ASDEV_PUBLIC_EXPERIENCE_EXECUTION.md) for this repository: distinctive interactive visual design, clear conversational Persian for nontechnical Iranian visitors, authored mobile, truthful case studies and a clear website-assessment path. These support trust, acquisition and service conversion for the existing business. Meaningful motion and the bounded advanced/GPU prototype are legitimate approved product work; they do not require an invented prior conversion uplift or a new product. Do not divert these sprints into audit-platform or control-plane development. Other unrelated products remain frozen under the policy below.
+
 **Effective:** 2026-07-06  
 **Authority:** Canonical — overrides all older roadmaps, Obsidian queues, and secondary project objectives
 

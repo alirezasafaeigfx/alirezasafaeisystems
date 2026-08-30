@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { DiscoverGrid } from '@/components/discover/discover-grid'
 
@@ -11,6 +11,9 @@ const items = [
     tags: ['research', 'productivity'],
     featured: true,
     imageUrl: null,
+    resourceType: 'ai-tool',
+    platforms: ['Web'],
+    pricingModel: 'free',
   },
   {
     slug: 'canva',
@@ -20,6 +23,9 @@ const items = [
     tags: ['design'],
     featured: false,
     imageUrl: null,
+    resourceType: 'app',
+    platforms: ['Web', 'Android'],
+    pricingModel: 'freemium',
   },
 ]
 
@@ -49,31 +55,47 @@ describe('DiscoverGrid', () => {
     expect(parsed.searchParams.get('utm_content')).toBe('reel-42')
   })
 
-  it('filters cards by category and search without creating query-page URLs', () => {
+  it('renders exactly the server-provided result set without local filter truth', () => {
     render(<DiscoverGrid items={items} isEn={false} attribution={{}} />)
 
-    fireEvent.click(screen.getByRole('button', { name: 'Design' }))
-    expect(screen.getByText('Canva')).toBeInTheDocument()
-    expect(screen.queryByText('NotebookLM')).not.toBeInTheDocument()
-
-    fireEvent.click(screen.getByRole('button', { name: 'همه' }))
-    fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'research' } })
     expect(screen.getByText('NotebookLM')).toBeInTheDocument()
-    expect(screen.queryByText('Canva')).not.toBeInTheDocument()
+    expect(screen.getByText('Canva')).toBeInTheDocument()
+    expect(screen.queryByRole('searchbox')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'AI' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Design' })).not.toBeInTheDocument()
   })
 
-  it('provides accessible search/filter controls and exposes the active category state', () => {
+  it('gives featured resources explicit semantics and one clear internal CTA per card', () => {
     render(<DiscoverGrid items={items} isEn={false} attribution={{}} />)
 
-    expect(screen.getByRole('searchbox', { name: 'جستجو بین ابزارها و سرویس‌ها' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'همه' })).toHaveAttribute('aria-pressed', 'true')
-    expect(screen.getByRole('button', { name: 'AI' })).toHaveAttribute('aria-pressed', 'false')
-    expect(screen.getByRole('button', { name: 'Design' })).toHaveAttribute('aria-pressed', 'false')
+    const featured = screen.getByRole('article', { name: 'منبع منتخب: NotebookLM' })
+    const regular = screen.getByRole('article', { name: 'منبع: Canva' })
 
-    fireEvent.click(screen.getByRole('button', { name: 'AI' }))
+    expect(within(featured).getByText('ai-tool')).toBeInTheDocument()
+    expect(within(featured).getByText('Web')).toBeInTheDocument()
+    expect(within(featured).getByText('free')).toBeInTheDocument()
+    expect(within(featured).getAllByRole('link')).toHaveLength(1)
 
-    expect(screen.getByRole('button', { name: 'همه' })).toHaveAttribute('aria-pressed', 'false')
-    expect(screen.getByRole('button', { name: 'AI' })).toHaveAttribute('aria-pressed', 'true')
-    expect(screen.getByText('1 مورد')).toHaveAttribute('aria-live', 'polite')
+    expect(within(regular).getByText('app')).toBeInTheDocument()
+    expect(within(regular).getByText('Android')).toBeInTheDocument()
+    expect(within(regular).getByText('freemium')).toBeInTheDocument()
+    expect(within(regular).queryByText('منتخب')).not.toBeInTheDocument()
+    expect(within(regular).getAllByRole('link')).toHaveLength(1)
+  })
+
+  it('renders an accessible empty state for an empty server result set', () => {
+    render(<DiscoverGrid items={[]} isEn={false} attribution={{}} />)
+
+    expect(screen.getByRole('status')).toHaveTextContent('موردی با این فیلتر پیدا نشد.')
+  })
+
+  it('prioritizes the first-row image while keeping media dimensions stable', () => {
+    render(<DiscoverGrid items={items.map((item) => ({ ...item, imageUrl: `/images/${item.slug}.webp` }))} isEn={false} attribution={{}} />)
+
+    const images = screen.getAllByRole('img')
+    expect(images[0]).toHaveAttribute('fetchpriority', 'high')
+    expect(images[0]).toHaveAttribute('width', '1280')
+    expect(images[0]).toHaveAttribute('height', '720')
+    expect(images[1]).toHaveAttribute('fetchpriority', 'high')
   })
 })

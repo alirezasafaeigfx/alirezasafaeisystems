@@ -1,68 +1,89 @@
-# V3.2 Work Ledger
+# V3.2 work ledger — reconciled state
 
-**Single writer:** ORCH  
-**Rule:** Evidence, not unchecked boxes, determines state.
+Updated: 2026-08-30. Single writer: ORCH. Task authority: [canonical roadmap](../roadmaps/ASDEV_PUBLIC_EXPERIENCE_EXECUTION.md). This ledger records evidence and uncertainty; it cannot lower acceptance criteria.
 
-## Immutable completed evidence — do not repeat
+## Current verdict
 
-| Scope | Exact evidence | State | Reopen only if |
-|---|---|---|---|
-| V3 production baseline | `main@ac08d1232ee4edfcdbe029a5f636d68b9e8861cc` | frozen | a verified production incident requires it |
-| V3.1 Tasks 1–10 | PR #17 head `41a80235c83ec6949d518bd7fa034814d6e43fef` | complete by code/check/artifact evidence | relevant source/head changes or a demonstrated regression |
-| V3.1 visual contract | 37/37; artifact `9721029344`; digest `d48839…` | owner-approved | candidate SHA or relevant visual inputs change |
-| V3.1 hosted pre-staging gates | six terminal-success workflows recorded on exact head | reusable | candidate SHA or relevant workflow/config changes |
+**Historical Production release: successful. Complete requested public experience: not accepted; implementation and evidence gaps remain.** This documentation revision does not implement animations, install dependencies, benchmark a new candidate or deploy anything.
 
-## Active task registry
+The [previous ledger at 3c61310](https://github.com/alirezasafaeigfx/alirezasafaeisystems/blob/3c61310acb0253aee537892143a023b8fd2f365c/docs/execution/V3_2_WORK_LEDGER.md) is immutable historical evidence of earlier reports. It contains contradictory task states (including already merged PRs labeled unmerged), an old Gate-A-only ceiling and a blanket S5 DONE. Do not execute that stale queue. The reconciled state below supersedes those operational instructions without erasing the historical record.
 
-| Task | Status | Owner | Base/head | Evidence | Blocker/next action |
-|---|---|---|---|---|---|
-| R0-01 | `DONE` | ORCH/SRE | PR #17 `41a80235` | run `33298314611`; staging release `20260830T070559Z`; artifact `9728655284` | verified pipeline-timeout diagnosis |
-| R0-02 | `QUEUED` | QA/SRE | new workflow-fix branch from `main` | `deploy-vps.yml` has 45-minute budget; uncompressed archive was 123,883,520 bytes | red/green compressed-archive contract |
-| R0-03 | `BLOCKED` | SRE | exact app candidate `41a80235` | pass 1 green; pass 2 not completed | R0-02 merge, then one governed rerun |
-| R0-04 | `QUEUED` | REVIEW | PR #17 `41a80235` | existing diff + hosted evidence | independent review |
-| R0-05 | `BLOCKED` | ORCH/SRE | same | none yet | R0-03 and R0-04 |
-| R0-06 | `BLOCKED` | ORCH | accepted merge/release base | none yet | R0-05 |
-| S1-* | `QUEUED` | UX/EVID/FE/QA | post-R0 base | none yet | R0-06 |
-| S2-* | `QUEUED` | EVID/UX/FE/QA | S1 accepted head | none yet | S1 exit gate |
-| S3-* | `QUEUED` | FE/UX/QA | S1 accepted head | none yet | S1 contracts |
-| S4-* | `QUEUED` | UX/FE/QA | S2/S3 accepted head | none yet | S2 and S3 exit gates |
-| S5-* | `BLOCKED` | QA/REVIEW/SRE/ORCH | final candidate | none yet | S1–S4 |
+## Verified baseline and reusable work
 
-## Update format
+| Item | Evidence / identity | Treatment |
+|---|---|---|
+| Current application/main baseline | `39c09b43191822d70c30f7fa8ae51dadb36d37b7` | Frozen comparison baseline; re-fetch current main before work |
+| R0 scope guard | PR #21 merge `308c2753eabab74d1dc0031fd0e2b76a4fabee39` | Reuse; do not repeat R0 |
+| R0 staging smoke correction | PR #20 merge `d1592ac749ad5113f72655c78622e67cbc86516e` | Reuse |
+| S1 existing implementation | PR #22 `a7dc295c93efafbf1f37248009283b3dab5bc365` | Extend; reopen only demonstrated acceptance gaps |
+| S2 existing flagship | PR #23 `7d331132fc019a63772a5ce7094fb3d1a8c8853b` | Reuse facts/primitives that pass source review |
+| S3 existing Discover work | PR #24 `23edc4fb7bd506125127c1eba577996cabe44ec1` | Preserve query/content architecture |
+| S4 existing scene | PR #25 `39c09b43191822d70c30f7fa8ae51dadb36d37b7` | Incomplete interaction; retain useful semantic/style foundations |
+| Previous successful staging | run `33329913543`, deployment `6170189078`, release `20260830T190829Z` | Historical reported staging receipt; not acceptance of future code |
+| Production workflow | [run 33332174608](https://github.com/alirezasafaeigfx/alirezasafaeisystems/actions/runs/33332174608), deployment `6170617220` | Terminal success and two LIVE_VERIFICATION_PASS log markers inspected |
+| Production identity | application `39c09b43191822d70c30f7fa8ae51dadb36d37b7`, release `20260830T195659Z`, `/var/www/my-portfolio/releases/production/20260830T195659Z` | Verified workflow release evidence; do not infer later state from main |
+| Retained rollback target | `/var/www/my-portfolio/releases/production/20260829T044320Z` | Retained target; not a newly exercised rollback |
+| Live verification artifact | ID `9738465513`, expiry recorded `2026-11-28` | Reports artifact, not proof that all owner screenshots were uploaded |
 
-Append one row per meaningful state change; do not log micro-steps.
+Previous failed-safe staging/rollback and transport evidence remains in the immutable historical ledger. R0-01/02/03A/04 and accepted R0-03B/03C/05A/05B/06 are reuse-only unless a relevant regression is proved. Do not diagnose the formerly slow upload again.
 
-```text
-UTC:
-TASK_ID:
-OLD_STATE -> NEW_STATE:
-OWNER:
-BASE_SHA:
-RESULT_SHA:
-FILES:
-PRIMARY_EVIDENCE:
-FAILURES/RISKS:
-NEXT_DEPENDENCY:
-```
+## Audit findings that reopen product acceptance
 
-## State definitions
+| Finding | Primary source / observation | Consequence |
+|---|---|---|
+| Four static nodes; no real five-state scene | `src/components/public/operational-scene.tsx` at baseline; PR #25 | S4-05/06 incomplete |
+| Infinite dashed-path motion | `src/app/public-v31.css`: `operational-path 3.2s linear infinite` | Violates finite/no-idle-motion contract; remove in S4-05 |
+| Home hierarchy differs from approved order; portrait dominates early | `src/components/sections/homepage-v3.tsx` | Reopen S4-01/02/03 |
+| English technical proof labels inside FA UI | `src/components/public/proof-strip.tsx` and related public copy | S1-08 and localized proof required |
+| Quantitative record has generic source/review string | `src/lib/evidence.ts` and flagship data, e.g. accepted evidence record | Re-open S1-01/03 and S2-05; obtain real sources or remove claim |
+| Discover raw taxonomy/unknown presentation | Current Discover content/components | S3-06 plain-language integrity required |
+| Scene test primarily checks presence | `src/__tests__/components/operational-scene.test.tsx` | Not proof of interaction/lifecycle/visual quality |
+| Live verifier is route smoke | Workflow reports at desktop/mobile, JS enabled | No full no-JS/a11y/performance/motion acceptance established |
+| LHCI uses weaker warning thresholds | `lighthouserc.json`, LCP4s, CLS0.2, performance0.75 | Green job insufficient for product budgets; S5-01 enforcement |
+| Existing visual suite mutates content | `e2e/public-v31-visual.spec.ts` | New read-only live suite needed; never run full suite on Production |
+| Package edits always enter R0 guard | `.github/workflows/ci-router.yml`, `scripts/ci/validate-r0-pr.mjs` | S4-10 bounded scope correction before runtime dependency PR |
 
-- `QUEUED`: dependencies satisfied or expected; unclaimed.
-- `CLAIMED`: one owner and non-overlapping paths recorded.
-- `IN_PROGRESS`: bounded work has started.
-- `BLOCKED`: exact dependency/gate/external blocker recorded.
-- `REVIEW`: implementation complete; independent verification pending.
-- `DONE`: primary evidence and ORCH acceptance recorded.
-- `SUPERSEDED`: newer task/evidence replaces it; link required.
+These are source/report findings, not a claim that this review workspace completed a fresh visual browser matrix. Unavailable visual evidence remains unverified.
 
-## Anti-loop checks
+## Important evidence limits
 
-Do not execute a task when any answer is unknown:
+- The owner reported FA/EN desktop/mobile screenshots in `C:\Users\ASDEV\AppData\Local\Temp\asdev-v3-2-production-ui-39c09b4`. That folder is not independently retrievable here; no claim is made that its images were inspected. Future evidence needs durable links and hashes.
+- The production workflow log says `[sqlite-relocation] DATABASE_URL is already absolute; no relocation required`. That proves a no-op at this step, not the separately reported earlier relocation. The backup SHA-256 `62548e9e7d952cd30c6fb547109d3c204f689d9edf7625f03dd1835e21c536fc` remains an owner/executor-reported value until the corresponding restricted verification evidence is retrieved. Do not expose the database to prove it.
+- The non-required semantic-release TLS timeout is recorded history, not a visual blocker and not an excuse to rerun Production.
+- No claim of field INP, real-device performance, human comprehension testing, complete independent design acceptance or actual new rollback drill is established by the pasted S5 report.
 
-1. What exact user/Audit outcome does it support?
-2. What evidence proves it is not already done?
-3. Which files does it own exclusively?
-4. What fresh command or artifact proves completion?
-5. Which higher-value safe task would be displaced?
+## Active state registry
 
-If the task is cleanup without measurable value, duplicate verification on an unchanged SHA, speculative abstraction, or unrelated dependency churn, reject it.
+| Scope | State | Next action |
+|---|---|---|
+| DOCS-01 | REVIEW — documentation alignment | Independent consistency review and governed integration; resulting commit identified by PR metadata |
+| S1-01/03 | REOPENED — provenance gap | Inspect real sources, strengthen publication contract |
+| S1-08 | PENDING — DOCS-01 integration | Plain-language FA/EN public surfaces |
+| S1-02/04/05/07 | IMPLEMENTED / ACCEPTANCE REVIEW REQUIRED | Reuse satisfactory parts; close copy/action/analytics evidence gaps |
+| S2-01/02/05/06 | IMPLEMENTED / PARTIAL ACCEPTANCE | Verify facts and complete documentary/hierarchy after dependencies |
+| S3-01/04/05/06 | IMPLEMENTED / ACCEPTANCE REVIEW REQUIRED | Test actual media/copy/publication/SEO behavior; repair proven gaps |
+| S3-03 | REUSE CANDIDATE — query regression constraint | Confirm current implementation/evidence before REUSED-DONE |
+| S4-01/02/03/05/06 | REOPENED — incomplete required experience | Complete visible composition and meaningful native interaction |
+| S4-07 | PENDING | Native benchmark after real implementation |
+| S4-10/11/12 | ADMITTED / DEPENDENCY-BLOCKED | Scoped advanced/GPU implementation and measured comparison |
+| S5-01 | PENDING — DOCS-01 integration | Early harness; final run after applicable implementation |
+| S5-02/03/04 | UNVERIFIED for completed experience | Full candidate matrix, review and current checks |
+| S5-05/06/07 | HISTORICAL RELEASE DONE / FUTURE CANDIDATE PENDING | Preserve old release; new release only after product acceptance |
+
+Do not overwrite all S1–S5 rows with DONE based on one release. The roadmap dependency table and current verified evidence determine ready tasks. First implementation batch is S1-08 + S1-01 with non-overlapping ownership or sequential execution; S5-01 harness may begin independently.
+
+## DOCS-01 bounded change record
+
+- Base: main `39c09b43191822d70c30f7fa8ae51dadb36d37b7`.
+- Proven gap: old agent/rules contradict actual SQLite/tooling/autonomy; roadmap treats Gate A as terminal; ledger confuses release success with experience acceptance; no complete stack/skills/report-inspection contract.
+- Scope: root agent contract, project rules/engineering/report review, canonical roadmap/sprints/ledger/prompt, and scoped pointers in existing automation/strategy/memory docs. No application, package, schema, workflow or server changes.
+- Existing mission PR: #18, original head `48eb38afe66ab80bbd1767e5240f06bd81d7450a`. Its stale ancestry must be reconciled against current main through a normal merge, preserving main's entire application tree; do not merge old draft files blindly or force-push.
+- Reused evidence: actual main/source/workflow/PR metadata; prior reports explicitly labeled where not independently reproduced.
+- Acceptance: complete diff limited to intended docs; internal links/actual source paths and task dependencies checked; contradiction/permission review; independent reviewer findings addressed; current hosted checks and remote readback. Actual results belong in PR evidence, not invented here before execution.
+- Rollback: normal revert of the coherent documentation integration; no runtime rollback or data operation.
+
+## Update protocol
+
+For a meaningful change record: UTC; task IDs; prior/new state; owner; exact base/candidate/merge SHAs; paths; acceptance matrix; real commands/exits/counts; artifact URLs/hashes; reviewer/type; failures/limitations; rollback; next dependency.
+
+`READY` means dependencies are satisfied, `IN_PROGRESS` means implementation started, `REVIEW` means verification/disposition pending, `DONE` requires every applicable criterion, `REUSED-DONE` requires valid existing implementation/evidence, `PARTIAL`/`FAIL`/`UNVERIFIED` state the actual gap, and `BLOCKED` names the precise unavailable prerequisite. Program acceptance and release status remain separate.

@@ -1,12 +1,11 @@
-# Historical Roadmap Compatibility Pointer
+# THIS MONTH — ASDEV
 
-**Status:** Superseded — do not select tasks from this file  
-**Superseded:** 2026-08-30
+**July 2026**  
+**Also:** `MONTHLY_ROADMAP.md`, `docs/roadmaps/NEXT_30_DAYS.md`
 
-Active execution is dependency-driven:
+## Outcomes
 
-- `docs/roadmaps/ASDEV_PUBLIC_EXPERIENCE_EXECUTION.md`
-- `docs/execution/V3_2_AGENT_SPRINTS.md`
-- `docs/execution/V3_2_WORK_LEDGER.md`
-
-Calendar day/week/month/quarter planning was frozen by `docs/strategy/FROZEN_BACKLOG.md`. Git history preserves the former contents.
+- AUTOMATION_HOST = reliable control plane  
+- CRITICAL_SITE public edge when approved  
+- Backup + monitoring discipline  
+- Multi-site template adoption  

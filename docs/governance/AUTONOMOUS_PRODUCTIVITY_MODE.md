@@ -1,5 +1,9 @@
 # Autonomous Productivity Mode
 
+## Current public-experience priority — 2026-08-30
+
+For `alirezasafaeigfx/alirezasafaeisystems`, the owner's active work is the [public-experience roadmap](../roadmaps/ASDEV_PUBLIC_EXPERIENCE_EXECUTION.md), governed by [AGENTS.md](../../AGENTS.md) and [project rules](REPOSITORY_RULES.md). Complete meaningful UI, motion, plain-language copy and evidence before unrelated automation maturity. Autonomy means continuing admitted useful work, not generating housekeeping indefinitely, mutating other projects or sending unrequested messages. Existing authorizations persist within scope; security/data/runtime gates are not waived. Treat conflicting task-selection guidance below as historical for this lane.
+
 **Status:** ENABLED  
 **Last Updated:** 2026-07-08
 

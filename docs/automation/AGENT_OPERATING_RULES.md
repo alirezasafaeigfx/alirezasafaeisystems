@@ -1,5 +1,9 @@
 # Agent Operating Rules — ASDEV
 
+## Public-site execution override — 2026-08-30
+
+For this repository's public experience follow [AGENTS.md](../../AGENTS.md), [project rules](../governance/REPOSITORY_RULES.md) and the [canonical roadmap](../roadmaps/ASDEV_PUBLIC_EXPERIENCE_EXECUTION.md). The owner's controlled-autonomy policy permits normal eligible PR merges with actual required checks and zero required human approvals; do not invent a routine owner-review gate from historical rules below. Independent acceptance review still applies. No issue #45/command-bus, Slack or other external post is authorized merely by this document. Use the canonical ledger, not parallel queues or mandatory duplicate memory updates. Historical model/provider/host assumptions must be verified, not imposed. Runtime authorization, secret and data protections remain intact.
+
 **Last Updated:** 2026-07-08
 **Status:** Active
 

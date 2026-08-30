@@ -3,7 +3,7 @@
 **Model:** Dependency-driven phases — no calendar promises  
 **Authority:** Canonical roadmap for the ASDEV ecosystem  
 **Product:** ASDEV Audit Platform (`auditsystems`)  
-**Last Updated:** 2026-08-30
+**Last Updated:** 2026-07-06
 
 ---
 
@@ -46,8 +46,6 @@ ASDEV Audit Platform is the primary revenue product. PersianToolbox acquires tra
 **Audit-first priority:** E1-01 and E1-02 directly drive audit submissions.
 
 **Execution detail:** [`PHASE_1_TRUST_AND_CONVERSION.md`](PHASE_1_TRUST_AND_CONVERSION.md)
-
-**Active portfolio-support execution:** [`../roadmaps/ASDEV_PUBLIC_EXPERIENCE_EXECUTION.md`](../roadmaps/ASDEV_PUBLIC_EXPERIENCE_EXECUTION.md) — evidence-led positioning, technical case studies, and attributed Audit conversion.
 
 ---
 

@@ -6,9 +6,9 @@ describe('home content', () => {
     const content = getHomeContent('fa')
 
     expect(content.hero).toMatchObject({
-      name: 'علیرضا صفایی',
-      title: 'مهندس نرم‌افزار',
-      primaryCta: 'شروع همکاری',
+      name: 'مهندسی تحریریه + رابط عملیاتی',
+      title: 'سیستم‌های عملیاتی را قابل دیدن می‌کنم',
+      primaryCta: 'درخواست ارزیابی Audit',
       secondaryCta: 'مشاهده پروژه‌ها',
     })
   })
@@ -17,9 +17,9 @@ describe('home content', () => {
     const content = getHomeContent('en')
 
     expect(content.hero).toMatchObject({
-      name: 'Alireza Safaei',
-      title: 'Software Engineer',
-      primaryCta: 'Start collaboration',
+      name: 'Engineering Editorial + Operational Interface',
+      title: 'Operational systems made visible',
+      primaryCta: 'Request an ASDEV Audit',
       secondaryCta: 'View projects',
     })
   })
@@ -35,7 +35,7 @@ describe('home content', () => {
       ]),
       projects: expect.arrayContaining([
         expect.objectContaining({ title: 'پلتفرم PersianToolbox' }),
-        expect.objectContaining({ title: 'هشدار قیمت Novax' }),
+        expect.objectContaining({ title: 'نجات بومی‌سازی زیرساخت' }),
         expect.objectContaining({ title: 'پلتفرم Audit Systems' }),
       ]),
     })

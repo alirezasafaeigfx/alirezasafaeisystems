@@ -1,137 +1,102 @@
-# ASDEV Public Experience Execution Roadmap
+# ASDEV public experience — canonical execution roadmap
 
-**Model:** Dependency-driven sprints; no calendar promises  
-**Status:** Active planning; V3.1 release reconciliation first  
-**Updated:** 2026-08-30  
-**Primary ASDEV goals:** trusted reports, qualified leads, Audit conversion, production reliability
+Revision: 2026-08-30, owner-requested experience recovery. This is the **only public-experience task selector**. [Task cards](../execution/V3_2_AGENT_SPRINTS.md) explain execution; [ledger](../execution/V3_2_WORK_LEDGER.md) records actual state; [engineering guide](../engineering/PUBLIC_EXPERIENCE_ENGINEERING.md) defines implementation and measurement.
 
-## Source of truth
+## 1. Outcome, not a release checklist
 
-This file is the canonical public-experience execution roadmap. It supersedes task selection from `roadmap/TODAY.md`, `roadmap/THIS_WEEK.md`, `roadmap/THIS_MONTH.md`, `roadmap/QUARTER.md`, and their `docs/roadmaps/` mirrors.
+Create a distinctive, polished interactive site that makes engineering understandable to an ordinary Iranian visitor. Within the first viewport the visitor can understand what help is available and take the next step. The visual signature is a system under pressure becoming understandable, repaired and supported by evidence. Technical depth is optional; primary Persian is simple, natural and respectful.
 
-Strategic authority remains:
+The owner's references inform authored typography, spatial continuity, purposeful motion and dedicated mobile behavior. Awards, “world-class” and numerical design scores are aspirations, not verifiable deliverables or guarantees. Do not copy reference sites or hide essential information behind a game/loader.
 
-1. `docs/strategy/FOCUS_POLICY.md`
-2. `docs/strategy/ASDEV_AUDIT_MASTER_ROADMAP.md`
-3. `AGENTS.md`
-4. this roadmap
-5. `docs/execution/V3_2_AGENT_SPRINTS.md`
-6. `docs/execution/V3_2_WORK_LEDGER.md`
+**Smallest complete solution** means satisfying every accepted outcome while avoiding unrelated work. It never means delivering a token SVG, a hover effect or only infrastructure checks.
 
-Design: `docs/superpowers/specs/2026-08-30-v3-2-evidence-conversion-design.md`  
-Implementation plan: `docs/superpowers/plans/2026-08-30-v3-2-evidence-conversion.md`  
-Execution prompt: `prompts/codex/V3_2_YOLO_LOOP.md`
+## 2. Baseline and acceptance correction
 
-## State reconciliation
+Application baseline: `39c09b43191822d70c30f7fa8ae51dadb36d37b7`. Production workflow [33332174608](https://github.com/alirezasafaeigfx/alirezasafaeisystems/actions/runs/33332174608) succeeded; release `20260830T195659Z`. Preserve it while developing the next candidate.
 
-| Item | Evidence | Roadmap meaning |
+The previous ledger's S1–S5 blanket DONE claim is superseded **for product acceptance**, not erased from history. Actual source shows a static four-node scene plus an infinite dashed-line animation, no five-state interaction, mismatched Home order, English technical proof labels in Persian, and evidence records without retrievable primary sources. Successful live smoke does not establish composition, motion, comprehension, accessibility or performance.
+
+Keep R0 governance/transport/staging work and PRs #20–#25 as historical implemented/reusable work. Do not repeat R0 or redeploy the old candidate to manufacture activity. [Ledger](../execution/V3_2_WORK_LEDGER.md) separates observed facts, reported history and remaining evidence gaps.
+
+## 3. Current admission decisions
+
+- Native DOM/SVG/CSS/WAAPI is the complete semantic foundation, **not the final quality ceiling**.
+- `S4-10` now admits a bounded Anime.js v4 evaluation and necessary dependency-scope CI correction. `S4-11` admits one deferred Three.js signature prototype. These are authorized roadmap tasks, not speculative future preparation. Exact dependency versions are selected from official compatibility/license/security evidence during implementation.
+- `S4-12` decides adoption from working prototypes, inspected recordings and measured budgets. No library installation or production adoption is claimed by these documents. If 3D fails, record what failed and repair/simplify; do not silently rename the missing outcome DONE. A native-only final direction requires an explicit owner scope decision on the prepared comparison.
+- Former `S4-04` remains absorbed into `S4-06`; `S4-08`/`S4-09` remain historical IDs, not repurposed tasks. This revision introduces distinct IDs `S4-10` through `S4-12`.
+- No site-wide GPU/game architecture, WebGPU-only path, framework/database/auth/deployment migration, paid dependency or broad refactor is admitted.
+- Owner review happens on complete reviewable results, not at every routine implementation step. Continue independent ready tasks while final feedback is pending.
+
+## 4. Required composition and behavior
+
+Home: Header → Hero + system narrative → Verified proof → dominant flagship → Services → Selected work/Discover → Founder → assessment CTA → Footer.
+
+Move the portrait to Founder. Give the flagship `infrastructure-localization-rescue` a strong preview and a complete documentary: Incident → Constraint → Before → Diagnosis → Intervention → After → Evidence → Trade-offs → Verification → assessment CTA. Real facts and conceptual explanations must be visibly distinguishable.
+
+Scene states: pressure → diagnosis → intervention → stable → evidence. Each state changes meaningful geometry/path/emphasis and explanatory copy; the same topology continues from the scene into the evidence diagram. Keyboard/touch controls, backtracking and optional pointer exploration work without hijacking scroll. Mobile has its own reading order, compact art and controls. Reduced motion, no JS and blocked GPU preserve the narrative and action.
+
+Primary CTA: «درخواست بررسی سایت». Do not imply free/instant service without authority. Main copy explains problem, benefit and next action; jargon and raw taxonomy are not primary labels. FA/EN have equal content quality.
+
+## 5. Active task registry
+
+Status at this revision is recorded in the ledger. The table defines scope/dependencies; it does not assert future work passed. All implementation tasks depend on integration of this documentation contract (`DOCS-01`). Existing task IDs retain their original concern.
+
+| ID | Complete outcome | Dependencies |
 |---|---|---|
-| V3 production baseline | `main@ac08d123` | Frozen reference; do not rewrite |
-| V3.1 candidate | PR `#17` at `41a80235` | Owner-approved exact-head candidate |
-| V3.1 visual artifact | `9721029344`, digest `d48839…` | Tasks 1–10 are not repeat work |
-| V3.1 governed staging | release `20260830T070559Z`; run `33298314611` | Deploy/health/smoke/pass-1 green; pass-2 cancelled by 45-minute job timeout |
-| V3.2 | separate branch after R0 | Evidence and conversion program |
+| S1-01 | Evidence registry rejects unsupported quantitative publication; retrievable sources and review | DOCS-01 |
+| S1-02 | Clear bilingual Hero positioning and one H1 | S1-08 |
+| S1-03 | Proof strip contains only substantiated facts; optional localized detail | S1-01, S1-08 |
+| S1-04 | One clear assessment route and truthful CTA through Home/header/footer | S1-02 |
+| S1-05 | Simple public navigation; no premature Blog promotion | S1-08 |
+| S1-07 | Existing analytics funnel verified without live test submissions | S1-04 |
+| S1-08 | New: plain-language FA/EN content contract applied to primary surfaces | DOCS-01 |
+| S2-01 | Readable, accessible before/after, timeline and evidence primitives | S1-01, S1-03 |
+| S2-02 | Flagship documentary integrated with the scene's truthful narrative | S2-01, S4-06 |
+| S2-05 | Independent claim-by-claim provenance verdict | S2-02 |
+| S2-06 | Flagship-first case index, supporting projects secondary | S2-02 |
+| S3-01 | Useful stable media at slow network; meaningful loading/error states | S1-08 |
+| S3-03 | Preserve URL query/filter/pagination; regression only | DOCS-01 |
+| S3-04 | Blog nav honestly follows readiness | S1-05 |
+| S3-05 | Blog publication readiness contract; no filler publishing | DOCS-01 |
+| S3-06 | Localized taxonomy/empty/error states, metadata/hreflang/schema/sitemap integrity | S1-08, S3-03 |
+| S4-01 | Approved Home order, editorial hierarchy and dominant flagship preview | S1-02, S1-03, S1-04 |
+| S4-02 | Bilingual typography/measure/spacing and coherent visual vocabulary | S4-01 |
+| S4-03 | Authored mobile/tablet composition and edge-width resilience | S4-02 |
+| S4-05 | Finite, meaningful motion vocabulary and complete reduced-motion states | S4-03 |
+| S4-06 | Real five-state scene, controls, continuity and lifecycle | S4-05, S1-01 |
+| S4-07 | Measured native-scene baseline and identified advanced-motion needs | S4-06 |
+| S4-10 | Scoped CI/dependency admission and bounded advanced-motion implementation/evaluation | S4-07 |
+| S4-11 | One actual Three.js signature prototype with the same semantic model | S4-10 |
+| S4-12 | Inspected native/advanced/GPU comparison; adopt complete measured direction | S4-11 |
+| S5-01 | Real acceptance harness, evidence validator and strict performance enforcement | DOCS-01; final run after S1–S4 applicable tasks |
+| S5-02 | Exact-candidate FA/EN visual, motion, a11y, fallback and performance matrix | S5-01, S2-05, S2-06, S3-01, S3-04, S3-05, S3-06, S4-12, S1-07 |
+| S5-03 | Independent code/truth/design review and owner visual disposition | S5-02 |
+| S5-04 | Required hosted checks on actual final integration candidate | S5-03 |
+| S5-05 | Exact candidate governed staging + two read-only public passes | S5-04 |
+| S5-06 | Governed Production release, identity, prior release and rollback truth | S5-05 |
+| S5-07 | Two Production passes, final evidence retrieval and honest closure | S5-06 |
 
-## Sprint status
+Absorbed historical IDs: S1-06→S1-04; S2-03/S2-04→S2-01; S3-02→S3-01. Do not revive them as duplicate implementations. Existing satisfactory outcomes may be marked `REUSED-DONE` only after checking actual scope and valid evidence.
 
-| Sprint | Outcome | Status | Exit gate |
-|---|---|---|---|
-| R0 — Release truth | Repair the verified staging workflow timeout, then close merge/release state without changing the application candidate | `IN_PROGRESS — PIPELINE REPAIR` | Two live passes on exact candidate plus release state recorded |
-| S1 — Positioning & conversion | Make value, proof, and Audit path clear in three seconds | `QUEUED` | H1, proof, IA, CTA and analytics tests pass |
-| S2 — Evidence documentary | Ship one world-class flagship Case Study and reusable evidence contract | `QUEUED` | Provenance, diagrams, impact table, RTL/LTR and visual review pass |
-| S3 — Surface integrity | Make Discover useful on slow networks and stop empty Blog from weakening IA | `QUEUED` | Slow-network evidence and Blog readiness rule pass |
-| S4 — Editorial system | Reduce Carditis, improve typography/mobile rhythm, add purposeful motion | `QUEUED` | Cross-width screenshots and reduced-motion gate pass |
-| S5 — Release confidence | Independent review, full CI, staging, two-pass live verification | `BLOCKED BY S1–S4` | Exact-SHA release evidence and required approvals |
+## 6. Execution sprints
 
-## R0 — V3.1 Release Truth
+These are outcome batches, not new task IDs, schedules or invented duration estimates. Tests and evidence are produced inside each batch, not postponed to the last sprint.
 
-**Owners:** ORCH, QA, SRE  
-**Constraint:** do not change `41a80235` to update documentation.
+| Sprint | Tasks / work | Exit evidence |
+|---|---|---|
+| 1 — clarity and truth | S1 tasks; start S5-01 harness | Actual first viewport, plain-language review, supported proof, functional assessment path |
+| 2 — art direction and mobile | S4-01/02/03 | Real route before/after, FA/EN at 390/768/1440, portrait moved, flagship hierarchy |
+| 3 — meaningful native motion | S4-05/06/07 | Five-state recording, state/keyboard/touch tests, reduced/no-JS, idle/performance baseline |
+| 4 — advanced motion and spatial signature | S4-10/11/12 | Version/license decisions, guard negative tests, measured real GPU prototype and comparison |
+| 5 — documentary and discovery | S2/S3 remaining tasks | Honest narrative/diagrams, mobile detail, localized discovery, route/query/SEO checks |
+| 6 — acceptance and release | Finish S5-01 then S5-02…07 | Full candidate evidence, independent/owner disposition, governed exact release and rollback |
 
-| ID | Task | Dependency | Done when |
-|---|---|---|---|
-| R0-01 | Record run `33298314611`: release deployed, health/smoke/pass-1 green, pass-2 cancelled by the 45-minute job timeout | none | Exact log lines, release and artifact are in the ledger |
-| R0-02 | Add a tested compressed-source archive contract to `deploy-vps.yml` on a separate workflow-fix branch | R0-01 | Archive transfer is compressed; candidate app SHA remains unchanged |
-| R0-03 | Re-run governed staging exactly once on `41a80235` and require both live passes | R0-02 | Staging deployment and live-verification statuses are green |
-| R0-04 | Independently review the 41-file application PR for truth, security, accessibility, performance, and scope | R0-01 | Findings resolved or recorded without duplicate implementation |
-| R0-05 | Complete governed merge/release progression only when all repository gates and approvals are valid | R0-03, R0-04 | Exact merge/release identity recorded |
-| R0-06 | Establish the post-release V3.2 base branch/worktree | R0-05 | Clean branch from the actual accepted base |
+This order deliberately prioritizes visible Home improvement after truthful content. S2/S3 work may proceed earlier where dependencies and path ownership allow; no artificial wait for a prototype. Independent QA/review may run beside implementation if tools permit. ORCH alone integrates and writes the ledger.
 
-## S1 — Positioning and Conversion
+## 7. Acceptance and stopping
 
-**Owners:** UX, FE, QA; ORCH integrates.
+Use project budgets in the engineering guide: LCP ≤2.5s, CLS ≤0.1, field INP p75 ≤200ms when available (otherwise explicit lab proxy), Gate A initial JS delta ≤30 KiB gzip, no attributable >50ms long task and no idle rendering. Every advanced/GPU task also meets its deferred-code/asset budgets. A green legacy Lighthouse warning is not proof.
 
-| ID | Task | Main output | Done when |
-|---|---|---|---|
-| S1-01 | Create a typed evidence registry for sourced metrics | evidence contract + tests | no metric can render without provenance |
-| S1-02 | Replace generic hero H1 and supporting copy in FA/EN | three-second positioning | job-title H1 absent; semantic H1 remains one |
-| S1-03 | Render `180→55`, `−58%`, `0/30d` above the fold or immediately after Hero | quantitative proof strip | every value links to scoped evidence |
-| S1-04 | Make ASDEV Audit the primary CTA and evidence the secondary CTA | attributed conversion path | one primary action across Home/Header/Footer |
-| S1-05 | Simplify primary IA to Work, Services, Discover, About | focused navigation | Blog absent until readiness gate; mobile parity passes |
-| S1-06 | Route the Audit Systems proof slot to the real Audit/case evidence path | correct product hierarchy | no generic `/case-studies` dead-end |
-| S1-07 | Verify conversion analytics names and attribution | measurable funnel | view → CTA → Audit destination is inspectable |
+Final acceptance requires actual routes, meaningful interaction/recordings, readable copy, durable artifacts, exact identities, accessible fallbacks, independent review and owner visual disposition. Report implementation, experience, copy, a11y, performance, provenance and release separately. Never call retained rollback “tested,” lab latency “field INP,” or a listed screenshot “inspected.”
 
-## S2 — Flagship Evidence Documentary
-
-**Owners:** EVID, FE, QA; REVIEW validates claims.
-
-| ID | Task | Main output | Done when |
-|---|---|---|---|
-| S2-01 | Define reusable Case Study evidence types and presentation primitives | isolated evidence components | interfaces are documented and tested |
-| S2-02 | Rebuild Infrastructure Localization Rescue as the flagship | before/after, timeline, impact, decisions | no stacked text-card narrative remains |
-| S2-03 | Convert metrics to a clear Before/After table | legible impact | mobile and screen-reader semantics pass |
-| S2-04 | Add code-native architecture diagrams | operational storytelling | RTL/LTR, reduced-motion and print/static fallback pass |
-| S2-05 | Record claim provenance and remove/downgrade unverifiable claims | truth ledger | independent evidence review passes |
-| S2-06 | Redesign Case Studies index around one flagship and selected evidence | editorial hierarchy | fewer equal-weight cards; flagship dominates |
-
-## S3 — Discover and Blog Surface Integrity
-
-**Owners:** FE, UX, QA.
-
-| ID | Task | Main output | Done when |
-|---|---|---|---|
-| S3-01 | Give only first-row Discover media eager/high-priority loading | useful first viewport | later media remains lazy |
-| S3-02 | Add stable media skeleton/fallback and dimensions | no white image void | slow-network visual evidence passes |
-| S3-03 | Preserve URL-backed search/filter/pagination and 15 real resources | no regression | query contract and E2E pass |
-| S3-04 | Remove Blog from primary navigation while publication gate is unmet | honest IA | direct Blog route remains functional and truthful |
-| S3-05 | Record the Blog publication re-entry gate and evidence-source checklist | explicit readiness contract | no thin filler; publishing remains separately gated |
-| S3-06 | Verify hreflang, metadata, article schema, sitemap behavior, and empty state | search integrity | SEO tests pass in FA/EN |
-
-## S4 — Engineering Editorial System
-
-**Owners:** UX, FE, QA.
-
-| ID | Task | Main output | Done when |
-|---|---|---|---|
-| S4-01 | Audit all equal-weight surfaces and remove roughly 40–50% of unnecessary cards | stronger hierarchy | before/after inventory recorded |
-| S4-02 | Establish typography and reading-measure targets | distinctive bilingual rhythm | 390/768/1440 review passes |
-| S4-03 | Author mobile composition instead of stacking desktop sections | progressive storytelling | no overflow, dead height, or repeated pattern |
-| S4-04 | Add one meaningful operational visualization where it explains the work | ASDEV visual signature | understandable without animation |
-| S4-05 | Add CSS-only state/motion polish with full reduced-motion behavior | purposeful motion | no decorative infinite motion or content dependency |
-
-## S5 — Verification and Governed Release
-
-**Owners:** QA, REVIEW, SRE; ORCH owns verdict.
-
-| ID | Task | Main output | Done when |
-|---|---|---|---|
-| S5-01 | Run targeted red/green tests per task and full local verification once stable | test evidence | no partial or fake pass |
-| S5-02 | Capture FA/EN full-page matrix at 390/768/1440 plus focus/reduced motion | visual evidence | every required file is tied to exact SHA |
-| S5-03 | Run independent truth, security, accessibility, SEO, and scope review | review report | all P0/P1 findings resolved |
-| S5-04 | Run hosted CI, E2E, a11y, Lighthouse, security, and secret scan | hosted evidence | all required checks terminal green |
-| S5-05 | Deploy exact candidate to governed staging and verify twice | staging evidence | two consecutive live browser passes |
-| S5-06 | Obtain any still-required exact approval and complete production release | release evidence | post-deploy policy verdict recorded |
-| S5-07 | Run post-release smoke/visual/analytics verification and close roadmap state | closure | rollback target known; no fresh P0/P1 |
-
-## Global stop conditions
-
-Agents do not stop for routine ambiguity. They choose the safest high-value interpretation, record it, and continue. They stop only for:
-
-1. an exact approval gate that is genuinely absent;
-2. a security, privacy, data-loss, or destructive-operation risk;
-3. an external access/credential/service blocker that cannot be resolved safely;
-4. honest proof that no safe valuable work remains.
-
-## Anti-duplication rule
-
-Before claiming a task, the orchestrator checks current code, tests, Git history, PR/Issue state, workflow evidence, and `V3_2_WORK_LEDGER.md`. Green evidence is reused when the exact SHA and relevant inputs are unchanged. A stale unchecked box is not evidence that work is missing.
+Continue automatically through safe ready work. Stop only the affected lane for unavailable access, a genuinely missing applicable runtime authorization, destructive/security/data risk, unavoidable unadmitted architecture, or no remaining safe admitted work. Do not invent new maintenance queues when finished. An acceptance failure is a repair task within its existing concern, not permission to weaken the requirement.

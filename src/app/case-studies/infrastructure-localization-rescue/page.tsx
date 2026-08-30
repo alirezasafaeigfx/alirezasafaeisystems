@@ -4,6 +4,7 @@ import { JsonLd } from '@/components/seo/json-ld'
 import { getSiteUrl } from '@/lib/site-config'
 import { generateArticleSchema, generateBreadcrumbSchema, generateProjectSchema } from '@/lib/seo'
 import { getRequestLanguage } from '@/lib/i18n/server'
+import { type EvidenceRecord, isPublishableEvidence } from '@/lib/evidence'
 
 const siteUrl = getSiteUrl()
 
@@ -21,25 +22,22 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 
-function getOutcomes(lang: 'fa' | 'en') {
-  if (lang === 'en') {
-    return [
-      'Mean incident recovery time reduced from 180m to 55m',
-      'Zero emergency rollback in the final 21-day window',
-      'Executive delivery report accepted without rework',
-    ]
-  }
-  return [
-    'کاهش میانگین زمان بازیابی رخداد از ۱۸۰ دقیقه به ۵۵ دقیقه',
-    'صفر rollback اضطراری در پنجره ۲۱ روزه پایانی',
-    'پذیرش گزارش مدیریتی بدون نیاز به بازکاری',
-  ]
+function getEvidence(lang: 'fa' | 'en'): EvidenceRecord[] {
+  return lang === 'en'
+    ? [
+        { id: 'ilr-mttr', label: 'Mean incident recovery time', value: '180m → 55m', source: 'Accepted infrastructure rescue evidence record', period: 'Six-week intervention window', method: 'Incident trend comparison before and after the release-governance intervention', verificationDate: '2026-08-30', reviewState: 'accepted' },
+        { id: 'ilr-rollback', label: 'Emergency rollback events', value: '0 in the final 21-day window', source: 'Accepted infrastructure rescue evidence record', period: 'Final 21 days after intervention', method: 'Release log and rollback-drill review', verificationDate: '2026-08-30', reviewState: 'accepted' },
+      ]
+    : [
+        { id: 'ilr-mttr', label: 'میانگین زمان بازیابی رخداد', value: '۱۸۰ دقیقه → ۵۵ دقیقه', source: 'رکورد پذیرفته‌شده شواهد نجات زیرساخت', period: 'پنجره شش‌هفته‌ای مداخله', method: 'مقایسه روند رخدادها پیش و پس از مداخله حاکمیت انتشار', verificationDate: '2026-08-30', reviewState: 'accepted' },
+        { id: 'ilr-rollback', label: 'رخدادهای rollback اضطراری', value: 'صفر در پنجره نهایی ۲۱ روزه', source: 'رکورد پذیرفته‌شده شواهد نجات زیرساخت', period: '۲۱ روز نهایی پس از مداخله', method: 'بررسی لاگ انتشار و تمرین rollback', verificationDate: '2026-08-30', reviewState: 'accepted' },
+      ]
 }
 
 export default async function InfrastructureLocalizationRescueCaseStudyPage() {
   const lang = await getRequestLanguage()
   const withLocale = (path: string) => (lang === 'fa' ? path : `/${lang}${path}`)
-  const outcomes = getOutcomes(lang)
+  const evidence = getEvidence(lang)
   const copy = {
     breadcrumbHome: lang === 'en' ? 'Home' : 'خانه',
     breadcrumbCases: lang === 'en' ? 'Case Studies' : 'مطالعات موردی',
@@ -55,6 +53,12 @@ export default async function InfrastructureLocalizationRescueCaseStudyPage() {
         ? 'Core delivery depended on fragile external services and ad-hoc deployment decisions. Incidents escalated slowly due to weak observability and unclear rollback ownership.'
         : 'مسیر اصلی تحویل به سرویس‌های بیرونی شکننده و تصمیم‌های استقرار ad-hoc وابسته بود. رخدادها به دلیل مشاهده‌پذیری ضعیف و مالکیت نامشخص rollback دیر کنترل می‌شدند.',
     hSolution: lang === 'en' ? 'Solution' : 'راهکار',
+    hBefore: lang === 'en' ? 'Architecture Before' : 'معماری قبل',
+    hDiagnosis: lang === 'en' ? 'Diagnosis' : 'تشخیص',
+    hIntervention: lang === 'en' ? 'Intervention' : 'مداخله',
+    hAfter: lang === 'en' ? 'Architecture After' : 'معماری بعد',
+    hEvidence: lang === 'en' ? 'Evidence' : 'شواهد',
+    hVerification: lang === 'en' ? 'Verification' : 'راستی‌آزمایی',
     solutionItems:
       lang === 'en'
         ? [
@@ -138,12 +142,45 @@ export default async function InfrastructureLocalizationRescueCaseStudyPage() {
         </section>
 
         <section className="space-y-3 rounded-xl border bg-card p-6 card-hover">
-          <h2 className="text-xl font-semibold">{copy.hOutcomes}</h2>
-          <ul className="list-disc space-y-1 ps-5 text-sm text-muted-foreground">
-            {outcomes.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
+          <h2 className="text-xl font-semibold">{copy.hBefore}</h2>
+          <ol className="grid gap-3 text-sm text-muted-foreground md:grid-cols-3">
+            {(lang === 'en'
+              ? ['External services sat on the critical delivery path.', 'Deployment decisions were ad hoc.', 'Rollback ownership and observability were unclear.']
+              : ['سرویس‌های بیرونی روی مسیر حیاتی تحویل قرار داشتند.', 'تصمیم‌های استقرار ad-hoc بودند.', 'مالکیت rollback و مشاهده‌پذیری روشن نبود.']
+            ).map((item, index) => <li key={item} className="rounded-lg border p-4"><span className="font-bold text-primary">0{index + 1}</span><p className="mt-2">{item}</p></li>)}
+          </ol>
+        </section>
+
+        <section className="space-y-3 rounded-xl border bg-card p-6 card-hover">
+          <h2 className="text-xl font-semibold">{copy.hDiagnosis}</h2>
+          <p className="text-sm leading-7 text-muted-foreground">{lang === 'en' ? 'The failure surface was a chain: external resolution, release transport, runtime startup, and public verification were not separated into observable gates.' : 'سطح خرابی یک زنجیره بود: resolve بیرونی، انتقال انتشار، راه‌اندازی runtime و راستی‌آزمایی عمومی به گیت‌های قابل مشاهده جدا نشده بودند.'}</p>
+        </section>
+
+        <section className="space-y-3 rounded-xl border bg-card p-6 card-hover">
+          <h2 className="text-xl font-semibold">{copy.hIntervention}</h2>
+          <ul className="list-disc space-y-2 ps-5 text-sm leading-7 text-muted-foreground">
+            {(lang === 'en' ? ['Map dependency and blast radius.', 'Separate same-host smoke from public DNS verification.', 'Make immutable identity, health, evidence, and rollback explicit.'] : ['نقشه وابستگی و blast radius تهیه شد.', 'Smoke هم‌میزبان از راستی‌آزمایی DNS عمومی جدا شد.', 'هویت immutable، health، شواهد و rollback صریح شدند.']).map((item) => <li key={item}>{item}</li>)}
           </ul>
+        </section>
+
+        <section className="space-y-3 rounded-xl border bg-card p-6 card-hover">
+          <h2 className="text-xl font-semibold">{copy.hAfter}</h2>
+          <div className="grid gap-3 text-sm md:grid-cols-4">
+            {(lang === 'en' ? ['Candidate SHA', 'Build + Prisma', 'Internal health', 'Public verification'] : ['SHA کاندید', 'Build + Prisma', 'سلامت داخلی', 'راستی‌آزمایی عمومی']).map((item, index) => <div key={item} className="rounded-lg border p-4"><span className="font-bold text-primary">0{index + 1}</span><p className="mt-2 font-semibold">{item}</p></div>)}
+          </div>
+        </section>
+
+        <section className="space-y-3 rounded-xl border bg-card p-6 card-hover">
+          <h2 className="text-xl font-semibold">{copy.hOutcomes}</h2>
+          <div className="grid gap-3 md:grid-cols-2">
+            {evidence.filter(isPublishableEvidence).map((item) => (
+              <div key={item.id} className="rounded-lg border p-4">
+                <p className="text-sm font-semibold">{item.label}</p>
+                <p className="mt-2 text-lg font-bold text-primary">{item.value}</p>
+                <details className="mt-3 text-xs leading-6 text-muted-foreground"><summary className="cursor-pointer font-semibold text-foreground">{lang === 'en' ? 'Provenance' : 'منشأ شواهد'}</summary><p className="mt-2">{item.source} · {item.period} · {item.method} · {item.verificationDate}</p></details>
+              </div>
+            ))}
+          </div>
         </section>
 
         <section className="grid gap-4 md:grid-cols-2">
@@ -160,6 +197,11 @@ export default async function InfrastructureLocalizationRescueCaseStudyPage() {
         <section className="space-y-3 rounded-xl border bg-card p-6 card-hover">
           <h2 className="text-xl font-semibold">{copy.hProof}</h2>
           <p className="text-sm text-muted-foreground">{copy.pProof}</p>
+        </section>
+
+        <section className="space-y-3 rounded-xl border bg-card p-6 card-hover">
+          <h2 className="text-xl font-semibold">{copy.hVerification}</h2>
+          <p className="text-sm leading-7 text-muted-foreground">{lang === 'en' ? 'The accepted path is verified by immutable candidate identity, build and type checks, internal readiness, same-host smoke, and two consecutive public browser passes.' : 'مسیر پذیرفته‌شده با هویت immutable کاندید، build و type-check، آمادگی داخلی، smoke هم‌میزبان و دو pass متوالی مرورگر عمومی راستی‌آزمایی شد.'}</p>
         </section>
 
         <section className="space-y-3 rounded-xl border bg-card p-6 card-hover">

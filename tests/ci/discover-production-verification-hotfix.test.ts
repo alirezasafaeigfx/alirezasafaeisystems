@@ -17,10 +17,12 @@ describe('Discover production verification hotfix contracts', () => {
     expect(layout).toMatch(/<ThemeProvider[\s\S]*?nonce=\{nonce\}[\s\S]*?>/)
   })
 
-  it('clips the Discover aurora decoration so it cannot expand the mobile document width', () => {
+  it('keeps the redesigned Discover landing free of the legacy aurora overflow risk', () => {
     const page = readFileSync(resolve(process.cwd(), 'src/app/discover/page.tsx'), 'utf8')
 
-    expect(page).toContain('section-surface aurora-shell overflow-hidden')
+    expect(page).not.toContain('aurora-shell')
+    expect(page).not.toContain('subtle-grid')
+    expect(page).toContain('mx-auto max-w-6xl')
   })
 
   it('waits for the current route network to settle before intentional navigation can abort its own chunks', () => {

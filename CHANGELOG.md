@@ -1,3 +1,54 @@
+# [1.1.0](https://github.com/alirezasafaeigfx/alirezasafaeisystems/compare/v1.0.3...v1.1.0) (2026-08-30)
+
+
+### Bug Fixes
+
+* **admin:** suppress public footer in control center ([39856d7](https://github.com/alirezasafaeigfx/alirezasafaeisystems/commit/39856d70849d0bf62777fb2926cd519bd5928e16))
+* **admin:** suppress public header in control center ([3169f8f](https://github.com/alirezasafaeigfx/alirezasafaeisystems/commit/3169f8f703d6700927f05824686513e63e3c76e6))
+* **ci:** skip visual work after cancellation ([8817986](https://github.com/alirezasafaeigfx/alirezasafaeisystems/commit/8817986f587732c8d5f638434b003c75aa9f98a5))
+* **deploy:** compress source archive transfer ([5a08208](https://github.com/alirezasafaeigfx/alirezasafaeisystems/commit/5a08208db2b7ea34bb11bbecb52b8c74bed07cfb))
+* **discover:** restore server-backed URL query state ([f0a452b](https://github.com/alirezasafaeigfx/alirezasafaeisystems/commit/f0a452bf6fde7c92a02b852a43a64a56cd8b8d21))
+* **test:** assert visual evidence semantics ([ecf709c](https://github.com/alirezasafaeigfx/alirezasafaeisystems/commit/ecf709cb93aaed2aa09bc741a85a8fa0056aa177))
+* **test:** isolate visual evidence captures ([14c6c40](https://github.com/alirezasafaeigfx/alirezasafaeisystems/commit/14c6c409bdea82e0415985c4a628c3ec5bdc91c8))
+* **test:** match visual evidence filenames semantically ([78a3cb1](https://github.com/alirezasafaeigfx/alirezasafaeisystems/commit/78a3cb1e6ee95dffb28792b5486e0f294e888a6f))
+* **test:** type visual evidence helpers ([9ee4a42](https://github.com/alirezasafaeigfx/alirezasafaeisystems/commit/9ee4a42c8d3d5ec824b1642cefc22209cdd7fa63))
+* **ui:** hydrate lazy media before visual evidence capture ([7e32910](https://github.com/alirezasafaeigfx/alirezasafaeisystems/commit/7e32910b8354cf6629059561f678e21008fd78f5))
+* **ui:** make project media responsive and motion-safe ([e581350](https://github.com/alirezasafaeigfx/alirezasafaeisystems/commit/e58135077d4a2ca75b866312f64f7d98f70518d4))
+* **ui:** narrow lazy media nodes to image elements ([c8d21d7](https://github.com/alirezasafaeigfx/alirezasafaeisystems/commit/c8d21d78d860b4e4c981a79a8d6e439fb3419169))
+* **visual:** harden audit proof rendering ([41a8023](https://github.com/alirezasafaeigfx/alirezasafaeisystems/commit/41a80235c83ec6949d518bd7fa034814d6e43fef))
+
+
+### Features
+
+* **blog:** add editorial post card ([3e84e00](https://github.com/alirezasafaeigfx/alirezasafaeisystems/commit/3e84e007b81634c1af0bc897e1f1a85207e72d54))
+* **blog:** add publication article shell ([d9bd30c](https://github.com/alirezasafaeigfx/alirezasafaeisystems/commit/d9bd30c7fc677612d1de53a9213d645a1ddfc69c))
+* **blog:** build editorial insights landing ([ce53abc](https://github.com/alirezasafaeigfx/alirezasafaeisystems/commit/ce53abc42e1a4182409c43553aec600d2146d7bd))
+* **blog:** build publication-grade article shell ([c2af828](https://github.com/alirezasafaeigfx/alirezasafaeisystems/commit/c2af8285321b2da3b6411983185aa0170b58bb53))
+* **blog:** style safe markdown for reading ([17ed208](https://github.com/alirezasafaeigfx/alirezasafaeisystems/commit/17ed20849e9e51a9fa6d4c6e29010a36872198b9))
+* **brand:** add real owner portrait asset ([dbc9b90](https://github.com/alirezasafaeigfx/alirezasafaeisystems/commit/dbc9b9067abf8b6bf74117a6b580ac14994b39e7))
+* **brand:** render real owner portrait ([f23064b](https://github.com/alirezasafaeigfx/alirezasafaeisystems/commit/f23064bc657a9425d386876730b89e55647198ee))
+* **brand:** replace novax with real case-study proof ([2fb8033](https://github.com/alirezasafaeigfx/alirezasafaeisystems/commit/2fb8033b8928695c0701ef45fbe89d4db7763dd1))
+* **brand:** wire real project screenshots ([4c101c2](https://github.com/alirezasafaeigfx/alirezasafaeisystems/commit/4c101c2ad2d32c89eb87dfd1382ca08f2d0fb2b9))
+* **discover:** add canonical server pagination ([29297c7](https://github.com/alirezasafaeigfx/alirezasafaeisystems/commit/29297c7c602f688e55a587e57b5634ab2b4d0ee0))
+* **discover:** add URL-backed resource controls ([279f7a9](https://github.com/alirezasafaeigfx/alirezasafaeisystems/commit/279f7a95072c4043442da1d3eb011cc49fc59188))
+* **discover:** elevate resource card hierarchy ([6bb46ab](https://github.com/alirezasafaeigfx/alirezasafaeisystems/commit/6bb46ab99a4e07e3898f653f374c781cd7ed88c0))
+* **discover:** make resource search visually primary ([4c630f0](https://github.com/alirezasafaeigfx/alirezasafaeisystems/commit/4c630f01319f3e2acf7c74da1e7438a95c14b087))
+* **discover:** redesign curated resource library ([d810e6e](https://github.com/alirezasafaeigfx/alirezasafaeisystems/commit/d810e6ea2ee11b9d69d7bc192fd58ab99ee64cad))
+* **home:** add evidence-first proof strip ([2c555a1](https://github.com/alirezasafaeigfx/alirezasafaeisystems/commit/2c555a1e388016c933b9acbbced633e9e7d71adc))
+* **home:** add visual project showcase primitive ([97a7e8e](https://github.com/alirezasafaeigfx/alirezasafaeisystems/commit/97a7e8e3ebb31c3991211d5624540afe1c3064d7))
+* **home:** build V3.1 signature personal hero ([bc04009](https://github.com/alirezasafaeigfx/alirezasafaeisystems/commit/bc040092c36964887d22142c6b9a2f94cc6f9681))
+* **home:** replace generic cards with editorial proof modules ([2936432](https://github.com/alirezasafaeigfx/alirezasafaeisystems/commit/29364322b92519b0d6277503747b7447a10630ea))
+* **test:** capture immutable v3.1 visual evidence ([533813f](https://github.com/alirezasafaeigfx/alirezasafaeisystems/commit/533813fd57418933ecd93acc8208bae6dd8cdd6b))
+* **test:** complete v3.1 review evidence matrix ([080d0c3](https://github.com/alirezasafaeigfx/alirezasafaeisystems/commit/080d0c3d5581a3bec82f5ee8499448c73eeaa7da))
+* **ui:** add controlled project media motion ([47490d5](https://github.com/alirezasafaeigfx/alirezasafaeisystems/commit/47490d5b15ee55beffdfb1fc33e485d0f6ef9998))
+* **ui:** add editorial section heading primitive ([eb5ece8](https://github.com/alirezasafaeigfx/alirezasafaeisystems/commit/eb5ece8c3d2ec052fa89bc70a4c4b86e74ac5034))
+* **ui:** add stable visual frame primitive ([3d59ff7](https://github.com/alirezasafaeigfx/alirezasafaeisystems/commit/3d59ff7074f0df822cd7d053ee0277b3e5f45be1))
+* **ui:** define V3.1 public visual tokens ([8b9604f](https://github.com/alirezasafaeigfx/alirezasafaeisystems/commit/8b9604f5ed61fb847d4e049d34fca0745bb006f3))
+* **ui:** load V3.1 public visual tokens ([0dfdda4](https://github.com/alirezasafaeigfx/alirezasafaeisystems/commit/0dfdda4ad1a4cb6fc9b9fd2ac3ad51ce35a224bc))
+* **ui:** rebuild V3.1 public footer ([ba09e64](https://github.com/alirezasafaeigfx/alirezasafaeisystems/commit/ba09e64b1731438080b6ffeccb2cfc4eb06e0159))
+* **ui:** redesign V3.1 global header ([5e2b630](https://github.com/alirezasafaeigfx/alirezasafaeisystems/commit/5e2b630c9c05187814cde39457d2b02d8ce87248))
+* **ui:** retire global mobile bottom nav ([9a5a008](https://github.com/alirezasafaeigfx/alirezasafaeisystems/commit/9a5a008469002567462d5387f7bb575c4a811a22))
+
 ## [1.0.3](https://github.com/alirezasafaeigfx/alirezasafaeisystems/compare/v1.0.2...v1.0.3) (2026-08-29)
 
 

@@ -44,19 +44,19 @@ function getCaseStudies(lang: 'fa' | 'en'): CaseStudyItem[] {
         title: 'Infrastructure Localization Rescue',
         summary: 'Stabilized a fragile production stack under localization constraints and cut incident recovery time by 69%.',
         href: '/case-studies/infrastructure-localization-rescue',
-        metric: 'MTTR: 180m → 55m',
+        metric: 'Documented recovery evidence',
       },
       {
         title: 'Legacy Next.js Replatform',
         summary: 'Migrated a risk-prone monolith to a governed Next.js architecture with cleaner release boundaries.',
         href: '/case-studies/legacy-nextjs-replatform',
-        metric: 'Release failure rate: -58%',
+        metric: 'Documented release evidence',
       },
       {
         title: 'CI/CD Governance Hardening',
         summary: 'Introduced release gates, rollback drills, and evidence-based operations for executive reporting.',
         href: '/case-studies/ci-cd-governance-hardening',
-        metric: 'Emergency rollback: 0 in 30 days',
+        metric: 'Documented rollback evidence',
       },
     ]
   }
@@ -91,19 +91,19 @@ function getCaseStudies(lang: 'fa' | 'en'): CaseStudyItem[] {
       title: 'نجات بومی‌سازی زیرساخت',
       summary: 'پایدارسازی استک شکننده تحت محدودیت‌های بومی‌سازی و کاهش زمان بازیابی رخدادها.',
       href: '/case-studies/infrastructure-localization-rescue',
-      metric: 'MTTR: ۱۸۰ → ۵۵ دقیقه',
+      metric: 'شواهد مستند بازیابی',
     },
     {
       title: 'بازپلتفرم Next.js قدیمی',
       summary: 'مهاجرت یک مونولیت پرریسک به معماری governed در Next.js با مرزهای انتشار تمیزتر.',
       href: '/case-studies/legacy-nextjs-replatform',
-      metric: 'کاهش نرخ شکست انتشار: ۵۸٪',
+      metric: 'شواهد مستند انتشار',
     },
     {
       title: 'سخت‌سازی حاکمیت CI/CD',
       summary: 'ایجاد گیت‌های انتشار، تمرین‌های rollback، و عملیات مبتنی بر شواهد برای گزارش مدیریتی.',
       href: '/case-studies/ci-cd-governance-hardening',
-      metric: 'Rollback اضطراری: ۰ در ۳۰ روز',
+      metric: 'شواهد مستند rollback',
     },
   ]
 }

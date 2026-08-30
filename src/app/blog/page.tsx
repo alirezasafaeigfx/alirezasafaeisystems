@@ -1,17 +1,122 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
 import { db } from '@/lib/db'
 import { getRequestLanguage } from '@/lib/i18n/server'
 import { hasCompleteBlogTranslation } from '@/lib/blog'
+import { BlogPostCard } from '@/components/blog/blog-post-card'
 
 export async function generateMetadata(): Promise<Metadata> {
   const en = (await getRequestLanguage()) === 'en'
-  return { title: en ? 'Blog | Engineering Insights' : 'بلاگ | بینش‌های مهندسی', description: en ? 'Practical engineering notes on systems, architecture and reliability.' : 'یادداشت‌های عملی درباره سیستم‌ها، معماری و پایداری نرم‌افزار.', alternates: { canonical: en ? '/en/blog' : '/blog' } }
+
+  return {
+    title: en ? 'Blog | Engineering Insights' : 'بلاگ | بینش‌های مهندسی',
+    description: en
+      ? 'Practical engineering notes on systems, architecture and reliability.'
+      : 'یادداشت‌های عملی درباره سیستم‌ها، معماری و پایداری نرم‌افزار.',
+    alternates: { canonical: en ? '/en/blog' : '/blog' },
+  }
+}
+
+function formatDate(date: Date, locale: 'fa' | 'en') {
+  return new Intl.DateTimeFormat(locale === 'fa' ? 'fa-IR' : 'en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  }).format(date)
 }
 
 export default async function BlogPage() {
-  const lang = await getRequestLanguage(); const en = lang === 'en'
-  const posts = await db.blogPost.findMany({ where: { published: true }, orderBy: [{ featured: 'desc' }, { publishedAt: 'desc' }, { updatedAt: 'desc' }], take: 12 })
+  const lang = await getRequestLanguage()
+  const en = lang === 'en'
+  const locale = en ? 'en' : 'fa'
+
+  const posts = await db.blogPost.findMany({
+    where: { published: true },
+    orderBy: [
+      { featured: 'desc' },
+      { publishedAt: 'desc' },
+      { updatedAt: 'desc' },
+    ],
+    take: 12,
+  })
+
   const visible = posts.filter((post) => !en || hasCompleteBlogTranslation(post))
-  return <section className="container mx-auto px-4 py-28" aria-labelledby="blog-heading"><header className="mx-auto max-w-3xl space-y-4"><p className="text-sm font-semibold text-primary">{en ? 'Insights' : 'بینش‌ها'}</p><h1 id="blog-heading" className="text-4xl font-bold">{en ? 'Engineering notes for reliable delivery' : 'یادداشت‌هایی برای تحویل مطمئن نرم‌افزار'}</h1></header><div className="mx-auto mt-10 grid max-w-5xl gap-5 md:grid-cols-2">{visible.map((post) => <article key={post.id} className="rounded-xl border bg-card p-6"><h2 className="text-2xl font-semibold"><Link href={`${en ? '/en' : ''}/blog/${post.slug}`} className="hover:underline">{en ? post.titleEn : post.title}</Link></h2><p className="mt-3 text-muted-foreground">{en ? post.excerptEn : post.excerpt}</p></article>)}</div></section>
+  const featured = visible.find((post) => post.featured)
+  const remaining = featured
+    ? visible.filter((post) => post.id !== featured.id)
+    : visible
+
+  const copy = en
+    ? {
+        eyebrow: 'Insights',
+        title: 'Engineering notes for reliable delivery',
+        description: 'Practical field notes on software architecture, production reliability, delivery systems, and the decisions behind maintainable products.',
+        latest: 'Latest notes',
+        empty: 'No published insights are available yet.',
+      }
+    : {
+        eyebrow: 'بینش‌ها',
+        title: 'یادداشت‌هایی برای تحویل مطمئن نرم‌افزار',
+        description: 'یادداشت‌های عملی درباره معماری نرم‌افزار، پایداری Production، سیستم تحویل و تصمیم‌هایی که محصول را قابل نگهداری می‌کنند.',
+        latest: 'یادداشت‌های تازه',
+        empty: 'هنوز یادداشت منتشرشده‌ای وجود ندارد.',
+      }
+
+  function card(post: (typeof visible)[number], isFeatured: boolean) {
+    const title = en ? (post.titleEn ?? '') : post.title
+    const excerpt = en ? (post.excerptEn ?? '') : post.excerpt
+    const publishedAt = post.publishedAt ?? post.createdAt
+
+    return (
+      <BlogPostCard
+        key={post.id}
+        title={title}
+        excerpt={excerpt}
+        href={`${en ? '/en' : ''}/blog/${post.slug}`}
+        category={post.category}
+        publishedLabel={formatDate(publishedAt, locale)}
+        readTimeLabel={en ? `${post.readTime} min read` : `${post.readTime} دقیقه مطالعه`}
+        featured={isFeatured}
+        locale={locale}
+      />
+    )
+  }
+
+  return (
+    <section className="container mx-auto px-4 pb-20 pt-24 md:pt-28" aria-labelledby="blog-heading">
+      <div className="mx-auto max-w-6xl">
+        <header className="max-w-4xl space-y-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+            {copy.eyebrow}
+          </p>
+          <h1 id="blog-heading" className="headline-tight text-4xl font-bold tracking-tight md:text-6xl">
+            {copy.title}
+          </h1>
+          <p className="max-w-3xl text-base leading-8 text-muted-foreground md:text-lg">
+            {copy.description}
+          </p>
+        </header>
+
+        {visible.length === 0 ? (
+          <p role="status" className="mt-12 rounded-2xl border border-dashed p-8 text-muted-foreground">
+            {copy.empty}
+          </p>
+        ) : (
+          <div className="mt-12 space-y-12">
+            {featured ? <section aria-label={en ? 'Featured insight' : 'یادداشت منتخب'}>{card(featured, true)}</section> : null}
+
+            {remaining.length > 0 ? (
+              <section aria-labelledby="latest-insights-heading">
+                <h2 id="latest-insights-heading" className="text-sm font-semibold text-muted-foreground">
+                  {copy.latest}
+                </h2>
+                <div className="mt-5 grid gap-x-8 gap-y-10 md:grid-cols-2">
+                  {remaining.map((post) => card(post, false))}
+                </div>
+              </section>
+            ) : null}
+          </div>
+        )}
+      </div>
+    </section>
+  )
 }
