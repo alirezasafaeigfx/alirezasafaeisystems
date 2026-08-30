@@ -71,6 +71,14 @@ This ledger records state and evidence. It does not create work independently. I
 - S1–S4 accepted on GITHUB_MAIN: PR #22 merge `a7dc295c93efafbf1f37248009283b3dab5bc365`; PR #23 merge `7d331132fc019a63772a5ce7094fb3d1a8c8853b`; PR #24 merge `23edc4fb7bd506125127c1eba577996cabe44ec1`; PR #25 merge `39c09b43191822d70c30f7fa8ae51dadb36d37b7`. Exact-main hosted CI, E2E, Lighthouse, security, and CodeQL signals passed at the final UI SHA.
 - S5 release acceptance remains blocked by the missing production approval literal; production was observed read-only and no production identity was inferred from GITHUB_MAIN. Main's non-required semantic-release job also failed at `33329600579` during GitHub API TLS handshake timeout and was not used as release evidence.
 
+## S5 governed production acceptance
+
+- UTC `2026-08-30`: governed production run `33332174608` succeeded for immutable `GITHUB_MAIN@39c09b43191822d70c30f7fa8ae51dadb36d37b7`; quality gate, archive transfer/checksum, authorized legacy SQLite relocation, remote deploy, same-host smoke, and two consecutive public Chromium passes completed successfully. Deployment `6170617220` and published contexts `production/deploy` and `production/live-verification` are successful.
+- Production release identity: `/var/www/my-portfolio/releases/production/20260830T195659Z`; active `current/production` resolves to that release. Exact rollback target from deploy state: `/var/www/my-portfolio/releases/production/20260829T044320Z`.
+- Migration/backup: relocation completed through the reviewed helper; snapshot `/var/www/my-portfolio/shared/backups/production/20260830T195659Z/database.sqlite` is present with restricted backup directory permissions and SHA-256 `62548e9e7d952cd30c6fb547109d3c204f689d9edf7625f03dd1835e21c536fc`, matching the active persistent database. No unrelated schema/data operation was performed.
+- Public acceptance: `/`, `/api/ready`, `/services`, `/discover`, `/en/discover`, and `/profile` returned HTTP 200. Two live reports at `20:31:22Z–20:32:47Z` and `20:32:48Z–20:34:16Z` both report `LIVE_VERIFICATION_PASS`, FA/EN desktop/mobile viewports, tested navigation and flagship Discover detail, with no failures. Benign Next.js RSC fetch-abort warnings were recorded by the verifier.
+- S5 verdict: **DONE**. Final screenshot artifacts are retained at `C:\Users\ASDEV\AppData\Local\Temp\asdev-v3-2-production-ui-39c09b4` (FA/EN desktop/mobile); staging and production browser reports remain in their respective temporary artifact directories.
+
 - R0-01, R0-02, R0-03A and R0-04 are terminal/reusable and must not be dispatched again.
 - PR #20 and PR #21 are `EXISTS-UNMERGED`, not `DONE`; continue the existing work rather than create parallel implementations.
 - R0-05B repository settings and R0-03C staging are external side effects with separate literal gates.
