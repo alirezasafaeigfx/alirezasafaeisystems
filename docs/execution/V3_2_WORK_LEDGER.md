@@ -36,7 +36,7 @@ This ledger records state and evidence. It does not create work independently. I
 | PR #18 | canonical V3.2 documentation PR; original head `48eb38afe66ab80bbd1767e5240f06bd81d7450a` | supporting docs source; must not become a competing roadmap |
 | immersive documentation branch | `docs/v3-2-immersive-interaction-spec` | isolated docs-only continuation from PR #18 head |
 | PR #20 | draft, CI-green, bounded three-file staging-smoke change | existing R0-03B implementation; review/accept it instead of reimplementing |
-| PR #21 | draft governance guard + R0-04 report | R0-04 evidence reusable; guard is not accepted because branch-name trigger and allowlist do not fail closed on its own PR/sensitive path changes |
+| PR #21 | draft governance guard + R0-04 report | R0-04 evidence reusable; amended head `dc77060afea987bdfde45538b43ca5fef1feaf8e` has all hosted checks green and the guard now covers sensitive paths, declarations, ancestry and fail-closed categories | remains draft during incident freeze; repository settings are a separate admin gate |
 | Public production sample | Home content did not match `main@39c686d4...`; `/discover`, `/blog`, and flagship samples returned `502` during review | exact production identity and current route health are unresolved until fresh R0-05 observation |
 
 ## Active task registry
@@ -51,8 +51,8 @@ This ledger records state and evidence. It does not create work independently. I
 | R0-03C | `BLOCKED` | SRE/QA | exact accepted R0-03B head | none yet | literal `APPROVE_PHASE_2_STAGING_DEPLOY`; one governed rerun only |
 | R0-04 | `REUSED-DONE` | REVIEW | exact app SHA `41a80235...` | existing exact-SHA evidence + PR #21 report | do not repeat unless inputs change |
 | R0-05 | `BLOCKED` | ORCH/SRE | actual public release truth | source/main and public observation disagree | R0-03C; observe exact production identity/release path rather than infer |
-| R0-05A | `QUEUED — EXISTS-UNMERGED` | ORCH/QA | draft PR #21 | useful existing guard/tests, but trigger is branch-name based and allowlist misses its own report scope | amend PR #21 only: sensitive-path trigger, self-coverage, ancestry/task/scope declaration, fail-closed categories |
-| R0-05B | `BLOCKED — ADMIN GATE` | ORCH | repository settings | `main` unprotected; rulesets empty | R0-05A acceptance + explicit authorization to mutate repository settings; otherwise record blocker |
+| R0-05A | `READY — EXISTS-UNMERGED` | ORCH/QA | `main@39c686d4...` → PR #21 `dc77060afea987bdfde45538b43ca5fef1feaf8e` | six-file bounded diff; hosted Router, quality, smoke, Lighthouse, security and CodeQL checks green; local focused 7/7, type-check and lint 0 errors | remains draft during incident freeze; no merge or settings mutation |
+| R0-05B | `BLOCKED — ADMIN GATE` | ORCH | repository settings | read-only GitHub API: `main` unprotected (404), rulesets `[]` | repository administrator must explicitly authorize and activate the smallest protection/ruleset contract: required CI Router + quality/security checks, approving review, no direct push/bypass where feasible |
 | R0-06 | `BLOCKED` | ORCH | actual accepted post-release base | none yet | R0-05 |
 | S1-* | `BLOCKED BY R0` | UX/EVID/FE/QA | post-R0 base | roadmap/spec ready | R0-06 |
 | S2-* | `BLOCKED BY S1` | EVID/UX/FE/QA | accepted S1 head | roadmap/spec ready | S1 exit gate |
@@ -67,6 +67,19 @@ This ledger records state and evidence. It does not create work independently. I
 - R0-01, R0-02, R0-03A and R0-04 are terminal/reusable and must not be dispatched again.
 - PR #20 and PR #21 are `EXISTS-UNMERGED`, not `DONE`; continue the existing work rather than create parallel implementations.
 - R0-05B repository settings and R0-03C staging are external side effects with separate literal gates.
+
+## R0-05A admission and acceptance evidence
+
+- Task ID: `R0-05A`.
+- Intended base: `main@39c686d4b977e7122a6a2ca889878a43fea3f1f9`.
+- Primary concern: bounded ancestry and scope guard.
+- Expected path categories: `workflow,ci,report,plan`.
+- Allowed paths: `.github/workflows/**`, `scripts/ci/**`, `tests/ci/**`, `docs/reports/**`, and `docs/superpowers/plans/**` for this existing bounded PR; no application, content, deployment, release or other paths.
+- Reused evidence: R0-04 report and existing PR #21 implementation/tests; no V3.1 application behavior was reimplemented.
+- TDD evidence: new declaration/category crossover tests were observed red before implementation and are green at 7/7 on the accepted candidate.
+- Acceptance: sensitive changed-path detection replaced the branch-name trigger; PR event declarations provide canonical task/base/concern/categories; the CLI verifies full-SHA inputs, merge-base, ancestry and complete `base...head` file range; undeclared or forbidden categories fail closed; the guard runs on its own PR.
+- Fresh checks at head `dc77060afea987bdfde45538b43ca5fef1feaf8e`: hosted CI Router, quality, smoke, Lighthouse, security, dependency review, audit and CodeQL all passed; local `pnpm type-check` passed, `pnpm lint` had 0 errors, and full `pnpm test` reproduced the pre-existing Windows-sensitive backup-contract timeout (401 passed, 1 timed out, outside this diff).
+- Rollback/safe failure: one focused PR revert restores the prior guard; no production, staging, repository-settings or history mutation was performed.
 
 ## R0-03 terminal evidence — run `33303771900`
 
