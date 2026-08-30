@@ -28,6 +28,23 @@ jobs:
           printf '%s\n' "$CHANGED" > /tmp/asdev_changed_files.txt
           echo "Changed files:"
           cat /tmp/asdev_changed_files.txt
+          if grep -qE '^\.github/workflows/|^scripts/(deploy|ops)/|^ops/deploy/|^(package\.json|pnpm-lock\.yaml|next\.config\.|Dockerfile|docker-compose)' /tmp/asdev_changed_files.txt; then
+            echo "sensitive=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "sensitive=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: R0 infrastructure base and scope preflight
+        if: steps.changed.outputs.sensitive == 'true'
+        run: |
+          set -euo pipefail
+          git fetch origin main --depth=1
+          node scripts/ci/validate-r0-pr.mjs \
+            --base "${{ github.event.pull_request.base.sha }}" \
+            --head "${{ github.event.pull_request.head.sha }}" \
+            --main "$(git rev-parse FETCH_HEAD)" \
+            --scope r0-infrastructure \
+            --event "$GITHUB_EVENT_PATH"
 
       - name: Syntax-check changed shell scripts
         run: |
