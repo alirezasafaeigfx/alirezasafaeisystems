@@ -143,6 +143,10 @@ If any row is unknown, investigate first. Do not start implementation by guessin
 | R0-03 deploy | release `20260830T0937xxZ`, internal health PASS on port 3003 | candidate built/deployed successfully to staging before external smoke |
 | R0-03 failure | external staging hostname resolution timed out during post-deploy smoke (`curl` exit 28) | classify as DNS/public-route smoke failure, not application build/health failure |
 | R0-03 rollback | exact rollback completed to `20260830T070559Z` | failed-safe behavior proven; no live-browser passes produced |
+| R0-03A diagnosis | run `33303771900` plus successful same-host path in `33298314611` | transient VPS resolver-path incident; exact resolver sublayer was unobservable |
+| PR #20 | draft, CI-green, three-file bounded staging-smoke correction | existing work to review/accept; do not reimplement R0-03B |
+| PR #21 | draft governance guard/report | R0-04 evidence is reusable; R0-05A guard needs a bounded trigger/allowlist correction before acceptance |
+| Public production observation | public Home did not match `main@39c686d4...`; sampled `/discover`, `/blog`, and flagship routes returned `502` during review | production identity remains unproven; re-observe in R0-05 rather than inferring from Git/semantic-release |
 
 `33303771900` produced no live-verification artifact because live browser verification was skipped after smoke failure.
 
@@ -170,15 +174,16 @@ No sprint is calendar-driven. A sprint begins only when its dependency gate is s
 
 | ID | Task | Dependency | Minimal-change rule | Done when |
 |---|---|---|---|---|
-| R0-01 | Preserve evidence from run `33298314611` | none | documentation only | release, health, smoke, pass-1 and timeout truth recorded |
-| R0-02 | Repair archive transport using git-produced `.tar.gz` and checksum | R0-01 | workflow/test only | compressed transfer proved in real staging run |
+| R0-01 | `REUSED-DONE` — preserve evidence from run `33298314611` | none | documentation only | release, health, smoke, pass-1 and timeout truth recorded |
+| R0-02 | `REUSED-DONE` — compressed `.tar.gz` transport | R0-01 | no redesign | implementation and real staging transfer remain valid |
 | R0-03 | Execute the single governed staging attempt on exact `41a80235...` | R0-02 | no app changes | terminal truth recorded: internal deploy PASS, external DNS smoke FAIL, exact rollback PASS |
-| R0-03A | Diagnose staging public-route/DNS smoke failure from primary evidence | R0-03 | investigate DNS/smoke path only; no app refactor | root cause classified and smallest safe correction identified |
-| R0-03B | Apply only the proven bounded correction and re-verify staging according to release policy | R0-03A | no second unrelated workflow redesign | staging health/smoke plus required live verification evidence green |
-| R0-04 | Complete independent exact-SHA review | R0-01 | reuse existing exact-SHA evidence | truth/security/a11y/SEO/performance/scope verdict recorded |
-| R0-05 | Reconcile accidental source merge, production identity, and release governance | R0-03B, R0-04 | no history rewrite, no cosmetic revert | real history, current production release identity and authorized release path recorded |
-| R0-05A | Add branch/base ancestry and bounded-PR scope guard | incident evidence | isolated tests + minimal governance code only | contaminated workflow-fix PR class fails closed |
-| R0-05B | Establish repository protection/ruleset policy | R0-05A | smallest enforceable repository control set | required checks/review/merge constraints active or explicit admin blocker recorded |
+| R0-03A | `REUSED-DONE` — classify DNS/public-route incident | R0-03 | evidence only; no app/DNS/Nginx refactor | transient VPS resolver-path incident recorded; unobservable sublayer not guessed |
+| R0-03B | Review and accept the existing bounded correction in PR #20 | R0-05B, R0-03A | reuse PR #20; no duplicate implementation or wider workflow redesign | diff proves same-VPS smoke is DNS-independent while public browser passes still exercise real DNS; targeted contracts green |
+| R0-03C | Execute one governed staging rerun | R0-03B + literal staging approval | exact immutable candidate; one attempt | internal health, bounded smoke, and two public live-browser passes green, or terminal failed-safe truth + exact rollback recorded |
+| R0-04 | `REUSED-DONE` — independent exact-SHA review | R0-01 | reuse PR #21 report/evidence; do not repeat valid V3.1 checks | truth/security/a11y/SEO/performance/scope verdict recorded |
+| R0-05 | Observe and reconcile production identity and authorized release truth | R0-03C, R0-04 | no history rewrite, no semantic-release inference | exact public production release identity, route health, rollback target and authorized release path recorded |
+| R0-05A | Correct and accept the existing ancestry/scope guard in PR #21 | incident evidence | amend existing work only; no replacement implementation | guard triggers from sensitive changed paths, runs on its own PR, verifies intended base/ancestry + declared task/scope, and fails closed on unexpected categories |
+| R0-05B | Establish repository protection/ruleset policy | R0-05A + explicit repository-admin authorization | smallest enforceable control set; settings mutation is separately gated | required checks/review/merge constraints active or exact admin blocker recorded |
 | R0-06 | Establish clean V3.2 base/worktree from actual accepted release base | R0-05 | branch creation only | base SHA recorded; worktree clean; no stale branch ancestry |
 
 ### R0 refactor prohibition
@@ -195,10 +200,9 @@ R0 is an incident/release sprint, not an application modernization sprint. No UI
 |---|---|---|---|---|
 | S1-01 | typed evidence registry | evidence contract + tests | extend existing data/types before creating parallel registry | metrics cannot render without provenance |
 | S1-02 | specific FA/EN Hero positioning | three-second positioning | modify copy/composition only; do not rebuild Hero foundation without evidence | generic job-title H1 gone; one semantic H1 |
-| S1-03 | quantitative proof strip | `180→55`, `−58%`, `0/30d` | reuse existing proof primitives where possible | every metric has verifiable provenance |
-| S1-04 | ASDEV Audit primary CTA | attributed conversion path | reuse existing CTA primitives/routes | one dominant primary action across Home/Header/Footer |
+| S1-03 | provenance-approved quantitative proof strip | only claims admitted by typed evidence registry | reuse existing `ProofStrip`; do not hard-code campaign numbers in the roadmap | every rendered metric has source, period, method, and review state |
+| S1-04 | ASDEV Audit primary CTA + evidence routing | attributed evidence → Audit path | reuse existing CTA primitives/routes and absorb former S1-06 | one dominant primary action across Home/Header/Footer; no generic evidence dead-end |
 | S1-05 | simplify primary IA | Work / Services / Discover / About | navigation-only scope | Blog removed from primary nav until publication gate |
-| S1-06 | route Audit proof correctly | evidence → Audit hierarchy | route/content patch only | no generic evidence dead-end |
 | S1-07 | conversion analytics verification | inspectable funnel | reuse existing analytics transport/events when valid | view → CTA → Audit attribution inspectable |
 
 S1 MUST NOT trigger a general Home redesign. Only surfaces required by these acceptance criteria may change.
@@ -211,10 +215,8 @@ S1 MUST NOT trigger a general Home redesign. Only surfaces required by these acc
 
 | ID | Task | Output | Reuse/minimal-change rule | Done when |
 |---|---|---|---|---|
-| S2-01 | reusable evidence types/primitives | evidence components | extend existing primitives before replacement | interfaces documented/tested |
+| S2-01 | reusable evidence primitives, impact table, and code-native Before/After diagram | evidence components | extend existing primitives; absorbs former S2-03/S2-04 | semantic mobile/screen-reader/RTL/LTR/static/reduced-motion contracts documented and tested |
 | S2-02 | flagship `infrastructure-localization-rescue` | technical documentary | redesign this case study first; do not refactor all cases | before/after/timeline/impact/decisions clear |
-| S2-03 | semantic Before/After impact table | legible evidence | no generic table-system rewrite | mobile + screen-reader semantics pass |
-| S2-04 | code-native architecture diagrams | operational storytelling | SVG/DOM first; no GPU dependency | RTL/LTR/reduced-motion/static fallback pass |
 | S2-05 | claim provenance review | truth ledger | remove/downgrade rather than invent | independent evidence review passes |
 | S2-06 | case-study index hierarchy | flagship-first index | change index composition only | fewer equal-weight cards; flagship dominant |
 
@@ -228,9 +230,8 @@ S2 MUST NOT rebuild every case study. The flagship becomes the reference impleme
 
 | ID | Task | Output | Reuse/minimal-change rule | Done when |
 |---|---|---|---|---|
-| S3-01 | first-row priority media | useful first viewport | preserve current query/data architecture | later media remains lazy |
-| S3-02 | stable media skeleton/fallback/dimensions | no blank media void | extend current card/media primitive | slow-network evidence passes |
-| S3-03 | preserve URL search/filter/pagination | no regression | no query architecture rewrite | existing 15-resource contract + E2E green |
+| S3-01 | first-row priority media + stable dimensions/skeleton/fallback | useful, stable first viewport | extend current media primitive; absorbs former S3-02 | first row is prioritized, later media remains lazy, and slow-network evidence has no blank void/layout jump |
+| S3-03 | `REUSED-DONE` — URL search/filter/pagination | regression constraint only | preserve existing 15-resource URL-backed contract; no query rewrite | existing code/E2E evidence remains valid for unchanged inputs |
 | S3-04 | remove Blog from primary navigation while unready | honest IA | navigation-only | direct route remains functional |
 | S3-05 | Blog publication re-entry gate | explicit readiness contract | docs/content policy only | no filler content |
 | S3-06 | SEO/hreflang/schema/sitemap/empty state | search integrity | patch only failing contracts | FA/EN SEO tests green |
@@ -248,22 +249,17 @@ S3 MUST NOT rewrite Discover or Blog persistence/admin architecture.
 | S4-01 | remove unnecessary equal-weight cards | stronger hierarchy | edit affected Home/Case Study surfaces only | before/after inventory proves reduction |
 | S4-02 | bilingual typography/measure system | editorial rhythm | token-level changes before component rewrites | 390/768/1440 visual review passes |
 | S4-03 | authored mobile composition | progressive mobile narrative | modify only sections that fail composition | no overflow/dead-height/repeated stacking |
-| S4-04 | one operational visualization | ASDEV visual signature | semantic SVG/DOM; understandable statically | concept understood without animation |
 | S4-05 | purposeful CSS/WAAPI motion vocabulary | coherent motion | no dedicated animation dependency yet | reduced-motion and keyboard behavior pass |
-| S4-06 | Gate A Scene Logic prototype | Hero → System → Evidence continuity | existing stack only; no Canvas/GPU runtime | measurable narrative gain without CWV/a11y regression |
+| S4-06 | Gate A operational scene + Scene Logic | Hero → system → verified evidence continuity | semantic DOM/SVG/CSS; absorbs former S4-04; no Canvas/GPU runtime | concept is understandable statically and measurable narrative gain has no CWV/a11y regression |
 | S4-07 | Gate A decision | evidence-based GO/STOP | STOP is valid success | either freeze at Gate A or authorize one bounded Gate B experiment |
-| S4-08 | Optional Gate B advanced-motion experiment | one interaction only | dependency allowed only after S4-07 GO | value > complexity; bundle/perf/a11y budgets pass |
-| S4-09 | Optional Gate C GPU signature prototype | one isolated signature scene | only after explicit Gate B evidence and roadmap re-approval | graceful Tier 0 fallback + measurable value + budgets pass |
 
 ### S4 immersive rule
 
 The site must never become dependent on Canvas, WebGL, WebGPU, pointer physics, or scroll animation for comprehension, navigation, conversion, or evidence access.
 
-Gate progression is:
+Gate progression is an admission rule, not a pre-populated task queue:
 
 ```text
-S4-04 semantic visualization
-        ↓
 S4-05 motion vocabulary
         ↓
 S4-06 Gate A Scene Logic
@@ -272,16 +268,16 @@ S4-06 Gate A Scene Logic
       ↙     ↘
    STOP     GO
              ↓
-       optional Gate B
+       new roadmap admission: one bounded Gate B experiment
              ↓
          benchmark
           ↙     ↘
        STOP     GO
                  ↓
-           optional Gate C
+           new roadmap admission: one isolated Gate C prototype
 ```
 
-No Gate B/C work may be pre-built “for later”.
+Former S4-08/S4-09 are removed from the active queue. Gate B/C require a new evidence-backed roadmap admission after the preceding gate; no dependency, prototype, abstraction, or asset may be pre-built “for later”.
 
 ---
 
@@ -308,10 +304,12 @@ R0-01
   ↓
 R0-02
   ↓
-R0-03 → R0-03A → R0-03B ─┐
-  └────────→ R0-04 ────────┼→ R0-05 → R0-05A → R0-05B → R0-06
-                            │
-                            └───────────────────────────────────────┐
+R0-01 → R0-02 → R0-03 → R0-03A ───────────────────────────┐
+  └────────────────────────→ R0-04 (REUSED-DONE) ──────────┤
+incident → R0-05A → R0-05B → R0-03B → R0-03C ─────────────┤
+                                                           ↓
+                                                        R0-05 → R0-06
+                                                                    │
                                                                     ↓
 S1 ────────────────┐                                              V3.2 BASE
                    ├→ S2 ─┐
@@ -338,9 +336,57 @@ Within a sprint, agents may parallelize only tasks whose dependency cones and ch
 
 Two agents MUST NOT modify the same file set concurrently without ORCH explicitly splitting ownership.
 
+### Lane contracts
+
+| Lane | Owned concern / allowed surface | Required output and evidence | Stop/escalate when |
+|---|---|---|---|
+| ORCH | task admission, integration, roadmap/ledger, dependency rulings | exact base/head, bounded diff, terminal evidence; sole ledger writes | destructive/external gate, security risk, or no safe admitted work |
+| UX | IA, bilingual content hierarchy, mobile composition, interaction intent | annotated contract + width/reduced-motion states | implementation would require an unadmitted system change |
+| EVID | claim registry, provenance, documentary facts | source/method/period/review state; downgrade unsupported claims | primary evidence is absent or contradictory |
+| FE | bounded semantic implementation | targeted tests + changed-surface evidence | scope crosses task ownership or needs broad refactor |
+| FE-MOTION | S4-05/S4-06 only after admission | motion-state matrix + static/reduced-motion/touch equivalents | Gate A cannot meet budgets or a new runtime is requested |
+| FE-GPU | disabled | none until a new Gate C roadmap admission | always, unless Gate C is explicitly admitted |
+| QA | functional, a11y, responsive, slow-network, no-JS/reduced-motion evidence | exact-SHA commands/artifacts; no implementation ownership by default | evidence cannot be tied to exact inputs |
+| PERF | budgets and before/after measurement | CWV, JS, long-task, asset, memory/idle report | proposed interaction exceeds budget or measurement is inconclusive |
+| SRE | workflow, staging, release identity, rollback, rulesets | run/commit/release IDs and rollback proof | approval/credential/admin gate is missing |
+| REVIEW | independent scope/truth/security/a11y/perf verdict | severity-ranked verdict against exact diff/SHA | reviewer would need to implement its own finding |
+
 ---
 
-## 8. Definition of Done for every task
+## 8. Home and flagship architecture contract
+
+Home V3.2 follows one evidence narrative:
+
+`Header → Hero + Operational Scene → Verified Proof → Flagship Documentary → Services → Selected Work / Discover → Founder Credibility → ASDEV Audit CTA → Footer`.
+
+- Scene Logic is allowed only across Hero → system state → verified proof; it must explain `constraint → diagnosis → intervention → evidence`, not create a decorative dashboard.
+- The existing founder portrait moves to the founder/About credibility moment; it is not a reason to rebuild the Hero foundation.
+- Header, Services, Discover, Founder and Footer are changed only where positioning, comprehension, proof, conversion or credibility measurably improves.
+- The reference flagship is only `infrastructure-localization-rescue`: Incident → Constraint → Architecture Before → Diagnosis → Intervention → Architecture After → Evidence → Trade-offs → Verification → Audit CTA.
+- Reusable: evidence registry, impact table, Before/After diagram shell, timeline, verification/provenance blocks and Audit CTA. Case-specific: incident facts, constraints, diagnosis, intervention narrative and trade-offs.
+- Do not migrate every case study during S2.
+
+---
+
+## 9. Performance and accessibility contract
+
+Gate A and every later conditional experiment must keep:
+
+- LCP `≤ 2.5s`, INP `≤ 200ms`, CLS `≤ 0.1` at p75 where field data exists, with controlled lab evidence otherwise;
+- no new long task over `50ms` attributable to the changed interaction on the acceptance profile;
+- route-specific new initial JS budget `≤ 30 KiB gzip` for Gate A; any larger delta requires a new roadmap admission with before/after proof;
+- no autoplay/continuous background rendering, no idle animation loop, and no LCP/H1/primary CTA dependency on animation or client hydration;
+- responsive image/SVG assets with declared dimensions; no texture/video/GPU asset in Gate A;
+- complete keyboard, screen-reader, focus, zoom, forced-colors where applicable, no-JS/static and `prefers-reduced-motion` paths;
+- authored 390/768/1440 FA/EN compositions with touch targets, no horizontal overflow, no dead scroll zones and no desktop-only stacking;
+- reduced motion as explicit state replacement, never content removal;
+- low-capability fallback selected before initializing optional work; content/navigation/evidence remain Tier 0 accessible.
+
+Performance failure rejects or simplifies the interaction; it does not authorize a broad refactor.
+
+---
+
+## 10. Definition of Done for every task
 
 A task is `DONE` only when all applicable items are true:
 
@@ -357,7 +403,7 @@ A task is `DONE` only when all applicable items are true:
 
 ---
 
-## 9. Replanning rule
+## 11. Replanning rule
 
 New ideas do not immediately become implementation tasks.
 
@@ -375,7 +421,7 @@ This prevents research, inspiration, cleanup ideas, and agent suggestions from c
 
 ---
 
-## 10. Global stop conditions
+## 12. Global stop conditions
 
 Agents do not stop for routine ambiguity; they investigate and choose the safest bounded interpretation.
 
@@ -389,7 +435,19 @@ They stop only for:
 
 ---
 
-## 11. Program success
+## 13. Final roadmap review disposition
+
+| Disposition | Tasks / work |
+|---|---|
+| `REUSED-DONE` | R0-01, R0-02, R0-03A, R0-04, S3-03 and unchanged V3.1 primitives/evidence |
+| `MODIFY` | R0-03B, R0-05, R0-05A, R0-05B, S1-03, S1-04, S3-01, S4-06/S4-07 |
+| `MERGE` | S1-06→S1-04; S2-03/S2-04→S2-01; S3-02→S3-01; S4-04→S4-06 |
+| `REMOVE FROM ACTIVE QUEUE` | former S4-08/S4-09, unsupported fixed metrics `−58%` and `0/30d`, all-case-study migration, broad Home rewrite, Discover query/admin rewrite, speculative dependency/refactor work |
+| `KEEP` | all remaining tasks, subject to their updated dependencies and exit gates |
+
+---
+
+## 14. Program success
 
 The roadmap is complete only when:
 

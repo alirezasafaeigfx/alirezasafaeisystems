@@ -45,6 +45,9 @@ Every branch/PR must have one primary concern, intended base ancestry, and a bou
 - Observed `main`: `39c686d4b977e7122a6a2ca889878a43fea3f1f9` (`semantic-release` v1.1.0 source state). Main membership/release metadata is not proof of production deployment.
 - Latest repository-settings read: `main` protection disabled and repository rulesets empty.
 - Do not rewrite history, force-push, cosmetically revert, or attempt to merge PR #17 again merely to restore the intended sequence.
+- Draft PR #20 contains the existing bounded R0-03B staging-smoke correction; it is not accepted/merged and must not be reimplemented in parallel.
+- Draft PR #21 contains reusable R0-04 review evidence and a partial R0-05A guard. Its guard is not accepted: branch-name triggering misses its own `chore/r0-*` branch and can be bypassed; its allowlist does not cover its own report scope.
+- Public observation during final review did not match `main@39c686d4...`; sampled `/discover`, `/blog`, and flagship routes returned `502`. This is an observation to re-verify in R0-05, not an inferred production SHA.
 
 ## 5. R0-03 terminal truth — GitHub Actions run `33303771900`
 
@@ -90,13 +93,14 @@ Do not trigger broad application or deployment refactors from this evidence.
 
 Only canonical-roadmap dependencies determine execution order.
 
-1. `R0-03A` — bounded diagnosis of staging DNS/public-route smoke failure from primary evidence.
-2. `R0-04` — independent review against exact V3.1 application SHA; reuse existing exact-SHA evidence.
-3. `R0-05A` — isolated TDD governance guard for branch/base ancestry + bounded changed-path scope; do not hide application changes inside it.
-4. `R0-03B` — only after R0-03A identifies a proven smallest safe correction; re-verify according to release policy.
-5. `R0-05` — governance + production/release-identity reconciliation after R0-03B and R0-04.
-6. `R0-05B` — establish smallest enforceable branch/ruleset policy or record explicit administrative blocker.
-7. `R0-06` — create the clean V3.2 base from the actual accepted release base.
+Terminal/reused: `R0-01`, `R0-02`, `R0-03A`, `R0-04`. Do not dispatch them again.
+
+1. `R0-05A` — amend and accept the existing PR #21 guard: trigger from sensitive changed paths, cover its own PR, verify intended base/ancestry plus declared task/scope, and fail closed on unexpected categories.
+2. `R0-05B` — activate the smallest enforceable ruleset only with explicit repository-admin authorization; otherwise record the exact blocker.
+3. `R0-03B` — review and accept the existing PR #20 bounded correction; do not implement a second version.
+4. `R0-03C` — with literal `APPROVE_PHASE_2_STAGING_DEPLOY`, run one governed staging attempt and require two public browser passes or exact failed-safe rollback truth.
+5. `R0-05` — freshly observe exact production identity, route health, release path and rollback target; never infer deployment from Git membership or semantic-release.
+6. `R0-06` — create the clean V3.2 base from the actual accepted release base.
 
 S1 implementation remains blocked until R0-06.
 
@@ -129,17 +133,27 @@ Use existing platform capabilities first:
 
 Prove the narrative and interaction value before adding an animation/GPU runtime.
 
-### Gate B — conditional
+### Gate B — conditional and outside the active queue
 
 A dedicated advanced-motion runtime may be considered only if Gate A evidence demonstrates a specific interaction that cannot be achieved safely and maintainably with the existing approach.
 
-### Gate C — conditional
+### Gate C — conditional, disabled and outside the active queue
 
 Three.js/WebGL/WebGPU/GPU scene may be considered only if a measured prototype demonstrates material storytelling value while respecting performance, accessibility, mobile, reduced-motion, memory, and reliability budgets.
 
-Stopping at Gate A or Gate B is a valid successful outcome.
+Former S4-08/S4-09 are removed from the active queue. Gate B or C can exist only after a new evidence-backed canonical-roadmap admission. Stopping at Gate A or Gate B is a valid successful outcome.
 
-## 9. Explicit non-goals at this checkpoint
+## 9. Final architecture decisions
+
+- Identity: **Engineering Editorial + Operational Interface**; promise: **Operational systems made visible.**
+- Home: `Header → Hero + Operational Scene → Verified Proof → Flagship → Services → Selected Work / Discover → Founder → Audit CTA → Footer`.
+- Scene Logic is limited to explaining `constraint → diagnosis → intervention → evidence`; no decorative dashboard, game layer, Awwwards imitation or 3D prerequisite.
+- Reference flagship: only `infrastructure-localization-rescue`. Reusable primitives are evidence registry, impact table, Before/After diagram shell, timeline, verification/provenance and Audit CTA; incident/constraint/diagnosis/intervention/trade-off narrative stays case-specific.
+- Fixed claims `−58%` and `0/30d` are removed from the program contract. `180→55` and `0 rollback / 21d` may render only after provenance admission.
+- Existing portrait, display/evidence primitives, Hero CTAs, analytics foundation, URL-backed Discover, V3.1 visual matrix and reduced-motion media behavior are reuse targets, not rebuild tasks.
+- Unrelated-refactor budget remains zero. No broad application, design-system, routing, admin/persistence, deployment or animation-stack refactor is admitted.
+
+## 10. Explicit non-goals at this checkpoint
 
 Do not:
 
@@ -155,7 +169,7 @@ Do not:
 - force-push or rewrite history;
 - create a second roadmap/queue.
 
-## 10. Documentation state on this branch
+## 11. Documentation state on this branch
 
 Branch: `docs/v3-2-immersive-interaction-spec`.
 
@@ -169,7 +183,7 @@ Key checkpoint documents:
 4. `docs/memory/DECISION_LOG.md` — durable architectural/governance decisions.
 5. `docs/execution/2026-08-30-v3-2-program-checkpoint.md` — this restart-safe handoff.
 
-## 11. Restart protocol for any future agent/session
+## 12. Restart protocol for any future agent/session
 
 1. Read the canonical roadmap first.
 2. Read this checkpoint and `V3_2_WORK_LEDGER.md`.

@@ -4,6 +4,31 @@ Append-only. Newest first.
 
 ---
 
+## 2026-08-30 — Final V3.2 architecture and execution reconciliation
+
+- **Decision:** V3.2 is an **Engineering Editorial + Operational Interface** under the promise **Operational systems made visible**.
+- **Home:** `Header → Hero + Operational Scene → Verified Proof → Flagship → Services → Selected Work / Discover → Founder → Audit CTA → Footer`.
+- **Flagship:** establish only `infrastructure-localization-rescue` as the reference technical documentary. Reuse evidence, table, diagram, timeline, verification/provenance and CTA primitives; keep incident facts and trade-offs case-specific.
+- **Claims:** remove fixed `−58%` and `0/30d` from the program contract. `180→55` and `0 rollback / 21d` remain candidates only after typed provenance review.
+- **Immersive:** Gate A is the only active implementation direction. Former S4-08/S4-09 are removed from the active queue; Gate B/C require new evidence-backed roadmap admission.
+- **Refactor ruling:** no broad refactor is admitted. Extend existing portrait, visual/evidence components, CTA/analytics and URL-backed Discover primitives with the smallest safe delta.
+
+## 2026-08-30 — R0 order and existing PR reuse are authoritative
+
+- **Decision:** Immediate dependency order is `R0-05A → R0-05B → R0-03B → R0-03C → R0-05 → R0-06`.
+- **Reused terminal work:** R0-01, R0-02, R0-03A and R0-04 are `REUSED-DONE`; unchanged evidence must not be repeated.
+- **PR #20:** existing bounded R0-03B implementation; review/accept it rather than build a parallel fix. Same-VPS smoke may be DNS-independent only because the required public browser passes still exercise the real public hostname and DNS path.
+- **PR #21:** amend the existing guard rather than replace it. Admission requires sensitive-path triggering, execution on its own PR, intended-base/ancestry verification, declared task/scope and fail-closed unexpected categories.
+- **External gates:** repository ruleset mutation requires explicit admin authorization; staging rerun requires literal `APPROVE_PHASE_2_STAGING_DEPLOY`.
+- **Production truth:** Git/semantic-release membership is not deployment proof. R0-05 must freshly observe exact public identity, route health and rollback target.
+
+## 2026-08-30 — Hard branch and PR scope contract
+
+- **Decision:** Every branch/PR declares intended base SHA, canonical task ID, primary concern and expected changed-path categories before integration.
+- **Automation:** sensitive workflow/release path changes trigger the guard regardless of branch name. The guard verifies merge-base/ancestry, commit range, changed categories and declaration; unexpected crossover fails closed.
+- **Why:** PR #19 proved naming convention and human memory cannot prevent an ostensibly narrow workflow fix from carrying application history.
+- **Effect:** Broad or cross-category scope must be split or explicitly admitted as a separate roadmap task; green unrelated CI cannot waive this contract.
+
 ## 2026-08-30 — One canonical ASDEV public-experience roadmap
 
 - **Decision:** `docs/roadmaps/ASDEV_PUBLIC_EXPERIENCE_EXECUTION.md` is the only task-selection roadmap for the R0 → S1 → S2 → S3 → S4 → S5 public-experience program.
