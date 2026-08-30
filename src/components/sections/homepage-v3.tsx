@@ -116,7 +116,7 @@ export function HomePageV3({ language }: HomePageV3Props) {
 
               <div aria-label={copy.heroActions} role="group" className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Button asChild size="lg" className="min-h-12 rounded-xl px-6 font-extrabold shadow-sm">
-                  <Link href={withLocale('/qualification', language)} onClick={trackPrimaryCta}>
+                  <Link href={withLocale('/qualification?source=portfolio&placement=hero&offer=request_assessment', language)} onClick={trackPrimaryCta}>
                     {content.hero.primaryCta}
                     <ArrowUpLeft
                       aria-hidden="true"
@@ -243,16 +243,8 @@ export function HomePageV3({ language }: HomePageV3Props) {
             description={copy.proofDescription}
             items={
               isFa
-                ? [
-                    { title: 'PersianToolbox', description: 'محصول و مطالعه موردی قابل بررسی در اکوسیستم ASDEV.' },
-                    { title: 'Infrastructure Localization Rescue', description: 'مطالعه موردی واقعی برای حاکمیت انتشار و local-first stabilization.' },
-                    { title: 'Audit Systems', description: 'گردش‌کار ارزیابی فنی با خروجی عملی برای وب‌سایت و محصول.' },
-                  ]
-                : [
-                    { title: 'PersianToolbox', description: 'A product and case study that can be inspected across the ASDEV ecosystem.' },
-                    { title: 'Infrastructure Localization Rescue', description: 'A real case study for release governance and local-first stabilization.' },
-                    { title: 'Audit Systems', description: 'A technical assessment workflow built around actionable web and product output.' },
-                  ]
+                  ? content.proof.items.map((item) => ({ title: item.label, description: item.value, evidence: item }))
+                  : content.proof.items.map((item) => ({ title: item.label, description: item.value, evidence: item }))
             }
           />
         </div>

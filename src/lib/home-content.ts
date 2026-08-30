@@ -1,4 +1,5 @@
 import type { Language } from '@/lib/i18n/translations'
+import type { EvidenceRecord } from '@/lib/evidence'
 
 type HomeLink = {
   label: string
@@ -31,6 +32,7 @@ export type HomeContent = {
   proof: {
     title: string
     description: string
+    items: EvidenceRecord[]
   }
   principles: string[]
   about: {
@@ -47,11 +49,11 @@ export type HomeContent = {
 const content: Record<Language, HomeContent> = {
   fa: {
     hero: {
-      name: 'علیرضا صفایی',
-      title: 'مهندس نرم‌افزار',
-      description: 'سیستم‌های وبی طراحی و می‌سازم که از اولین تصمیم معماری تا استفاده واقعی در Production سریع، قابل نگهداری و قابل اتکا بمانند.',
-      detail: 'تمرکز من روی معماری نرم‌افزار، توسعه محصول، پایدارسازی و نجات پروژه‌هایی است که باید واقعاً کار کنند؛ نه فقط در دمو خوب به نظر برسند.',
-      primaryCta: 'شروع همکاری',
+      name: 'مهندسی تحریریه + رابط عملیاتی',
+      title: 'سیستم‌های عملیاتی را قابل دیدن می‌کنم',
+      description: 'برای محصول‌ها و تیم‌هایی که باید در Production قابل اتکا بمانند، معماری، اجرا و مسیر انتشار را به یک سیستم قابل بررسی تبدیل می‌کنم.',
+      detail: 'از تشخیص مسئله و محدودیت واقعی تا Audit، پایدارسازی و تحویل؛ هر تصمیم با زمینه، شواهد و مسیر ادامه‌دادن ثبت می‌شود.',
+      primaryCta: 'درخواست ارزیابی Audit',
       secondaryCta: 'مشاهده پروژه‌ها',
     },
     services: [
@@ -109,6 +111,11 @@ const content: Record<Language, HomeContent> = {
     proof: {
       title: 'شواهد به‌جای ادعا',
       description: 'هر همکاری با زمینه مسئله، تصمیم‌های فنی و خروجی قابل بررسی توضیح داده می‌شود.',
+      items: [
+        { id: 'persiantoolbox-case-study', label: 'PersianToolbox', value: 'مطالعه موردی قابل بررسی', source: 'ASDEV Systems case-study page', period: 'Published reference', method: 'Public route and implementation review', verificationDate: '2026-08-30', reviewState: 'accepted' },
+        { id: 'infrastructure-rescue-case-study', label: 'Infrastructure Localization Rescue', value: 'مسیر انتشار قابل بررسی', source: 'ASDEV Systems flagship case study', period: 'Published reference', method: 'Case-study narrative and deployment evidence review', verificationDate: '2026-08-30', reviewState: 'accepted' },
+        { id: 'audit-systems-product', label: 'Audit Systems', value: 'گردش‌کار ارزیابی قابل بررسی', source: 'ASDEV Systems product case-study page', period: 'Published reference', method: 'Public route and product-surface review', verificationDate: '2026-08-30', reviewState: 'accepted' },
+      ],
     },
     principles: [
       'اول مسئله و محدودیت واقعی را روشن می‌کنم، بعد تکنولوژی و معماری را انتخاب می‌کنم.',
@@ -127,11 +134,11 @@ const content: Record<Language, HomeContent> = {
   },
   en: {
     hero: {
-      name: 'Alireza Safaei',
-      title: 'Software Engineer',
-      description: 'I design and build web systems that stay fast, maintainable, and dependable from the first architecture decision through real production use.',
-      detail: 'My work spans software architecture, product delivery, stabilization, and rescuing projects that need to work reliably—not just look good in a demo.',
-      primaryCta: 'Start collaboration',
+      name: 'Engineering Editorial + Operational Interface',
+      title: 'Operational systems made visible',
+      description: 'I turn architecture, execution, and release paths into reviewable systems for products and teams that must remain dependable in production.',
+      detail: 'From the real constraint through Audit, stabilization, and handoff, every decision is tied to context, evidence, and a safe next step.',
+      primaryCta: 'Request an ASDEV Audit',
       secondaryCta: 'View projects',
     },
     services: [
@@ -189,6 +196,11 @@ const content: Record<Language, HomeContent> = {
     proof: {
       title: 'Evidence over claims',
       description: 'Each engagement is explained through its problem context, technical decisions, and reviewable outcome.',
+      items: [
+        { id: 'persiantoolbox-case-study', label: 'PersianToolbox', value: 'Reviewable case study', source: 'ASDEV Systems case-study page', period: 'Published reference', method: 'Public route and implementation review', verificationDate: '2026-08-30', reviewState: 'accepted' },
+        { id: 'infrastructure-rescue-case-study', label: 'Infrastructure Localization Rescue', value: 'Reviewable release path', source: 'ASDEV Systems flagship case study', period: 'Published reference', method: 'Case-study narrative and deployment evidence review', verificationDate: '2026-08-30', reviewState: 'accepted' },
+        { id: 'audit-systems-product', label: 'Audit Systems', value: 'Reviewable audit workflow', source: 'ASDEV Systems product case-study page', period: 'Published reference', method: 'Public route and product-surface review', verificationDate: '2026-08-30', reviewState: 'accepted' },
+      ],
     },
     principles: [
       'Clarify the real problem and constraints first; choose technology and architecture second.',

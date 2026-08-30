@@ -27,7 +27,7 @@ test.describe('smoke', () => {
     await expect(page.getByLabel('پروژه‌های منتخب')).toBeVisible()
   })
 
-  test('Homepage V3 keeps its FA mobile CTA and service contract', async ({ page }) => {
+  test('Homepage V3.2 keeps its FA mobile Audit CTA and service contract', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 })
     const pageErrors = []
     const failedRequests = []
@@ -36,9 +36,9 @@ test.describe('smoke', () => {
 
     await page.goto('/')
     const hero = page.getByLabel('معرفی علیرضا صفایی')
-    await expect(hero.getByRole('heading', { level: 1 })).toContainText('مهندس نرم‌افزار')
+    await expect(hero.getByRole('heading', { level: 1 })).toContainText('سیستم‌های عملیاتی را قابل دیدن می‌کنم')
     await expect(hero.getByRole('link')).toHaveCount(2)
-    await expect(hero.getByRole('link', { name: 'شروع همکاری' })).toBeVisible()
+    await expect(hero.getByRole('link', { name: 'درخواست ارزیابی Audit' })).toBeVisible()
     await expect(page.getByLabel('خدمات اصلی').getByRole('article')).toHaveCount(3)
     expect(pageErrors).toEqual([])
     expect(failedRequests).toEqual([])
@@ -47,7 +47,7 @@ test.describe('smoke', () => {
   test('language switch sets english direction', async ({ page }) => {
     await page.goto('/en')
     await expect.poll(async () => page.evaluate(() => document.documentElement.dir)).toBe('ltr')
-    await expect(page.locator('h1')).toContainText('Software Engineer')
+    await expect(page.locator('h1')).toContainText('Operational systems made visible')
   })
 
   test('Discover keeps English locale and presents the search-first Resource Hub contract', async ({ page }) => {
