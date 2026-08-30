@@ -88,4 +88,14 @@ describe('DiscoverGrid', () => {
 
     expect(screen.getByRole('status')).toHaveTextContent('موردی با این فیلتر پیدا نشد.')
   })
+
+  it('prioritizes the first-row image while keeping media dimensions stable', () => {
+    render(<DiscoverGrid items={items.map((item) => ({ ...item, imageUrl: `/images/${item.slug}.webp` }))} isEn={false} attribution={{}} />)
+
+    const images = screen.getAllByRole('img')
+    expect(images[0]).toHaveAttribute('fetchpriority', 'high')
+    expect(images[0]).toHaveAttribute('width', '1280')
+    expect(images[0]).toHaveAttribute('height', '720')
+    expect(images[1]).toHaveAttribute('fetchpriority', 'high')
+  })
 })

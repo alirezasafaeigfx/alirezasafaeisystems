@@ -50,7 +50,7 @@ export function DiscoverGrid({ items, attribution, isEn }: DiscoverGridProps) {
 
   return (
     <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-      {items.map((item) => {
+      {items.map((item, index) => {
         const basePath = isEn ? `/en/discover/${item.slug}` : `/discover/${item.slug}`
         const href = appendDiscoverAttribution(basePath, attribution)
         const articleLabel = item.featured
@@ -71,7 +71,10 @@ export function DiscoverGrid({ items, attribution, isEn }: DiscoverGridProps) {
                 <img
                   src={item.imageUrl}
                   alt={item.title}
-                  loading="lazy"
+                  width={1280}
+                  height={720}
+                  loading={index < 3 ? 'eager' : 'lazy'}
+                  fetchPriority={index < 3 ? 'high' : undefined}
                   className="aspect-[16/9] w-full object-cover transition duration-300 group-hover:scale-[1.015]"
                 />
               ) : (
