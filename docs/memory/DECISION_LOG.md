@@ -4,6 +4,50 @@ Append-only. Newest first.
 
 ---
 
+## 2026-08-30 — One canonical ASDEV public-experience roadmap
+
+- **Decision:** `docs/roadmaps/ASDEV_PUBLIC_EXPERIENCE_EXECUTION.md` is the only task-selection roadmap for the R0 → S1 → S2 → S3 → S4 → S5 public-experience program.
+- **Why:** Multiple plans, sprint files, prompts, and stale checkboxes can create duplicate execution, contradictory sequencing, and agent loops.
+- **Effect:** Specs, implementation plans, ledgers, prompts, and legacy roadmaps are subordinate references. They may add detail but cannot create a competing queue. Agent work must be reconciled to the canonical roadmap before execution.
+- **Execution model:** dependency-driven, evidence-led, minimal-change; no calendar promises and no task selection from stale legacy queues.
+
+## 2026-08-30 — Zero unrelated-refactor budget and evidence reuse
+
+- **Decision:** Default unrelated-refactor budget is zero; every task must use the smallest safe delta and reuse valid same-SHA/same-input evidence.
+- **Why:** Broad refactors and repeat verification create risk, invalidate good evidence, consume agent capacity, and make release truth harder to audit.
+- **Effect:** Before task admission ORCH checks current implementation, tests, history/ancestry, PRs, workflows/artifacts, screenshots/reports, ledger state, bounded changed paths, and existing evidence.
+- **`REUSED-DONE`:** If the outcome already exists and evidence is valid for the relevant unchanged inputs, the task is complete without reimplementation.
+- **Broad refactor rule:** Any genuinely necessary broad refactor must have its own roadmap item, proof of necessity, bounded dependency cone, migration/rollback strategy, and independent review. It cannot be hidden inside a feature PR.
+
+## 2026-08-30 — Immersive interaction is a gated progressive enhancement
+
+- **Decision:** Adopt the design direction `Operational systems made visible`, but only through progressive gates subordinate to the canonical V3.2 roadmap.
+- **Gate A:** existing stack + semantic DOM/SVG/CSS/code-native operational diagrams.
+- **Gate B:** advanced motion runtime only when Gate A proves a concrete interaction requirement that the existing approach cannot satisfy safely.
+- **Gate C:** Three.js/WebGL/WebGPU/GPU signature scene only when a measured prototype demonstrates material narrative value while meeting performance, accessibility, mobile, reduced-motion, and reliability budgets.
+- **Why:** Technology adoption is not a product outcome. The interaction must explain systems/evidence rather than become decorative complexity.
+- **Effect:** Three.js, GSAP, Anime.js, WebGL, and WebGPU are not implicitly authorized. Stopping at Gate A or Gate B is a valid successful outcome.
+- **Spec:** `docs/superpowers/specs/2026-08-30-v3-2-immersive-interaction-system.md`.
+
+## 2026-08-30 — R0 release-governance incident is historical truth, not a graph-cleanup task
+
+- **Decision:** Treat PR #19 merge `4a02127bfdc2ed37956803c113b635700a930efe` as an R0 release-governance incident because its workflow-fix branch inherited the complete approved V3.1 candidate ancestry and therefore carried that candidate into `main`.
+- **Observed source state:** `main` later advanced to semantic-release commit `39c686d4b977e7122a6a2ca889878a43fea3f1f9` / v1.1.0.
+- **Governance evidence:** latest read showed `main` protection disabled and repository rulesets empty.
+- **Why:** Repository history must reflect what actually happened. Cosmetic history repair can create more risk than the original sequencing error.
+- **Effect:** No force-push, history rewrite, cosmetic revert, repeated PR #17 merge attempt, or production mutation merely to restore intended ordering. R0-05 is governance + release-identity reconciliation, not a second application merge.
+- **Prevention:** Add branch/base ancestry preflight and bounded changed-path/scope guards; prepare the smallest enforceable repository protection/ruleset controls.
+
+## 2026-08-30 — Run 33303771900 closed failed-safe; next work is bounded DNS/public-route diagnosis
+
+- **Decision:** Record staging run `33303771900` as terminal `DONE-FAILED-SAFE`, not queued, not a generic application failure, and not a reason for broad deployment refactor.
+- **Exact application target:** `41a80235c83ec6949d518bd7fa034814d6e43fef`.
+- **Reusable evidence:** Quality gate succeeded; Git-produced `.tar.gz` upload succeeded; archive SHA-256 `349a8f6ec2dfa4486867b0a8c765e40534432629daf865216835f3c742398acd` matched remotely; candidate built and internal staging health passed on port 3003.
+- **Failure:** Post-deploy smoke failed because resolving `staging.alirezasafaeisystems.ir` from the VPS timed out (`curl` exit 28).
+- **Live verification:** skipped after smoke failure; no live-verification artifact produced.
+- **Safety:** automatic rollback restored the database snapshot and exact staging release `20260830T070559Z`.
+- **Effect:** R0-03A owns DNS/public-route smoke root-cause analysis. Only the smallest proven correction may proceed to R0-03B. Do not repeat application work or redesign the release pipeline without primary evidence.
+
 ## 2026-07-09 — Autonomous Loop Governance installed in GitHub
 
 - **Decision:** Official policy path `docs/automation/ASDEV_AUTONOMOUS_LOOP_POLICY.md`; AGENTS.md + control-plane README + agent rules point here.  
