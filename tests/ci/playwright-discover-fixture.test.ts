@@ -53,6 +53,19 @@ describe('Playwright Discover fixture isolation', () => {
     expect(workflow).not.toContain('DATABASE_URL: "file:${{ github.workspace }}/prisma/dev.db"')
   })
 
+  it('gives Lighthouse a job-scope-safe disposable Discover database before collection', () => {
+    const workflow = readFileSync(resolve(process.cwd(), '.github/workflows/lighthouse.yml'), 'utf8')
+    const disposableDatabase = 'DATABASE_URL: "file:${{ github.workspace }}/test-results/playwright.db"'
+    const seedIndex = workflow.indexOf('- name: Prepare disposable Lighthouse data')
+    const collectIndex = workflow.indexOf('- name: Run Lighthouse CI')
+
+    expect(workflow).toContain(disposableDatabase)
+    expect(workflow).not.toContain('DATABASE_URL: file:${{ runner.temp }}/lighthouse.db')
+    expect(seedIndex).toBeGreaterThan(-1)
+    expect(collectIndex).toBeGreaterThan(seedIndex)
+    expect(workflow.slice(seedIndex, collectIndex)).toContain('node scripts/test/seed-playwright-discover.mjs')
+  })
+
   it('starts Browser Smoke with the same direct standalone launcher contract used by E2E and production', () => {
     const workflow = readFileSync(resolve(process.cwd(), '.github/workflows/ci.yml'), 'utf8')
 

@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      DATABASE_URL: file:${{ runner.temp }}/lighthouse.db
+      DATABASE_URL: "file:${{ github.workspace }}/test-results/playwright.db"
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4

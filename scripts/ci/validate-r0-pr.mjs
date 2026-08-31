@@ -17,7 +17,7 @@ const ALLOWED_PUBLIC_EXPERIENCE_PATHS = [
   /^\.github\/workflows\/(ci-router|e2e-smoke|lighthouse)\.yml$/,
   /^\.github\/pull_request_template\.md$/,
   /^scripts\/ci\/(validate-(r0-pr|public-experience-evidence)|measure-public-experience-budget)\.mjs$/,
-  /^tests\/ci\/validate-(r0-pr|public-experience-evidence)\.test\.ts$/,
+  /^tests\/ci\/(playwright-discover-fixture|validate-(r0-pr|public-experience-evidence))\.test\.ts$/,
   /^(package\.json|pnpm-lock\.yaml|next\.config\.ts)$/,
   /^src\/components\/(public|sections|discover|layout)\//,
   /^src\/lib\/(system-scene|home-content|evidence|discover-labels)\.ts$/,

@@ -159,7 +159,12 @@ describe('public-experience dependency preflight', () => {
       headSha: sha('b'),
       mainSha: sha('a'),
       scope: 'public-experience-dependencies',
-      changedFiles: ['.github/workflows/e2e-smoke.yml', '.github/workflows/lighthouse.yml', 'scripts/ci/measure-public-experience-budget.mjs'],
+      changedFiles: [
+        '.github/workflows/e2e-smoke.yml',
+        '.github/workflows/lighthouse.yml',
+        'scripts/ci/measure-public-experience-budget.mjs',
+        'tests/ci/playwright-discover-fixture.test.ts',
+      ],
       mergeBaseSha: sha('a'),
       headIsDescendant: true,
       ...publicDeclaration,
