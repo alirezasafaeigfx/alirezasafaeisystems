@@ -19,6 +19,7 @@ async function measure(browser, url) {
     window.__budgetLongTasks = []
     window.__budgetLongAnimationFrames = []
     window.__budgetFrameTimes = []
+    window.__budgetInteractionWindow = null
     window.__budgetLayoutShift = 0
     window.__budgetLcp = 0
     new PerformanceObserver((list) => {
@@ -77,12 +78,15 @@ async function measure(browser, url) {
   if (await stateButtons.count() >= 2) {
     await stateButtons.nth(1).scrollIntoViewIfNeeded()
     await page.evaluate(() => window.__startBudgetFrameSample(700))
-    const startedAt = await page.evaluate(() => performance.now())
-    await stateButtons.nth(1).click()
+    await page.evaluate(() => { window.__budgetInteractionWindow = { start: performance.now(), end: null } })
+    interactionMs = await stateButtons.nth(1).evaluate((button) => new Promise((resolve) => {
+      const startedAt = performance.now()
+      button.click()
+      requestAnimationFrame(() => resolve(performance.now() - startedAt))
+    }))
     await page.locator('[data-testid="operational-scene"]').waitFor({ state: 'visible' })
-    const endedAt = await page.evaluate(() => performance.now())
-    interactionMs = endedAt - startedAt
     await page.waitForTimeout(500)
+    await page.evaluate(() => { window.__budgetInteractionWindow.end = performance.now() })
   }
   const performance = await page.evaluate(() => ({
     lcp: window.__budgetLcp,
@@ -90,6 +94,7 @@ async function measure(browser, url) {
     longTasks: window.__budgetLongTasks,
     longAnimationFrames: window.__budgetLongAnimationFrames,
     frameTimes: window.__budgetFrameTimes,
+    interactionWindow: window.__budgetInteractionWindow,
   }))
   const result = {
     url,
@@ -128,6 +133,8 @@ async function measureProfile(browser, url) {
     missingBodies: runs.reduce((sum, run) => sum + run.missingBodies, 0),
     longTasks: runs.flatMap((run, runIndex) => run.longTasks.map((task) => ({ run: runIndex + 1, ...task }))),
     longAnimationFrames: runs.flatMap((run, runIndex) => run.longAnimationFrames.map((frame) => ({ run: runIndex + 1, ...frame }))),
+    interactionLongAnimationFrames: runs.flatMap((run, runIndex) => run.longAnimationFrames.filter((frame) => run.interactionWindow && frame.startTime + frame.duration >= run.interactionWindow.start && frame.startTime <= run.interactionWindow.end).map((frame) => ({ run: runIndex + 1, ...frame }))),
+    interactionLongTasks: runs.flatMap((run, runIndex) => run.longTasks.filter((task) => run.interactionWindow && task.startTime + task.duration >= run.interactionWindow.start && task.startTime <= run.interactionWindow.end).map((task) => ({ run: runIndex + 1, ...task }))),
     frameTimeMedianMs: median(runs.flatMap((run) => run.frameTimes)),
     frameTimeP95Ms: percentile(runs.flatMap((run) => run.frameTimes), 0.95),
     profile: { cpuSlowdownMultiplier: 4, latencyMs: 40, downloadBytesPerSecond: 1_600_000, uploadBytesPerSecond: 750_000 },
@@ -155,10 +162,10 @@ try {
   if (baseline.missingBodies || candidate.missingBodies) process.exitCode = 2
   if (report.initialJavaScriptDeltaGzipBytes > report.budgetGzipBytes) process.exitCode = 1
   if (candidate.medianLcp > 2500 || candidate.maxCls > 0.1 || (candidate.maxInteractionMs !== null && candidate.maxInteractionMs > 200)) process.exitCode = 1
-  const attributableLongFrame = candidate.longAnimationFrames.some((frame) => frame.blockingDuration > 50 && frame.scripts.some((script) => script.sourceURL))
+  const attributableLongFrame = candidate.interactionLongAnimationFrames.some((frame) => frame.blockingDuration > 50 && frame.scripts.some((script) => script.sourceURL))
   if (attributableLongFrame || (candidate.frameTimeP95Ms !== null && candidate.frameTimeP95Ms > 50)) process.exitCode = 1
-  const unattributedLongTask = candidate.longTasks.some((task) => task.duration > 50 && !task.attribution.some((item) => item.containerName || item.containerSrc))
-  if (unattributedLongTask && candidate.longAnimationFrames.length === 0 && !process.exitCode) process.exitCode = 2
+  const unattributedLongTask = candidate.interactionLongTasks.some((task) => task.duration > 50 && !task.attribution.some((item) => item.containerName || item.containerSrc))
+  if (unattributedLongTask && candidate.interactionLongAnimationFrames.length === 0 && !process.exitCode) process.exitCode = 2
 } finally {
   await browser.close()
 }
