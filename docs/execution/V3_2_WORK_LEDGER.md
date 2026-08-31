@@ -1,8 +1,24 @@
 # V3.2 work ledger — reconciled state
 
-Updated: 2026-08-30. Single writer: ORCH. Task authority: [canonical roadmap](../roadmaps/ASDEV_PUBLIC_EXPERIENCE_EXECUTION.md). This ledger records evidence and uncertainty; it cannot lower acceptance criteria.
+Updated: 2026-08-31. Single writer: ORCH. Task authority: [canonical roadmap](../roadmaps/ASDEV_PUBLIC_EXPERIENCE_EXECUTION.md). This ledger records evidence and uncertainty; it cannot lower acceptance criteria.
 
 ## Current verdict
+
+### 2026-08-31 current-state overlay
+
+Rechecked GitHub: main is `2fe4988841a36c7f4eaf1da47fb5bffe22d00547`; DOCS-01/PR #18 is merged. PR #26 is open at `72e634bc403c3038b546de10a2ebfca37db8ca2e`, with substantial new implementation, not accepted/deployed proof. The paired docs PR #28 began this extension at `f7abc0d9041ee0d085cdd1ea8d7b998d07418faa`; companion Audit PR #1 began at `415e9b371aa9721626d46967aaa0f07ed94e9cc1`, both Draft. Fetch current successors before execution.
+
+The source findings and S rows below describe the earlier frozen baseline unless explicitly reconciled to the PR #26 successor. **Do not restart those implementations from the old next-action text.** Retain accepted code/evidence, repair remaining criteria and keep merge/runtime identity separate. This docs update makes no new app-fix, deployment, performance, user-test or ranking claim.
+
+| Current scope | State | Next action |
+|---|---|---|
+| DOCS-01 | INTEGRATED — PR #18 | Reuse; do not wait or implement again |
+| S1–S4 / S5 tooling | PR #26 IMPLEMENTED IN PART / ACCEPTANCE OPEN | Compare actual code/artifacts to criteria; repair only demonstrated gaps |
+| EC-01…05 | OPEN — paired implementation/acceptance | Follow current roadmap; preserve #26/#27 and Audit ownership |
+| GR-01…06 | OPEN — quality/SEO/content/measurement extension | First current baseline/criteria, then dependency-ready implementation; growth observation later |
+| Pair release / search outcomes | UNVERIFIED for new candidates | No inference from main, CI or earlier release |
+
+Task claim/checkpoint fields: ID, executor/session, base and candidate, owned paths, missing criterion, reused evidence and equivalence, exact next action, commands/results, artifacts/hashes, independent review, blockers/retry trigger, merge/runtime/observation status separately. One coordinator writes this ledger. Update only for real state changes; after two identical failed attempts without new evidence, block that action and continue independent ready work.
 
 **Historical Production release: successful. Complete requested public experience: not accepted; implementation and evidence gaps remain.** This documentation revision does not implement animations, install dependencies, benchmark a new candidate or deploy anything.
 
@@ -52,11 +68,11 @@ These are source/report findings, not a claim that this review workspace complet
 - The non-required semantic-release TLS timeout is recorded history, not a visual blocker and not an excuse to rerun Production.
 - No claim of field INP, real-device performance, human comprehension testing, complete independent design acceptance or actual new rollback drill is established by the pasted S5 report.
 
-## Active state registry
+## Earlier baseline state registry — current overlay takes precedence
 
 | Scope | State | Next action |
 |---|---|---|
-| DOCS-01 | REVIEW — documentation alignment | Independent consistency review and governed integration; resulting commit identified by PR metadata |
+| DOCS-01 | INTEGRATED — PR #18 | Verified merged at `2fe4988841a36c7f4eaf1da47fb5bffe22d00547`; reuse |
 | S1-01/03 | REOPENED — provenance gap | Inspect real sources, strengthen publication contract |
 | S1-08 | PENDING — DOCS-01 integration | Plain-language FA/EN public surfaces |
 | S1-02/04/05/07 | IMPLEMENTED / ACCEPTANCE REVIEW REQUIRED | Reuse satisfactory parts; close copy/action/analytics evidence gaps |
@@ -70,9 +86,9 @@ These are source/report findings, not a claim that this review workspace complet
 | S5-02/03/04 | UNVERIFIED for completed experience | Full candidate matrix, review and current checks |
 | S5-05/06/07 | HISTORICAL RELEASE DONE / FUTURE CANDIDATE PENDING | Preserve old release; new release only after product acceptance |
 
-Do not overwrite all S1–S5 rows with DONE based on one release. The roadmap dependency table and current verified evidence determine ready tasks. First implementation batch is S1-08 + S1-01 with non-overlapping ownership or sequential execution; S5-01 harness may begin independently.
+Do not overwrite all S1–S5 rows with DONE based on one release. The current overlay, roadmap dependencies and verified evidence determine ready tasks. The old S1-08/S1-01 starting sequence is historical: reconcile PR #26/#27, reuse its work and repair the first ready missing criterion instead.
 
-## DOCS-01 bounded change record
+## DOCS-01 historical bounded change record — integrated by PR #18
 
 - Base: main `39c09b43191822d70c30f7fa8ae51dadb36d37b7`.
 - Proven gap: old agent/rules contradict actual SQLite/tooling/autonomy; roadmap treats Gate A as terminal; ledger confuses release success with experience acceptance; no complete stack/skills/report-inspection contract.

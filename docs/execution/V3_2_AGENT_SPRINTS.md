@@ -2,6 +2,8 @@
 
 Updated: 2026-08-30. Companion to the [single roadmap](../roadmaps/ASDEV_PUBLIC_EXPERIENCE_EXECUTION.md), not a separate queue. Follow [AGENTS.md](../../AGENTS.md), [engineering guide](../engineering/PUBLIC_EXPERIENCE_ENGINEERING.md) and [report verification](../governance/CODEX_REPORT_REVIEW.md).
 
+2026-08-31 continuation: these IDs/cards remain valid, but substantial implementation is already in PR #26. Read the ledger's current overlay and reuse verified work. The [shared quality contract](../strategy/PAIRED_QUALITY_GROWTH_CONTRACT.md) and [GR cards](QUALITY_GROWTH_SPRINTS.md) extend acceptance; the canonical roadmap's current paired batches select execution. Do not replay this historical sprint order from task one.
+
 ## Claim and delivery contract
 
 Before touching a task, ORCH records its actual base SHA, proven missing outcome, dependencies, exact allowed files, reused evidence, acceptance criteria, responsible role and rollback. Paths below are allowed concerns, not permission for unrelated edits. Proposed paths are labeled; choose an existing equivalent where possible. One concern may contain several tightly coupled cards in one PR; do not create a micro-PR per bullet.
@@ -72,7 +74,7 @@ For every behavior change: establish a meaningful failing case → implement →
 
 ### S4-10 — dependency-scope guard and advanced motion
 
-- Proven blocker: current `.github/workflows/ci-router.yml` classifies package/lockfile changes as sensitive and invokes the R0 infrastructure-only guard. `scripts/ci/validate-r0-pr.mjs` rejects application/release categories. Do not submit a false R0 declaration or bypass it.
+- Historical blocker at the original baseline: `.github/workflows/ci-router.yml` routed package/lockfile changes to the R0-only guard, rejecting application/release categories. PR #26 now implements bounded public-experience admission. Verify/reuse that successor and repair only its demonstrated gaps; do not replay the original guard implementation or submit a false scope declaration.
 - First bounded unit paths: those CI files, related `tests/ci/**`, PR declaration documentation if required. Add an explicit public-experience dependency scope with task/base/ancestry/complete-diff verification and bounded app/dependency/test/guide paths. Keep the old R0 allowlist and fail-closed behavior intact; no repository settings changes.
 - Guard negative tests: undeclared scope, forged task/base, unrelated deployment/auth/database changes, unexpected ancestry, mismatched file categories, and mixed infrastructure/application work without proper admission all fail. Existing R0 valid/invalid fixtures retain outcomes. Normal PR policy must permit the correctly declared UI dependency unit.
 - Second unit paths: `package.json`, `pnpm-lock.yaml`, existing scene/motion components/tests. Inspect official Anime.js v4 APIs/license/current advisories, pin an exact compatible version, import only used modules, and implement a visible advanced interaction that the native baseline could not cleanly express. Compare native and advanced behavior with recordings and byte/CPU cost.

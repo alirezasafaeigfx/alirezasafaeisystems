@@ -1,12 +1,14 @@
 # Codex report review — evidence before acceptance
 
-Updated: 2026-08-30. Applies to Codex, other executors and the coordinating assistant whenever the owner supplies a progress/completion report.
+Updated: 2026-08-31. Applies to Codex, other executors and the coordinating assistant whenever the owner supplies a progress/completion report.
 
 ## Required response behavior
 
 Do not paraphrase the report and call it verified. Read its claims, retrieve primary evidence, compare the delivered behavior with the owner's current requirements, and state the limits of what was actually checked. Use the connected GitHub tools and a real browser when available. Missing access is `UNVERIFIED`, not assumed success or assumed failure.
 
 Start with the user's objective: distinctive interactive experience, ordinary-Iranian comprehension, authored mobile, credible evidence and a working assessment path. Successful engineering operations cannot substitute for these outcomes.
+
+Also apply [the shared quality/growth contract](../strategy/PAIRED_QUALITY_GROWTH_CONTRACT.md): useful complete tasks, accurate Audit output, technical SEO, substantive content and source-backed search/customer outcomes. Check each repository/candidate separately. No rank/traffic/field-data claim may be inferred from source presence, Lighthouse, simulated fixtures or a roadmap checkbox.
 
 First classify scope: progress update, documentation unit, implementation unit, runtime operation, or whole-program acceptance. Apply only relevant checks to a unit, with explicit reasons for NOT_APPLICABLE; partial progress may honestly remain incomplete. Documentation units require diff/link/consistency/permission checks and independent documentation review, not UI benchmarks or owner visual approval. Required hosted checks remain mandatory regardless of scope. An infrastructure/harness unit needs its own behavior/security evidence, not premature final visual acceptance. Whole-program S5 cannot waive the required product dimensions; unavailable evidence is UNVERIFIED, not NOT_APPLICABLE.
 
@@ -33,6 +35,9 @@ First classify scope: progress update, documentation unit, implementation unit, 
 | Accessibility and fallbacks | PASS / FAIL / UNVERIFIED / NOT_APPLICABLE |
 | Performance | PASS / FAIL / UNVERIFIED / NOT_APPLICABLE |
 | Claims and provenance | PASS / FAIL / UNVERIFIED / NOT_APPLICABLE |
+| Utility/correctness and recovery | PASS / PARTIAL / FAIL / UNVERIFIED / NOT_APPLICABLE |
+| Technical SEO and content quality | PASS / PARTIAL / FAIL / UNVERIFIED / NOT_APPLICABLE |
+| Observed search/customer outcomes | OBSERVED / UNVERIFIED / AWAITING_OBSERVATION / NOT_APPLICABLE |
 | Release/runtime | PASS / FAIL / UNVERIFIED / NOT_APPLICABLE |
 | Independent review of this unit | ACCEPTED / CHANGES_REQUESTED / PENDING / NOT_APPLICABLE |
 | Owner visual disposition of prepared product | ACCEPTED / CHANGES_REQUESTED / PENDING / NOT_APPLICABLE |
@@ -51,6 +56,10 @@ First classify scope: progress update, documentation unit, implementation unit, 
 - Were an asset list, test command, reviewer, deployment or user quote invented?
 - Did “smallest delta” remove a required outcome rather than unrelated work?
 - Did a backup helper perform a relocation, or report a no-op? Is the report precise?
+- Does the report confuse crawlable metadata with actual Google indexing or average position with universal rank one?
+- Are missing checks scored as passed; can extra failures improve a result; do HTML/API/PDF/comparison agree under authorization?
+- Do content examples, user-study participants, query volume, conversions and measurement dates have real sources?
+- Did the agent rerun/rebuild already accepted work, create duplicate intent pages, or skip a required criterion to look productive?
 
 ## Executor handoff schema
 
@@ -77,7 +86,9 @@ For public-experience implementation/acceptance units, put a compact manifest in
 
 This is a schema example, not evidence. Replace SHA markers with real identities; empty required arrays cannot pass. Each command records command, working directory, runtime, start/end, exit code and pass/fail/skip counts. Each criterion records ID, verdict and evidence references. Each artifact records relative path, durable URL, SHA-256, locale, viewport, state and capture conditions. Each review records author/type (human, independent agent or self), scope SHA, findings and disposition. Release, if applicable, records application SHA, workflow run/attempt, release ID, prior release and whether rollback was actually exercised.
 
-The current docs revision defines this contract. It does not falsely claim a validator already exists; task `S5-01` must implement/check it before final acceptance.
+PR #26 contains a candidate validator; it is not proof that the full experience or this extension is accepted. `S5-01`/`GR-01` must inspect and extend actual validation for the required task criteria. For new quality tasks also record scope, peer candidate when needed, reused-evidence identity/rationale, and observation source/window/cohort/denominator/limitations when a field claim is made. Schema validity alone cannot certify facts or design.
+
+Keep `implementation`, `release` and `observation` verdicts separate in the criterion records. Missing future traffic is AWAITING_OBSERVATION, not a reason to fabricate evidence or fail an otherwise valid scoped code test. Final product review still requires all its applicable design/copy/accessibility/security criteria. A docs-only PR uses scoped validation in its PR, not a fictional application manifest.
 
 ## Reviewer reply format
 

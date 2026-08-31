@@ -1,8 +1,10 @@
-# ASDEV + Audit Systems — paired experience contract v1
+# ASDEV + Audit Systems — paired experience contract v2
 
 Date: 2026-08-31. Owner-requested scope: `alirezasafaeigfx/alirezasafaeisystems` and `alirezasafaeigfx/auditsystems` only.
 
 This is a supporting design/acceptance contract. The [public-experience roadmap](../roadmaps/ASDEV_PUBLIC_EXPERIENCE_EXECUTION.md) remains this repository's only public-experience task selector. Audit has its own implementation queue. Neither agent may silently mark the other product complete. These documents prepare work; they do not claim new UI or runtime changes.
+
+Version 2 adds the [quality and search leadership contract](../strategy/PAIRED_QUALITY_GROWTH_CONTRACT.md) without changing the route/attribution wire contract below. Read its quality matrix, intent ownership, honest ranking/measurement rules and resumption boundaries. GR-01…06/AU-08…13 are local extensions; existing EC/AU/S work is reused. Final paired implementation acceptance includes applicable new quality criteria; later search observation is separate from release acceptance.
 
 ## Product relationship and non-goals
 
@@ -118,6 +120,10 @@ Exit: representative empty/partial/failed/completed reports, authorization state
 
 Depends on EC-01…04 acceptance plus existing main S5 conditions and Audit's applicable release gates. Files: current evidence manifest, release runbooks and per-product ledgers only.
 
+For the updated candidate, include GR-01…05 and AU-08…12 criteria where applicable. Do not require future GR-06/AU-13 ranking observations for a code/release verdict, and do not report those observations as passed when unavailable.
+
+Dependency interpretation: local candidate acceptance uses the peer's required **implementation/API/route inputs**, not the peer's completed release/closure task. AU-07 does not wait for EC-05 to finish, and ASDEV staging/production does not wait for Audit program closure. Each product may release an accepted backwards-compatible candidate under its own gates; EC-05 records final pair closure only after both release receipts and round-trip evidence exist. No circular EC-05↔AU-07 gate.
+
 - [ ] Record both exact candidates and both deployed identities. Preserve distinct source/build/workflow/runtime SHAs.
 - [ ] Verify FA/EN 390/768/1440, 360px edge, keyboard, reduced motion, no-JS essential path, slow/error states and dark/light contrast. No full mutating E2E suite against Production.
 - [ ] Measure LCP ≤2.5s, CLS ≤0.1 and field INP p75 ≤200ms when available; otherwise label lab interaction proxy. ASDEV retains its stricter current JS/GPU budgets. Audit publishes baseline/current transfer size; no new graphics runtime for routine form/report UI.
@@ -126,7 +132,7 @@ Depends on EC-01…04 acceptance plus existing main S5 conditions and Audit's ap
 
 Exit: acceptance matrix passes for both products. One site's green CI/health cannot close the other site's task. Retained release is not a tested rollback.
 
-## Sprint order and resumption
+## Existing sprint grouping and resumption
 
 1. Safety/truth: EC-01; Audit AU-01/AU-02. Start safe EC-02 copy/design work concurrently without modifying overlapping paths.
 2. Paired visible experience: EC-02 and Audit AU-03, building on PR #26 instead of starting over.
@@ -134,3 +140,5 @@ Exit: acceptance matrix passes for both products. One site's green CI/health can
 4. Acceptance/release: EC-05 and existing S5, with exact pair evidence and owner visual disposition.
 
 These are outcome batches, not delivery-date promises. Every implementation report names applicable task IDs, changed paths, actual commands/counts, artifacts, independent review, gaps and next ready action. This coordination revision alone does not mark any EC/AU implementation task complete.
+
+For the owner's expanded quality/SEO/content mission, the canonical roadmap's six current paired batches extend this original grouping. Use [the paired execution prompt](../../prompts/codex/PAIRED_SITES_YOLO_LOOP.md); do not replay a completed batch or create an infinite traffic-wait loop.
