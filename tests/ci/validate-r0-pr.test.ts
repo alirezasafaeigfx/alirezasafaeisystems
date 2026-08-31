@@ -140,6 +140,7 @@ describe('public-experience dependency preflight', () => {
         'src/components/public/system-core-3d.tsx',
         'src/components/public/operational-scene.tsx',
         'src/lib/system-scene.ts',
+        'src/generated/sitemap-manifest.json',
         'e2e/public-experience.spec.mjs',
         'docs/engineering/PUBLIC_EXPERIENCE_ENGINEERING.md',
       ],

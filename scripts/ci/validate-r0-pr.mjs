@@ -21,6 +21,7 @@ const ALLOWED_PUBLIC_EXPERIENCE_PATHS = [
   /^(package\.json|pnpm-lock\.yaml|next\.config\.ts)$/,
   /^src\/components\/(public|sections|discover|layout)\//,
   /^src\/lib\/(system-scene|home-content|evidence|discover-labels)\.ts$/,
+  /^src\/generated\/sitemap-manifest\.json$/,
   /^src\/app\/(globals\.css|audit-readiness\/page\.tsx|services\/page\.tsx|thank-you\/page\.tsx|discover\/\[slug\]\/page\.tsx|case-studies\/[^/]+\/page\.tsx)$/,
   /^src\/__tests__\/(components|discover|lib)\//,
   /^e2e\/(public-experience|smoke)\.spec\.mjs$/,
