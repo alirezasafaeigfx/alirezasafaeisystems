@@ -66,7 +66,7 @@ export function OperationalScene({ isFa }: OperationalSceneProps) {
   }, [data.path])
 
   return (
-    <figure className="operational-scene rounded-2xl border border-primary/15 bg-primary/[0.04] p-4 sm:p-5" aria-labelledby="operational-scene-title" data-testid="operational-scene" data-state={state} data-scene-mode="native" data-motion-engine="animejs" data-topology="delivery-network">
+    <figure className="operational-scene scroll-mt-20 rounded-2xl border border-primary/15 bg-primary/[0.04] p-4 sm:p-5" aria-labelledby="operational-scene-title" data-testid="operational-scene" data-state={state} data-scene-mode="native" data-motion-engine="animejs" data-topology="delivery-network">
       <figcaption>
         <p className="public-kicker">{copy.label}</p>
         <h2 id="operational-scene-title" className="mt-2 text-lg font-black sm:text-xl">{copy.title}</h2>

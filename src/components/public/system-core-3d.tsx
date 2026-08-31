@@ -76,7 +76,17 @@ export function SystemCore3d({ state, isFa, onFailure }: SystemCore3dProps) {
 
     let frame = 0
     let animationStart = 0
-    let visible = true
+    let intersecting = true
+    let documentVisible = document.visibilityState !== 'hidden'
+    let settledState: SystemSceneState | null = null
+
+    const pauseReason = () => documentVisible ? (intersecting ? null : 'offscreen') : 'hidden'
+    const setPaused = () => {
+      const reason = pauseReason()
+      cancelAnimationFrame(frame)
+      canvas.dataset.renderActive = 'false'
+      if (reason) canvas.dataset.renderPaused = reason
+    }
 
     const render = () => {
       renderer.render(scene, camera)
@@ -104,16 +114,28 @@ export function SystemCore3d({ state, isFa, onFailure }: SystemCore3dProps) {
       updateRoute()
       render()
       canvas.dataset.renderActive = 'false'
+      canvas.dataset.renderPaused = 'none'
+      canvas.dataset.sceneState = stateRef.current
+      settledState = stateRef.current
     }
     const animateState = () => {
+      if (pauseReason()) {
+        settledState = null
+        setPaused()
+        return
+      }
+
       cancelAnimationFrame(frame)
       const from = nodes.map((node) => node.position.clone())
-      const target = stateLayouts[stateRef.current].map(([x, y, z]) => new THREE.Vector3(x, y, z))
+      const targetState = stateRef.current
+      const target = stateLayouts[targetState].map(([x, y, z]) => new THREE.Vector3(x, y, z))
       animationStart = performance.now()
       canvas.dataset.renderActive = 'true'
+      canvas.dataset.renderPaused = 'none'
+      settledState = null
       const step = (now: number) => {
-        if (!visible) {
-          canvas.dataset.renderActive = 'false'
+        if (pauseReason()) {
+          setPaused()
           return
         }
         const progress = Math.min((now - animationStart) / 420, 1)
@@ -125,28 +147,43 @@ export function SystemCore3d({ state, isFa, onFailure }: SystemCore3dProps) {
         updateRoute()
         render()
         if (progress < 1) frame = requestAnimationFrame(step)
-        else canvas.dataset.renderActive = 'false'
+        else {
+          canvas.dataset.renderActive = 'false'
+          canvas.dataset.sceneState = targetState
+          settledState = targetState
+        }
       }
       frame = requestAnimationFrame(step)
+    }
+    const resume = () => {
+      if (pauseReason()) {
+        setPaused()
+        return
+      }
+      canvas.dataset.renderPaused = 'none'
+      if (settledState !== stateRef.current) animateState()
+      else render()
     }
     const onContextLost = (event: Event) => {
       event.preventDefault()
       cancelAnimationFrame(frame)
       onFailure()
     }
+    const onVisibilityChange = () => {
+      documentVisible = document.visibilityState !== 'hidden'
+      if (documentVisible) resume()
+      else setPaused()
+    }
 
     canvas.addEventListener('webglcontextlost', onContextLost)
     canvas.addEventListener('systemstatechange', animateState)
+    document.addEventListener('visibilitychange', onVisibilityChange)
     const resizeObserver = new ResizeObserver(resize)
     resizeObserver.observe(canvas)
     const intersectionObserver = new IntersectionObserver(([entry]) => {
-      visible = entry?.isIntersecting ?? false
-      if (!visible) {
-        cancelAnimationFrame(frame)
-        canvas.dataset.renderActive = 'false'
-      } else {
-        render()
-      }
+      intersecting = entry?.isIntersecting ?? false
+      if (intersecting) resume()
+      else setPaused()
     })
     intersectionObserver.observe(canvas)
     placeImmediately()
@@ -157,6 +194,7 @@ export function SystemCore3d({ state, isFa, onFailure }: SystemCore3dProps) {
       intersectionObserver.disconnect()
       canvas.removeEventListener('webglcontextlost', onContextLost)
       canvas.removeEventListener('systemstatechange', animateState)
+      document.removeEventListener('visibilitychange', onVisibilityChange)
       geometries.forEach((geometry) => geometry.dispose())
       nodes.forEach((node) => (node.material as THREE.Material).dispose())
       lineGeometry.dispose()

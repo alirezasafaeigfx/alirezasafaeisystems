@@ -15,7 +15,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description:
       lang === 'fa'
         ? 'چگونه یک استک استقرار پرریسک با معماری بومی و دروازه‌های حکمرانی پایدار شد.'
-        : 'How a high-risk deployment stack was stabilized with local-first architecture and governance gates.',
+        : 'A documented infrastructure-localization approach with its public evidence review still pending.',
     alternates: {
       canonical: `${siteUrl}/${lang}/case-studies/infrastructure-localization-rescue`,
     },
@@ -50,7 +50,7 @@ export default async function InfrastructureLocalizationRescueCaseStudyPage() {
     pProblem:
       lang === 'en'
         ? 'Core delivery depended on fragile external services and ad-hoc deployment decisions. Incidents escalated slowly due to weak observability and unclear rollback ownership.'
-        : 'مسیر اصلی تحویل به سرویس‌های بیرونی شکننده و تصمیم‌های استقرار ad-hoc وابسته بود. رخدادها به دلیل مشاهده‌پذیری ضعیف و مالکیت نامشخص rollback دیر کنترل می‌شدند.',
+        : 'مسیر اصلی تحویل به سرویس‌های بیرونی شکننده و تصمیم‌های استقرار بدون روال یکسان وابسته بود. رخدادها به دلیل مشاهده‌پذیری ضعیف و مسئولیت نامشخص بازگردانی نسخه دیر کنترل می‌شدند.',
     hSolution: lang === 'en' ? 'Solution' : 'راهکار',
     hBefore: lang === 'en' ? 'Architecture Before' : 'معماری قبل',
     hDiagnosis: lang === 'en' ? 'Diagnosis' : 'تشخیص',
@@ -66,28 +66,28 @@ export default async function InfrastructureLocalizationRescueCaseStudyPage() {
             'Release governance gates and handover checklist rollout',
           ]
         : [
-            'نقشه ریسک وابستگی‌ها و بررسی blast radius',
-            'معماری localization-first با مسیرهای fallback کنترل‌شده',
-            'گیت‌های حاکمیت انتشار و rollout چک‌لیست تحویل/تحویل‌گیری',
+            'نقشه ریسک وابستگی‌ها و بررسی گستره اثر خرابی',
+            'معماری بومی با مسیر جایگزین کنترل‌شده',
+            'دروازه‌های حاکمیت انتشار و اجرای چک‌لیست تحویل',
           ],
     hOutcomes: lang === 'en' ? 'Measured Outcomes' : 'خروجی‌های قابل اندازه‌گیری',
     hRole: lang === 'en' ? 'Role' : 'نقش',
     pRole:
       lang === 'en'
         ? 'Infrastructure and release governance lead, responsible for risk prioritization, architecture redesign, and deployment guardrails.'
-        : 'مسئول حاکمیت زیرساخت و انتشار: اولویت‌بندی ریسک، بازطراحی معماری، و گاردریل‌های استقرار.',
+        : 'مسئول حاکمیت زیرساخت و انتشار: اولویت‌بندی ریسک، بازطراحی معماری، و کنترل‌های حفاظتی استقرار.',
     hStack: lang === 'en' ? 'Tech Stack' : 'تکنولوژی‌ها',
     pStack: 'Next.js, TypeScript, Prisma, Nginx, PM2, Playwright, Lighthouse CI.',
     hProof: lang === 'en' ? 'Proof' : 'شواهد',
     pProof:
       lang === 'en'
-        ? 'Weekly incident trend snapshots, release evidence logs, and governance checklist completion records were delivered to stakeholders.'
-        : 'اسنپ‌شات‌های روند رخداد، لاگ‌های شواهد انتشار، و وضعیت تکمیل چک‌لیست حاکمیت به صورت هفتگی ارائه شد.',
-    hLessons: lang === 'en' ? 'Lessons & Tradeoffs' : 'درس‌ها و tradeoffها',
+        ? 'A public release-path record exists for this narrative, but no report or outcome is presented as accepted evidence before independent review.'
+        : 'برای این روایت، یک رکورد عمومی از مسیر انتشار وجود دارد؛ اما پیش از بازبینی مستقل، هیچ گزارش یا نتیجه‌ای به‌عنوان شاهد پذیرفته‌شده عرضه نمی‌شود.',
+    hLessons: lang === 'en' ? 'Lessons & Tradeoffs' : 'درس‌ها و ملاحظه‌ها',
     pLessons:
       lang === 'en'
-        ? 'Local-first resilience required tighter operational discipline and more explicit ownership, but dramatically reduced outage exposure and release anxiety.'
-        : 'تاب‌آوری local-first نیاز به نظم عملیاتی سخت‌گیرانه‌تر و مالکیت صریح‌تر داشت، اما ریسک قطعی و استرس انتشار را به شکل چشمگیر کاهش داد.',
+        ? 'Local-first resilience requires tighter operational discipline and explicit ownership; the effect in this case has not been independently accepted.'
+        : 'تاب‌آوری مبتنی بر زیرساخت بومی به نظم عملیاتی سخت‌گیرانه‌تر و مسئولیت‌پذیری روشن‌تر نیاز دارد؛ میزان اثر آن در این مورد هنوز به‌طور مستقل تأیید نشده است.',
     back: lang === 'en' ? 'Back to case studies' : 'بازگشت به مطالعات موردی',
     ctaAudit: lang === 'en' ? 'Request a website review' : 'درخواست بررسی سایت',
     ctaAuditDesc: lang === 'en'
@@ -98,20 +98,20 @@ export default async function InfrastructureLocalizationRescueCaseStudyPage() {
   const pageUrl = `${siteUrl}/${lang}/case-studies/infrastructure-localization-rescue`
   const projectSchema = generateProjectSchema({
     name: 'Infrastructure Localization Rescue',
-    description: 'Stabilization of a high-risk deployment stack under localization constraints.',
+    description: 'A documented approach to a high-risk deployment stack under localization constraints; evidence review pending.',
     url: lang === 'fa' ? '/case-studies/infrastructure-localization-rescue' : `/${lang}/case-studies/infrastructure-localization-rescue`,
     technologies: ['Next.js', 'TypeScript', 'Prisma', 'Nginx', 'PM2'],
   })
   const articleSchema = generateArticleSchema({
     title: 'Case Study: Infrastructure Localization Rescue',
-    description: 'How a high-risk deployment stack was stabilized with local-first architecture and governance gates.',
+    description: 'A documented infrastructure-localization approach with its public evidence review still pending.',
     publishDate: '2026-02-14',
     modifiedDate: '2026-02-16',
     author: 'Alireza Safaei',
   })
 
   return (
-    <main className="container mx-auto px-4 py-28 subtle-grid">
+    <div className="container mx-auto px-4 py-28 subtle-grid">
       <JsonLd data={generateBreadcrumbSchema([
         { name: copy.breadcrumbHome, url: siteUrl },
         { name: copy.breadcrumbCases, url: `${siteUrl}/${lang}/case-studies` },
@@ -145,27 +145,27 @@ export default async function InfrastructureLocalizationRescueCaseStudyPage() {
           <ol className="grid gap-3 text-sm text-muted-foreground md:grid-cols-3">
             {(lang === 'en'
               ? ['External services sat on the critical delivery path.', 'Deployment decisions were ad hoc.', 'Rollback ownership and observability were unclear.']
-              : ['سرویس‌های بیرونی روی مسیر حیاتی تحویل قرار داشتند.', 'تصمیم‌های استقرار ad-hoc بودند.', 'مالکیت rollback و مشاهده‌پذیری روشن نبود.']
+              : ['سرویس‌های بیرونی روی مسیر حیاتی تحویل قرار داشتند.', 'تصمیم‌های استقرار روال یکسانی نداشتند.', 'مسئولیت بازگردانی نسخه و مشاهده‌پذیری روشن نبود.']
             ).map((item, index) => <li key={item} className="rounded-lg border p-4"><span className="font-bold text-primary">0{index + 1}</span><p className="mt-2">{item}</p></li>)}
           </ol>
         </section>
 
         <section className="space-y-3 rounded-xl border bg-card p-6 card-hover">
           <h2 className="text-xl font-semibold">{copy.hDiagnosis}</h2>
-          <p className="text-sm leading-7 text-muted-foreground">{lang === 'en' ? 'The failure surface was a chain: external resolution, release transport, runtime startup, and public verification were not separated into observable gates.' : 'سطح خرابی یک زنجیره بود: resolve بیرونی، انتقال انتشار، راه‌اندازی runtime و راستی‌آزمایی عمومی به گیت‌های قابل مشاهده جدا نشده بودند.'}</p>
+          <p className="text-sm leading-7 text-muted-foreground">{lang === 'en' ? 'The failure surface was a chain: external resolution, release transport, runtime startup, and public verification were not separated into observable gates.' : 'سطح خرابی یک زنجیره بود: حل نام بیرونی، انتقال انتشار، راه‌اندازی برنامه و راستی‌آزمایی عمومی به دروازه‌های قابل مشاهده جدا نشده بودند.'}</p>
         </section>
 
         <section className="space-y-3 rounded-xl border bg-card p-6 card-hover">
           <h2 className="text-xl font-semibold">{copy.hIntervention}</h2>
           <ul className="list-disc space-y-2 ps-5 text-sm leading-7 text-muted-foreground">
-            {(lang === 'en' ? ['Map dependency and blast radius.', 'Separate same-host smoke from public DNS verification.', 'Make immutable identity, health, evidence, and rollback explicit.'] : ['نقشه وابستگی و blast radius تهیه شد.', 'Smoke هم‌میزبان از راستی‌آزمایی DNS عمومی جدا شد.', 'هویت immutable، health، شواهد و rollback صریح شدند.']).map((item) => <li key={item}>{item}</li>)}
+            {(lang === 'en' ? ['Map dependency and blast radius.', 'Separate same-host smoke from public DNS verification.', 'Make immutable identity, health, evidence, and rollback explicit.'] : ['نقشه وابستگی و گستره اثر خرابی تهیه شد.', 'آزمون سریع روی همان میزبان از راستی‌آزمایی عمومی نام دامنه جدا شد.', 'شناسه تغییرناپذیر نسخه، سلامت، شواهد و بازگردانی نسخه صریح شدند.']).map((item) => <li key={item}>{item}</li>)}
           </ul>
         </section>
 
         <section className="space-y-3 rounded-xl border bg-card p-6 card-hover">
           <h2 className="text-xl font-semibold">{copy.hAfter}</h2>
           <div className="grid gap-3 text-sm md:grid-cols-4">
-            {(lang === 'en' ? ['Candidate SHA', 'Build + Prisma', 'Internal health', 'Public verification'] : ['SHA کاندید', 'Build + Prisma', 'سلامت داخلی', 'راستی‌آزمایی عمومی']).map((item, index) => <div key={item} className="rounded-lg border p-4"><span className="font-bold text-primary">0{index + 1}</span><p className="mt-2 font-semibold">{item}</p></div>)}
+            {(lang === 'en' ? ['Candidate SHA', 'Build + Prisma', 'Internal health', 'Public verification'] : ['شناسه نسخه کاندید', 'ساخت و آماده‌سازی پایگاه‌داده', 'سلامت داخلی', 'راستی‌آزمایی عمومی']).map((item, index) => <div key={item} className="rounded-lg border p-4"><span className="font-bold text-primary">0{index + 1}</span><p className="mt-2 font-semibold">{item}</p></div>)}
           </div>
         </section>
 
@@ -181,7 +181,7 @@ export default async function InfrastructureLocalizationRescueCaseStudyPage() {
             ))}
             {publishableEvidence.length === 0 ? (
               <p className="md:col-span-2 rounded-lg border border-dashed p-4 text-sm leading-7 text-muted-foreground" role="status">
-                {lang === 'en' ? 'No outcome evidence is published until independent review is complete.' : 'تا پایان بازبینی مستقل، هیچ شاهدی برای نتیجه منتشر نمی‌شود.'}
+                {lang === 'en' ? 'No outcome evidence is published until independent review is complete.' : 'تا پایان بازبینی مستقل، نتیجه‌ای به‌عنوان دستاورد منتشر نمی‌شود.'}
               </p>
             ) : null}
           </div>
@@ -205,7 +205,7 @@ export default async function InfrastructureLocalizationRescueCaseStudyPage() {
 
         <section className="space-y-3 rounded-xl border bg-card p-6 card-hover">
           <h2 className="text-xl font-semibold">{copy.hVerification}</h2>
-          <p className="text-sm leading-7 text-muted-foreground">{lang === 'en' ? 'The accepted path is verified by immutable candidate identity, build and type checks, internal readiness, same-host smoke, and two consecutive public browser passes.' : 'مسیر پذیرفته‌شده با هویت immutable کاندید، build و type-check، آمادگی داخلی، smoke هم‌میزبان و دو pass متوالی مرورگر عمومی راستی‌آزمایی شد.'}</p>
+          <p className="text-sm leading-7 text-muted-foreground">{lang === 'en' ? 'Acceptance would require an immutable candidate identity, build and type checks, internal readiness, same-host smoke, and two consecutive public browser passes; independent acceptance is still pending.' : 'معیار پذیرش این مسیر شامل شناسه تغییرناپذیر نسخه کاندید، ساخت و بررسی نوع‌ها، آمادگی داخلی، آزمون سریع روی همان میزبان و دو بررسی پیاپی مرورگر عمومی است؛ تأیید مستقل آن هنوز در انتظار است.'}</p>
         </section>
 
         <section className="space-y-3 rounded-xl border bg-card p-6 card-hover">
@@ -232,6 +232,6 @@ export default async function InfrastructureLocalizationRescueCaseStudyPage() {
           </Link>
         </footer>
       </article>
-    </main>
+    </div>
   )
 }

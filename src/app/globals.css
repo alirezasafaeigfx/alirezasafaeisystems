@@ -605,6 +605,12 @@ html {
   font-weight: 700;
 }
 
+@media (orientation: landscape) and (max-height: 500px) {
+  .public-header {
+    position: absolute;
+  }
+}
+
 [dir="rtl"] .headline-tight {
   letter-spacing: 0;
 }

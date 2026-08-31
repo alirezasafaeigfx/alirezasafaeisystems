@@ -108,8 +108,13 @@ test('records an actual five-state interaction video', async ({ browser, baseURL
   const buttons = scene.getByRole('group', { name: 'انتخاب مرحلهٔ مسیر' }).getByRole('button')
   for (let index = 0; index < 5; index += 1) {
     await buttons.nth(index).click()
-    await motionPage.waitForTimeout(350)
+    await motionPage.waitForTimeout(520)
   }
+  for (let index = 3; index >= 0; index -= 1) {
+    await buttons.nth(index).click()
+    await motionPage.waitForTimeout(520)
+  }
+  await expect(scene).toHaveAttribute('data-state', 'pressure')
   const video = motionPage.video()
   await motionPage.close()
   await video?.saveAs(resolve(evidenceDir, 'five-state-interaction.webm'))
@@ -148,12 +153,22 @@ test('defers the real Three.js prototype, records its finite states, and release
   await expect(canvas).toHaveAttribute('data-render-active', 'false', { timeout: 2_000 })
 
   const stateButtons = scene.getByRole('group', { name: 'انتخاب مرحلهٔ مسیر' }).getByRole('button')
-  for (const index of [1, 4, 2, 0, 3]) await stateButtons.nth(index).click()
+  const stateNames = ['pressure', 'diagnosis', 'intervention', 'stable', 'evidence']
+  for (const index of [1, 4, 2, 0, 3]) {
+    await stateButtons.nth(index).click()
+    const selectedState = stateNames[index]
+    await expect(canvas).toHaveAttribute('data-scene-state', selectedState, { timeout: 2_000 })
+    await launcher.screenshot({ path: resolve(evidenceDir, `three-state-${selectedState}-mobile.png`), animations: 'disabled' })
+  }
   await expect(scene).toHaveAttribute('data-state', 'stable')
   await expect(canvas).toHaveAttribute('data-render-active', 'false', { timeout: 2_000 })
   await scene.screenshot({ path: resolve(evidenceDir, 'three-prototype-mobile.png'), animations: 'disabled' })
   await page.setViewportSize({ width: 844, height: 390 })
   await expect(canvas).toBeVisible()
+  await scene.evaluate((element) => element.scrollIntoView({ block: 'start' }))
+  const headerBox = await page.getByRole('banner').boundingBox()
+  const titleBox = await scene.getByRole('heading', { name: 'مشکل را می‌بینیم، مسیر درست را پیدا می‌کنیم' }).boundingBox()
+  expect(headerBox && titleBox && headerBox.y + headerBox.height <= titleBox.y).toBe(true)
   await scene.screenshot({ path: resolve(evidenceDir, 'three-prototype-landscape.png'), animations: 'disabled' })
   await page.setViewportSize({ width: 1440, height: 1000 })
   await expect(canvas).toBeVisible()
@@ -182,6 +197,34 @@ test('defers the real Three.js prototype, records its finite states, and release
   await restoredCanvas.dispatchEvent('webglcontextlost')
   await expect(launcher).toHaveAttribute('data-gpu-status', 'failed')
   await expect(launcher.getByRole('status')).toContainText('متوقف شد')
+})
+
+test('records the real GPU topology moving through all five states and back', async ({ browser, baseURL }) => {
+  test.setTimeout(60_000)
+  const context = await browser.newContext({
+    baseURL,
+    viewport: { width: 390, height: 844 },
+    recordVideo: { dir: evidenceDir, size: { width: 390, height: 844 } },
+  })
+  const gpuPage = await context.newPage()
+  await gpuPage.goto('/', { waitUntil: 'domcontentloaded' })
+  const scene = gpuPage.getByTestId('operational-scene')
+  await scene.scrollIntoViewIfNeeded()
+  const launcher = scene.locator('[data-gpu-status]')
+  await launcher.getByRole('button', { name: 'مشاهده نمونه سه‌بعدی' }).click()
+  const canvas = launcher.locator('canvas')
+  await expect(canvas).toBeVisible()
+  const buttons = scene.getByRole('group', { name: 'انتخاب مرحلهٔ مسیر' }).getByRole('button')
+  for (const index of [0, 1, 2, 3, 4, 3, 2, 1, 0]) {
+    await buttons.nth(index).click()
+    await expect(canvas).toHaveAttribute('data-scene-state', ['pressure', 'diagnosis', 'intervention', 'stable', 'evidence'][index], { timeout: 2_000 })
+    await gpuPage.waitForTimeout(100)
+  }
+  await expect(canvas).toHaveAttribute('data-scene-state', 'pressure')
+  const video = gpuPage.video()
+  await gpuPage.close()
+  await video?.saveAs(resolve(evidenceDir, 'three-state-interaction.webm'))
+  await context.close()
 })
 
 test('does not request the 3D island when reduced motion blocks activation', async ({ page }) => {
@@ -264,8 +307,42 @@ test('keeps the five-state explanation available without JavaScript', async ({ b
   const noScriptPage = await context.newPage()
   await noScriptPage.goto('/')
   const scene = noScriptPage.getByTestId('operational-scene')
+  await expect(noScriptPage.getByLabel('معرفی علیرضا صفایی')).toBeVisible()
+  await expect(scene).toBeVisible()
+  await expect(scene.getByTestId('operational-scene-fallback')).toBeVisible()
   await expect(scene.getByTestId('operational-scene-fallback')).toContainText('این نمونهٔ آموزشی بدون تعامل هم کامل است')
   await expect(scene.getByTestId('operational-scene-fallback').locator('li')).toHaveCount(5)
   await noScriptPage.screenshot({ path: resolve(evidenceDir, 'fa-mobile-no-js.png'), fullPage: true })
   await context.close()
+})
+
+test('captures the truthful flagship route in both languages and print-safe reduced motion', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  for (const locale of ['fa', 'en']) {
+    const path = `${locale === 'en' ? '/en' : ''}/case-studies/infrastructure-localization-rescue`
+    await page.goto(path, { waitUntil: 'domcontentloaded' })
+    await expect(page.getByRole('heading', { level: 1 })).toContainText(locale === 'fa' ? 'نجات بومی‌سازی زیرساخت' : 'Infrastructure Localization Rescue')
+    await expect(page.getByRole('status')).toContainText(locale === 'fa' ? 'تا پایان بازبینی مستقل' : 'independent review')
+    await page.screenshot({ path: resolve(evidenceDir, `flagship-${locale}-mobile.png`), fullPage: true, animations: 'disabled' })
+  }
+  await page.context().clearCookies()
+  await page.emulateMedia({ media: 'print', reducedMotion: 'reduce' })
+  await page.goto('/case-studies/infrastructure-localization-rescue', { waitUntil: 'domcontentloaded' })
+  await expect(page.getByRole('main')).toHaveCount(1)
+  await expect(page.locator('#main-content')).toBeVisible()
+  await page.screenshot({ path: resolve(evidenceDir, 'flagship-fa-print-reduced-motion.png'), fullPage: true, animations: 'disabled' })
+})
+
+test('keeps Discover query and SEO truth under a controlled slow connection', async ({ page, context }) => {
+  const cdp = await context.newCDPSession(page)
+  await cdp.send('Network.enable')
+  await cdp.send('Network.emulateNetworkConditions', { offline: false, latency: 150, downloadThroughput: 200_000, uploadThroughput: 100_000, connectionType: 'cellular3g' })
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto('/discover?q=playwright', { waitUntil: 'domcontentloaded' })
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('ابزار را پیدا کن')
+  await expect(page.getByRole('searchbox', { name: 'جستجوی منابع' })).toHaveValue('playwright')
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/)
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /\/discover$/)
+  await page.screenshot({ path: resolve(evidenceDir, 'discover-fa-query-slow-network.png'), fullPage: true, animations: 'disabled' })
 })

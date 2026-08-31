@@ -58,7 +58,7 @@ function getCases(lang: 'fa' | 'en'): CaseStudyItem[] {
       {
         title: 'Infrastructure Localization Rescue',
         sector: 'B2B SaaS',
-        outcome: 'Documented release-governance and recovery evidence',
+        outcome: 'Release-governance narrative; independent evidence review pending',
         href: '/case-studies/infrastructure-localization-rescue',
       },
       {
@@ -70,7 +70,7 @@ function getCases(lang: 'fa' | 'en'): CaseStudyItem[] {
       {
         title: 'CI/CD Governance Hardening',
         sector: 'Enterprise B2B',
-        outcome: 'Documented rollback-readiness evidence',
+        outcome: 'Release-governance narrative; independent evidence review pending',
         href: '/case-studies/ci-cd-governance-hardening',
       },
     ]
@@ -105,7 +105,7 @@ function getCases(lang: 'fa' | 'en'): CaseStudyItem[] {
     {
       title: 'نجات بومی‌سازی زیرساخت',
       sector: 'SaaS سازمانی',
-      outcome: 'شواهد مستند حاکمیت انتشار و بازیابی',
+      outcome: 'روایت حاکمیت انتشار؛ بازبینی مستقل شواهد در انتظار است',
       href: '/case-studies/infrastructure-localization-rescue',
     },
     {
@@ -117,7 +117,7 @@ function getCases(lang: 'fa' | 'en'): CaseStudyItem[] {
     {
       title: 'سخت‌سازی حاکمیت CI/CD',
       sector: 'B2B سازمانی',
-      outcome: 'شواهد مستند آمادگی rollback',
+      outcome: 'روایت حاکمیت انتشار؛ بازبینی مستقل شواهد در انتظار است',
       href: '/case-studies/ci-cd-governance-hardening',
     },
   ]
@@ -134,14 +134,14 @@ export default async function CaseStudiesPage() {
     schemaName: lang === 'en' ? 'Case Studies' : 'مطالعات موردی',
     schemaDesc:
       lang === 'en'
-        ? 'Selected delivery case studies with measurable outcomes and operational evidence.'
-        : 'مطالعات موردی منتخب با خروجی قابل اندازه‌گیری و شواهد اجرایی.',
+        ? 'Selected delivery case studies with their stated evidence status.'
+        : 'مطالعات موردی منتخب با وضعیت شواهد اعلام‌شده برای هر مورد.',
     eyebrow: lang === 'en' ? 'Proof-Backed Delivery' : 'تحویل مبتنی بر شواهد',
     title: lang === 'en' ? 'Case Studies' : 'مطالعات موردی',
     desc:
       lang === 'en'
-        ? 'Each case includes context, constraints, actions, outcomes, and accepted evidence.'
-        : 'هر مورد شامل زمینه، محدودیت‌ها، اقدام‌ها، خروجی‌ها و شواهد قابل قبول است.',
+        ? 'Each case states its context, constraints, actions, and current evidence status; accepted evidence is not available for every case.'
+        : 'هر مورد زمینه، محدودیت‌ها، اقدام‌ها و وضعیت فعلی شواهد را اعلام می‌کند؛ برای همهٔ موارد، شواهد پذیرفته‌شده در دسترس نیست.',
     open: lang === 'en' ? 'Open Full Case' : 'مشاهده کامل',
   }
 

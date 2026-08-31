@@ -37,7 +37,7 @@ export default async function CiCdGovernanceHardeningPage() {
     pProblem:
       lang === 'en'
         ? 'Releases bypassed test gates, incident handoffs lacked structure, and postmortems were not actionable.'
-        : 'انتشارها از گیت‌های تست عبور می‌کردند، handoff رخداد ساختار نداشت، و postmortemها به اقدام عملی تبدیل نمی‌شدند.',
+        : 'انتشارها از دروازه‌های آزمون عبور می‌کردند، تحویل‌گیری رخداد ساختار نداشت، و بررسی پس از رخداد به اقدام عملی تبدیل نمی‌شد.',
     hSolution: lang === 'en' ? 'Solution' : 'راهکار',
     solutionItems:
       lang === 'en'
@@ -47,32 +47,32 @@ export default async function CiCdGovernanceHardeningPage() {
             'Standardized release report and incident evidence templates',
           ]
         : [
-            'مسدودکننده کردن گیت‌های lint/type-check/integration/smoke/Lighthouse',
-            'تعریف cadence تمرین rollback و مدل مالکیت انتشار',
+            'الزامی کردن بررسی کد، بررسی نوع‌ها، آزمون یکپارچه، آزمون سریع و سنجش عملکرد',
+            'تعریف زمان‌بندی تمرین بازگردانی نسخه و مدل مسئولیت انتشار',
             'استانداردسازی قالب گزارش انتشار و شواهد رخداد',
           ],
     hResult: lang === 'en' ? 'Result' : 'نتیجه',
     pResult:
       lang === 'en'
-        ? 'No emergency rollback over 30 days and mean release lead-time reduced by 34%.'
-        : 'صفر rollback اضطراری در ۳۰ روز و کاهش میانگین lead-time انتشار به میزان ۳۴٪.',
+        ? 'No accepted quantitative outcome is published for this case until independent review is complete.'
+        : 'تا پایان بازبینی مستقل، هیچ نتیجه کمّی یا ادعای آمادگی بازگردانی نسخه برای این مورد منتشر نمی‌شود.',
     hRole: lang === 'en' ? 'Role' : 'نقش',
     pRole:
       lang === 'en'
         ? 'Pipeline governance design, standards implementation, and release enablement.'
-        : 'طراحی حاکمیت pipeline، پیاده‌سازی استانداردها، و توانمندسازی تیم برای release.',
+        : 'طراحی حاکمیت خط انتشار، پیاده‌سازی استانداردها، و توانمندسازی تیم برای انتشار.',
     hStack: lang === 'en' ? 'Tech Stack' : 'تکنولوژی‌ها',
     pStack: 'GitHub Actions, Playwright, Lighthouse CI, Node.js, Nginx.',
     hProof: lang === 'en' ? 'Proof' : 'شواهد',
     pProof:
       lang === 'en'
         ? 'Release dashboard snapshots, CI pass/fail history, and drill evidence were shared in weekly governance reviews.'
-        : 'اسنپ‌شات داشبورد انتشار، تاریخچه پاس/فیل CI، و شواهد drill در جلسات هفتگی حاکمیت ارائه شد.',
-    hLessons: lang === 'en' ? 'Lessons & Tradeoffs' : 'درس‌ها و tradeoffها',
+        : 'رکوردهای داشبورد انتشار، تاریخچه نتیجه بررسی خودکار و مستند تمرین بازگردانی نسخه، پیش از عرضه عمومی به بازبینی مستقل نیاز دارند.',
+    hLessons: lang === 'en' ? 'Lessons & Tradeoffs' : 'درس‌ها و ملاحظه‌ها',
     pLessons:
       lang === 'en'
         ? 'Stricter gates slightly increased pre-release effort but removed far larger post-release firefighting costs.'
-        : 'گیت‌های سخت‌گیرانه کمی هزینه قبل از انتشار را بالا برد اما هزینه‌های بسیار بزرگ‌تر بعد از انتشار را حذف کرد.',
+        : 'دروازه‌های سخت‌گیرانه، کار پیش از انتشار را بیشتر می‌کنند؛ نسبت اثر و هزینه در این مورد هنوز به‌طور مستقل تأیید نشده است.',
     back: lang === 'en' ? 'Back to case studies' : 'بازگشت به مطالعات موردی',
     ctaAudit: lang === 'en' ? 'Request a website review' : 'درخواست بررسی سایت',
     ctaAuditDesc: lang === 'en'

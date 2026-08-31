@@ -1,0 +1,43 @@
+import { expect, test } from '@playwright/test'
+
+test('reconciles the deferred Three.js scene after offscreen and document-visibility pauses', async ({ page }) => {
+  test.setTimeout(45_000)
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto('/', { waitUntil: 'domcontentloaded' })
+
+  const scene = page.getByTestId('operational-scene')
+  await scene.scrollIntoViewIfNeeded()
+  const launcher = scene.locator('[data-gpu-status]')
+  await launcher.getByRole('button', { name: 'مشاهده نمونه سه‌بعدی' }).click()
+  const canvas = launcher.locator('canvas')
+  await expect(canvas).toBeVisible()
+
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight))
+  await expect(canvas).toHaveAttribute('data-render-paused', 'offscreen')
+
+  await scene.getByRole('group', { name: 'انتخاب مرحلهٔ مسیر' }).getByRole('button').nth(4).evaluate((button) => button.click())
+  await expect(scene).toHaveAttribute('data-state', 'evidence')
+  await canvas.scrollIntoViewIfNeeded()
+  await expect(canvas).toHaveAttribute('data-scene-state', 'evidence')
+  await expect(canvas).toHaveAttribute('data-render-active', 'false', { timeout: 2_000 })
+
+  await page.evaluate(() => {
+    let visibilityState = 'hidden'
+    Object.defineProperty(document, 'visibilityState', {
+      configurable: true,
+      get: () => visibilityState,
+    })
+    window.__setSystemCoreVisibility = (next) => {
+      visibilityState = next
+      document.dispatchEvent(new Event('visibilitychange'))
+    }
+    window.__setSystemCoreVisibility('hidden')
+  })
+  await expect(canvas).toHaveAttribute('data-render-paused', 'hidden')
+
+  await scene.getByRole('group', { name: 'انتخاب مرحلهٔ مسیر' }).getByRole('button').nth(1).click()
+  await expect(scene).toHaveAttribute('data-state', 'diagnosis')
+  await page.evaluate(() => window.__setSystemCoreVisibility('visible'))
+  await expect(canvas).toHaveAttribute('data-scene-state', 'diagnosis')
+  await expect(canvas).toHaveAttribute('data-render-active', 'false', { timeout: 2_000 })
+})

@@ -24,4 +24,18 @@ describe('public assessment copy', () => {
     expect(copy).toContain('Request a website review')
     expect(copy).toContain('درخواست بررسی سایت')
   })
+
+  it('keeps Persian case-study claims plain and marks unaccepted outcomes as pending', () => {
+    const publicCaseStudyFiles = [
+      'src/app/case-studies/page.tsx',
+      'src/app/case-studies/infrastructure-localization-rescue/page.tsx',
+      'src/app/case-studies/ci-cd-governance-hardening/page.tsx',
+    ]
+    const copy = publicCaseStudyFiles.map((path) => readFileSync(resolve(process.cwd(), path), 'utf8')).join('\n')
+
+    expect(copy).toContain('تا پایان بازبینی مستقل، نتیجه‌ای به‌عنوان دستاورد منتشر نمی‌شود.')
+    expect(copy).toContain('برای همهٔ موارد، شواهد پذیرفته‌شده در دسترس نیست')
+    expect(copy).not.toMatch(/صفر rollback اضطراری|کاهش میانگین lead-time انتشار به میزان ۳۴٪/)
+    expect(copy).not.toMatch(/تصمیم‌های استقرار ad-hoc|بررسی blast radius|معماری localization-first|fallback کنترل‌شده|rollout چک‌لیست/)
+  })
 })

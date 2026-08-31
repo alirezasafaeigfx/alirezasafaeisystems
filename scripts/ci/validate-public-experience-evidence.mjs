@@ -17,7 +17,7 @@ const REQUIRED_CRITERIA = {
 
 /** @typedef {{command:string,workingDirectory:string,runtime:string,startedAt:string,endedAt:string,exitCode:number,status:string,counts:{passed:number,failed:number,skipped:number}}} PublicExperienceCommand */
 /** @typedef {{id:string,verdict:string,evidenceRefs:string[]}} PublicExperienceCriterion */
-/** @typedef {{id:string,relativePath:string,durableUrl:string,sha256:string,locale:string,viewport:string,state:string,captureConditions:string}} PublicExperienceArtifact */
+/** @typedef {{id:string,relativePath:string,durableUrl:string,sha256:string,locale:string,viewport:string,theme:string,state:string,captureConditions:string}} PublicExperienceArtifact */
 /** @typedef {{author:string,type:string,scopeSha:string,findings:unknown[],disposition:string}} PublicExperienceReview */
 /** @typedef {{schemaVersion:number,taskIds:string[],repository:string,baseSha:string,candidateSha:string,environment:string,capturedAt:string,sourceDirty:boolean,commands:PublicExperienceCommand[],criteria:PublicExperienceCriterion[],artifacts:PublicExperienceArtifact[],reviews:PublicExperienceReview[],release:Record<string, unknown>|null,limitations:string[]}} PublicExperienceEvidenceManifest */
 
@@ -84,9 +84,11 @@ export function validatePublicExperienceEvidence(manifest, options = {}) {
     artifactIds.add(artifact?.id)
     const relativePathValid = nonEmpty(artifact?.relativePath) && !isAbsolute(artifact.relativePath) && !artifact.relativePath.split(/[\\/]/).includes('..')
     if (!relativePathValid) errors.push(`artifact ${artifact?.id ?? index} must use a relative path without traversal`)
-    if (!nonEmpty(artifact?.durableUrl) || !/^https:\/\/[^\s]+$/i.test(artifact?.durableUrl)) errors.push(`artifact ${artifact?.id ?? index} must include a durable HTTPS URL`)
+    const durableUrl = artifact?.durableUrl ?? ''
+    const expiringActionsUrl = /https:\/\/(?:api\.)?github\.com\/(?:repos\/)?[^\s/]+\/[^\s/]+\/actions\/(?:runs|artifacts)\//i.test(durableUrl) || /[?&](?:X-Amz-|Expires=|token=|sig(?:nature)?=)/i.test(durableUrl)
+    if (!nonEmpty(durableUrl) || !/^https:\/\/[^\s]+$/i.test(durableUrl) || expiringActionsUrl) errors.push(`artifact ${artifact?.id ?? index} must include a durable HTTPS URL`)
     if (!HASH.test(artifact?.sha256 ?? '')) errors.push(`artifact ${artifact?.id ?? index} has an invalid SHA-256`)
-    if (!['fa', 'en'].includes(artifact?.locale) || !/^\d+x\d+$/.test(artifact?.viewport ?? '') || !nonEmpty(artifact?.state) || !nonEmpty(artifact?.captureConditions)) errors.push(`artifact ${artifact?.id ?? index} is missing locale, viewport, state, or capture conditions`)
+    if (!['fa', 'en'].includes(artifact?.locale) || !/^\d+x\d+$/.test(artifact?.viewport ?? '') || !['light', 'dark'].includes(artifact?.theme) || !nonEmpty(artifact?.state) || !nonEmpty(artifact?.captureConditions)) errors.push(`artifact ${artifact?.id ?? index} is missing locale, viewport, theme, state, or capture conditions`)
     const artifactPath = resolve(rootDir, relativePathValid ? artifact.relativePath : '__invalid_artifact__')
     if (!isInside(rootDir, artifactPath) || !existsSync(artifactPath)) {
       errors.push(`artifact ${artifact?.id ?? index} is not retrievable from rootDir`)
@@ -102,15 +104,28 @@ export function validatePublicExperienceEvidence(manifest, options = {}) {
   for (const criterion of manifest.criteria ?? []) {
     for (const ref of criterion?.evidenceRefs ?? []) if (!artifactIds.has(ref)) errors.push(`criterion ${criterion?.id ?? 'unknown'} references missing artifact ${ref}`)
   }
+  if ((manifest.taskIds ?? []).includes('S5-01')) {
+    const expected = new Set(['fa', 'en'].flatMap((locale) => ['390', '768', '1440'].flatMap((width) => ['light', 'dark'].map((theme) => `${locale}:${width}:${theme}`))))
+    const visualRefs = new Set((manifest.criteria ?? []).find((criterion) => criterion?.id === 'S5-01-visual-matrix')?.evidenceRefs ?? [])
+    const actual = new Set((manifest.artifacts ?? []).filter((artifact) => visualRefs.has(artifact?.id)).map((artifact) => {
+      const width = String(artifact?.viewport ?? '').split('x')[0]
+      return `${artifact?.locale}:${width}:${artifact?.theme}`
+    }))
+    for (const key of expected) if (!actual.has(key)) errors.push(`S5-01 visual matrix is missing ${key}`)
+    const behavioralRefs = new Set((manifest.criteria ?? []).find((criterion) => criterion?.id === 'S5-01-behavioral-suite')?.evidenceRefs ?? [])
+    const states = new Set((manifest.artifacts ?? []).filter((artifact) => behavioralRefs.has(artifact?.id)).map((artifact) => artifact?.state))
+    for (const state of ['pressure', 'diagnosis', 'intervention', 'stable', 'evidence']) if (!states.has(state)) errors.push(`S5-01 behavioral evidence is missing state ${state}`)
+  }
 
   if (!Array.isArray(manifest.reviews) || manifest.reviews.length === 0) errors.push('reviews must be non-empty')
   for (const [index, review] of (manifest.reviews ?? []).entries()) {
-    if (!nonEmpty(review?.author) || !['human', 'independent-agent', 'self'].includes(review?.type) || review?.scopeSha !== manifest.candidateSha || !Array.isArray(review?.findings) || !['accepted', 'changes_requested', 'pending'].includes(review?.disposition)) errors.push(`review ${index} must identify an author, candidate scope, findings, and disposition`)
+    const genericAuthor = /^(?:independent reviewer|reviewer|agent|codex|self|unknown)$/i.test(review?.author?.trim?.() ?? '')
+    if (!nonEmpty(review?.author) || genericAuthor || !['human', 'independent-agent', 'self'].includes(review?.type) || review?.scopeSha !== manifest.candidateSha || !Array.isArray(review?.findings) || !['accepted', 'changes_requested', 'pending'].includes(review?.disposition)) errors.push(`review ${index} must identify a non-generic reviewer, candidate scope, findings, and disposition`)
   }
   if (!(manifest.reviews ?? []).some((review) => ['human', 'independent-agent'].includes(review?.type) && review?.disposition === 'accepted' && review?.scopeSha === manifest.candidateSha)) errors.push('manifest requires an accepted independent review for candidateSha')
   if ((manifest.reviews ?? []).some((review) => review?.disposition === 'changes_requested')) errors.push('manifest cannot pass with a changes_requested review')
 
-  if (manifest.release !== null && (!manifest.release || !SHA.test(manifest.release.applicationSha ?? '') || !nonEmpty(manifest.release.workflowRun) || !(Number.isInteger(manifest.release.workflowAttempt) || nonEmpty(manifest.release.workflowAttempt)) || !nonEmpty(manifest.release.releaseId) || !nonEmpty(manifest.release.priorRelease) || typeof manifest.release.rollbackExercised !== 'boolean')) errors.push('release must be null or contain applicationSha, workflow run, workflow attempt, releaseId, prior release, and rollback exercised state')
+  if (manifest.release !== null && (!manifest.release || !SHA.test(manifest.release.applicationSha ?? '') || manifest.release.applicationSha !== manifest.candidateSha || !nonEmpty(manifest.release.workflowRun) || !(Number.isInteger(manifest.release.workflowAttempt) || nonEmpty(manifest.release.workflowAttempt)) || !nonEmpty(manifest.release.releaseId) || !nonEmpty(manifest.release.priorRelease) || typeof manifest.release.rollbackExercised !== 'boolean')) errors.push(manifest.release?.applicationSha !== manifest.candidateSha ? 'release applicationSha must match candidateSha' : 'release must be null or contain applicationSha, workflow run, workflow attempt, releaseId, prior release, and rollback exercised state')
   if (!Array.isArray(manifest.limitations)) errors.push('limitations must be a list')
 
   if (options.verifyGitIdentity !== false && SHA.test(manifest.baseSha ?? '') && SHA.test(manifest.candidateSha ?? '')) {
@@ -126,6 +141,26 @@ export function validatePublicExperienceEvidence(manifest, options = {}) {
   return errors
 }
 
+/** @param {PublicExperienceEvidenceManifest} manifest */
+export async function validateRemoteArtifacts(manifest) {
+  const errors = []
+  for (const artifact of manifest?.artifacts ?? []) {
+    if (!/^https:\/\/[^\s]+$/i.test(artifact?.durableUrl ?? '') || !HASH.test(artifact?.sha256 ?? '')) continue
+    try {
+      const response = await fetch(artifact.durableUrl, { redirect: 'follow' })
+      if (!response.ok) {
+        errors.push(`artifact ${artifact.id} remote retrieval returned HTTP ${response.status}`)
+        continue
+      }
+      const actual = createHash('sha256').update(Buffer.from(await response.arrayBuffer())).digest('hex')
+      if (actual !== artifact.sha256.toLowerCase()) errors.push(`artifact ${artifact.id} remote SHA-256 does not match its file`)
+    } catch {
+      errors.push(`artifact ${artifact?.id ?? 'unknown'} remote retrieval failed`)
+    }
+  }
+  return errors
+}
+
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   const manifestIndex = process.argv.indexOf('--manifest')
   const rootIndex = process.argv.indexOf('--root')
@@ -133,6 +168,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1]
   const manifestPath = resolve(process.argv[manifestIndex + 1])
   const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'))
   const errors = validatePublicExperienceEvidence(manifest, { rootDir: rootIndex >= 0 ? process.argv[rootIndex + 1] : undefined })
+  errors.push(...await validateRemoteArtifacts(manifest))
   if (errors.length) {
     for (const error of errors) console.error(`::error::${error}`)
     process.exitCode = 1
