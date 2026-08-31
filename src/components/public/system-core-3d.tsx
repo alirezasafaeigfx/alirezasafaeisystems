@@ -10,12 +10,22 @@ type SystemCore3dProps = {
   onFailure: () => void
 }
 
+type TopologyEdge = [number, number]
+
 const stateLayouts: Record<SystemSceneState, Array<[number, number, number]>> = {
   pressure: [[-2.7, 0.7, 0], [-0.8, -0.5, 0.4], [1.1, 0.65, -0.2], [2.8, -0.65, 0]],
   diagnosis: [[-2.7, 0, 0], [-0.8, 1.05, 0.8], [1.1, 0.15, -0.7], [2.8, 0, 0]],
   intervention: [[-2.7, -0.35, 0], [-0.8, 0.7, -0.5], [1.1, 0.7, 0.5], [2.8, -0.35, 0]],
   stable: [[-2.7, 0, 0], [-0.8, 0, 0], [1.1, 0, 0], [2.8, 0, 0]],
   evidence: [[-2.7, 0, 0], [-0.8, 0, 0], [1.1, 0, 0], [2.8, 0.7, 0.7]],
+}
+
+const stateTopologies: Record<SystemSceneState, { edges: TopologyEdge[]; signature: string }> = {
+  pressure: { edges: [[0, 1], [1, 2]], signature: 'input-diagnosis|diagnosis-release' },
+  diagnosis: { edges: [[0, 1], [1, 3]], signature: 'input-diagnosis|diagnosis-evidence' },
+  intervention: { edges: [[0, 1], [1, 3], [3, 2]], signature: 'input-diagnosis|diagnosis-evidence|evidence-release' },
+  stable: { edges: [[0, 1], [1, 2], [2, 3]], signature: 'input-diagnosis|diagnosis-release|release-evidence' },
+  evidence: { edges: [[0, 1], [1, 2], [2, 3], [3, 1]], signature: 'input-diagnosis|diagnosis-release|release-evidence|evidence-diagnosis' },
 }
 
 const stateLabels: Record<SystemSceneState, { fa: string; en: string }> = {
@@ -71,7 +81,7 @@ export function SystemCore3d({ state, isFa, onFailure }: SystemCore3dProps) {
     })
     const lineGeometry = new THREE.BufferGeometry()
     const lineMaterial = new THREE.LineBasicMaterial({ color: 0x6aa9bb, transparent: true, opacity: 0.7 })
-    const route = new THREE.Line(lineGeometry, lineMaterial)
+    const route = new THREE.LineSegments(lineGeometry, lineMaterial)
     scene.add(route)
 
     let frame = 0
@@ -106,12 +116,14 @@ export function SystemCore3d({ state, isFa, onFailure }: SystemCore3dProps) {
       camera.updateProjectionMatrix()
       render()
     }
-    const updateRoute = () => {
-      lineGeometry.setFromPoints(nodes.map((node) => node.position))
+    const updateRoute = (routeState: SystemSceneState) => {
+      const topology = stateTopologies[routeState]
+      lineGeometry.setFromPoints(topology.edges.flatMap(([from, to]) => [nodes[from].position, nodes[to].position]))
+      canvas.dataset.sceneTopology = topology.signature
     }
     const placeImmediately = () => {
       nodes.forEach((node, index) => node.position.set(...stateLayouts[stateRef.current][index]))
-      updateRoute()
+      updateRoute(stateRef.current)
       render()
       canvas.dataset.renderActive = 'false'
       canvas.dataset.renderPaused = 'none'
@@ -144,7 +156,7 @@ export function SystemCore3d({ state, isFa, onFailure }: SystemCore3dProps) {
           node.position.lerpVectors(from[index], target[index], eased)
           node.rotation.y += 0.012
         })
-        updateRoute()
+        updateRoute(targetState)
         render()
         if (progress < 1) frame = requestAnimationFrame(step)
         else {

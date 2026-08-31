@@ -1,5 +1,29 @@
 import { expect, test } from '@playwright/test'
 
+test('renders a distinct causal topology for every GPU narrative state', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto('/', { waitUntil: 'domcontentloaded' })
+
+  const scene = page.getByTestId('operational-scene')
+  await scene.scrollIntoViewIfNeeded()
+  const launcher = scene.locator('[data-gpu-status]')
+  await launcher.getByRole('button', { name: 'مشاهده نمونه سه‌بعدی' }).click()
+  const canvas = launcher.locator('canvas')
+
+  const expectedTopologies = [
+    'input-diagnosis|diagnosis-release',
+    'input-diagnosis|diagnosis-evidence',
+    'input-diagnosis|diagnosis-evidence|evidence-release',
+    'input-diagnosis|diagnosis-release|release-evidence',
+    'input-diagnosis|diagnosis-release|release-evidence|evidence-diagnosis',
+  ]
+
+  for (const [index, topology] of expectedTopologies.entries()) {
+    await scene.getByRole('group', { name: 'انتخاب مرحلهٔ مسیر' }).getByRole('button').nth(index).click()
+    await expect(canvas).toHaveAttribute('data-scene-topology', topology)
+  }
+})
+
 test('reconciles the deferred Three.js scene after offscreen and document-visibility pauses', async ({ page }) => {
   test.setTimeout(45_000)
   await page.setViewportSize({ width: 390, height: 844 })

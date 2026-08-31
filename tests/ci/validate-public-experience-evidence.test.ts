@@ -1,9 +1,10 @@
-import { mkdtempSync, writeFileSync } from 'node:fs'
+import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import { execFileSync, spawnSync } from 'node:child_process'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it, vi } from 'vitest'
 import { validatePublicExperienceEvidence, validateRemoteArtifacts, type PublicExperienceEvidenceManifest } from '@/../scripts/ci/validate-public-experience-evidence.mjs'
+import { createPublicExperienceEvidenceDraft } from '@/../scripts/ci/create-public-experience-evidence-draft.mjs'
 
 const sha = 'a'.repeat(40)
 
@@ -141,6 +142,44 @@ describe('public experience evidence manifest validator', () => {
       expect.stringContaining('S4-11-gpu-deferred'),
       expect.stringContaining('relative path'),
       expect.stringContaining('locale, viewport, theme, state'),
+    ]))
+  })
+
+  it('registers every claimed S2, S3, and S4 task so a complete exact-candidate manifest has no unregistered task error', () => {
+    const rootDir = mkdtempSync(join(tmpdir(), 'asdev-evidence-'))
+    writeFileSync(join(rootDir, 'evidence.png'), 'hello')
+    const validHash = '2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824'
+    const taskIds = ['S2-01', 'S2-02', 'S2-05', 'S2-06', 'S3-01', 'S3-03', 'S3-04', 'S3-05', 'S3-06', 'S4-01', 'S4-02', 'S4-03', 'S4-05', 'S4-06', 'S4-07', 'S4-10', 'S4-11', 'S4-12']
+    const criteria = [
+      ...['S2-01-accessible-primitives', 'S2-02-flagship-documentary', 'S2-05-provenance-verdict', 'S2-06-flagship-index', 'S3-01-slow-network-media', 'S3-03-query-regression', 'S3-04-blog-readiness', 'S3-05-publication-contract', 'S3-06-localized-seo', 'S4-01-home-hierarchy', 'S4-02-bilingual-composition', 'S4-03-mobile-resilience', 'S4-05-finite-motion', 'S4-06-five-state-scene', 'S4-07-measured-native-baseline'].map((id) => ({ id, verdict: 'PASS' as const, evidenceRefs: ['artifact-fa-390x844-light'] })),
+      { id: 'S4-10-dependency-scope', verdict: 'PASS' as const, evidenceRefs: ['artifact-fa-390x844-light'] },
+      { id: 'S4-10-advanced-motion', verdict: 'PASS' as const, evidenceRefs: ['artifact-fa-390x844-light'] },
+      { id: 'S4-11-gpu-deferred', verdict: 'PASS' as const, evidenceRefs: ['artifact-fa-390x844-light'] },
+      { id: 'S4-11-gpu-fallback', verdict: 'PASS' as const, evidenceRefs: ['artifact-fa-390x844-light'] },
+      { id: 'S4-11-gpu-budget', verdict: 'PASS' as const, evidenceRefs: ['artifact-fa-390x844-light'] },
+      { id: 'S4-12-comparison-inspection', verdict: 'PASS' as const, evidenceRefs: ['artifact-fa-390x844-light'] },
+    ]
+    const manifest = fixture({
+      taskIds,
+      criteria,
+      artifacts: fixture().artifacts.map((artifact) => ({ ...artifact, sha256: validHash })),
+    })
+    const errors = validatePublicExperienceEvidence(manifest, { rootDir, verifyGitIdentity: false })
+    expect(errors.filter((error) => error.includes('has no registered evidence criteria') || error.includes('is missing required criterion'))).toEqual([])
+  })
+
+  it('creates a candidate-identified hosted draft that remains invalid until durable evidence and review are supplied', () => {
+    const rootDir = mkdtempSync(join(tmpdir(), 'asdev-evidence-draft-'))
+    const candidateSha = 'b'.repeat(40)
+    const manifestPath = createPublicExperienceEvidenceDraft({ rootDir, baseSha: sha, candidateSha, taskIds: ['S2-01', 'S3-01', 'S4-12'] })
+    const manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) as PublicExperienceEvidenceManifest
+    expect(manifest.candidateSha).toBe(candidateSha)
+    expect(manifest.taskIds).toEqual(['S2-01', 'S3-01', 'S4-12'])
+    expect(validatePublicExperienceEvidence(manifest, { rootDir, verifyGitIdentity: false })).toEqual(expect.arrayContaining([
+      'commands must be non-empty',
+      'criteria must be non-empty',
+      'artifacts must be non-empty',
+      'reviews must be non-empty',
     ]))
   })
 

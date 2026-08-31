@@ -1,5 +1,3 @@
-'use client'
-
 import Image from 'next/image'
 import Link from 'next/link'
 import {
@@ -17,7 +15,7 @@ import { ProofStrip } from '@/components/public/proof-strip'
 import { SectionHeading } from '@/components/public/section-heading'
 import { VisualFrame } from '@/components/public/visual-frame'
 import { OperationalScene } from '@/components/public/operational-scene'
-import { trackEvent } from '@/lib/analytics/client'
+import { TrackedLink } from '@/components/analytics/tracked-link'
 import { getHomeContent } from '@/lib/home-content'
 import { withLocale, type Locale } from '@/lib/locale-utils'
 
@@ -96,22 +94,6 @@ export function HomePageV3({ language }: HomePageV3Props) {
   const copy = labels[language]
   const isFa = language === 'fa'
 
-  function trackPrimaryCta() {
-    void trackEvent({
-      name: 'hero_primary_cta_click',
-      category: 'conversion',
-      locale: language,
-    })
-  }
-
-  function trackProjectsCta() {
-    void trackEvent({
-      name: 'hero_projects_cta_click',
-      category: 'engagement',
-      locale: language,
-    })
-  }
-
   return (
     <div dir={isFa ? 'rtl' : 'ltr'}>
       <section aria-label={copy.hero} className="public-section overflow-hidden pt-28 md:pt-36 lg:pt-40">
@@ -133,22 +115,32 @@ export function HomePageV3({ language }: HomePageV3Props) {
 
               <div aria-label={copy.heroActions} role="group" className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Button asChild size="lg" className="min-h-12 rounded-xl px-6 font-extrabold shadow-sm">
-                  <Link href={withLocale('/qualification?source=portfolio&placement=hero&offer=request_assessment', language)} onClick={trackPrimaryCta}>
+                  <TrackedLink
+                    href={withLocale('/qualification?source=portfolio&placement=hero&offer=request_assessment', language)}
+                    eventName="hero_primary_cta_click"
+                    eventCategory="conversion"
+                    locale={language}
+                  >
                     {content.hero.primaryCta}
                     <ArrowUpLeft
                       aria-hidden="true"
                       className={isFa ? 'size-4' : 'size-4 rotate-90'}
                     />
-                  </Link>
+                  </TrackedLink>
                 </Button>
                 <Button asChild size="lg" variant="outline" className="min-h-12 rounded-xl px-6 font-bold">
-                  <Link href={withLocale('/case-studies', language)} onClick={trackProjectsCta}>
+                  <TrackedLink
+                    href={withLocale('/case-studies', language)}
+                    eventName="hero_projects_cta_click"
+                    eventCategory="engagement"
+                    locale={language}
+                  >
                     {content.hero.secondaryCta}
                     <ArrowLeft
                       aria-hidden="true"
                       className={isFa ? 'size-4' : 'size-4 rotate-180'}
                     />
-                  </Link>
+                  </TrackedLink>
                 </Button>
               </div>
 
