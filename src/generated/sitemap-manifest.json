@@ -7,7 +7,7 @@
   },
   {
     "route": "/fa/services",
-    "lastModified": "2026-07-09T15:07:27-04:00",
+    "lastModified": "2026-08-30T19:55:18-04:00",
     "priority": 0.95,
     "changeFrequency": "weekly"
   },
@@ -55,37 +55,37 @@
   },
   {
     "route": "/fa/case-studies/alirezasafaeidev-portfolio",
-    "lastModified": "2026-07-09T14:54:52-04:00",
+    "lastModified": "2026-08-30T19:55:18-04:00",
     "priority": 0.82,
     "changeFrequency": "monthly"
   },
   {
     "route": "/fa/case-studies/infrastructure-localization-rescue",
-    "lastModified": "2026-08-30T18:29:39-04:00",
+    "lastModified": "2026-08-30T19:55:18-04:00",
     "priority": 0.8,
     "changeFrequency": "monthly"
   },
   {
     "route": "/fa/case-studies/asdev-persiantoolbox-platform",
-    "lastModified": "2026-07-09T14:54:52-04:00",
+    "lastModified": "2026-08-30T19:55:18-04:00",
     "priority": 0.82,
     "changeFrequency": "monthly"
   },
   {
     "route": "/fa/case-studies/novax-price-alert",
-    "lastModified": "2026-07-09T14:54:52-04:00",
+    "lastModified": "2026-08-30T19:55:18-04:00",
     "priority": 0.82,
     "changeFrequency": "monthly"
   },
   {
     "route": "/fa/case-studies/legacy-nextjs-replatform",
-    "lastModified": "2026-07-09T14:54:52-04:00",
+    "lastModified": "2026-08-30T19:55:18-04:00",
     "priority": 0.8,
     "changeFrequency": "monthly"
   },
   {
     "route": "/fa/case-studies/ci-cd-governance-hardening",
-    "lastModified": "2026-07-09T14:54:52-04:00",
+    "lastModified": "2026-08-30T19:55:18-04:00",
     "priority": 0.8,
     "changeFrequency": "monthly"
   },
