@@ -149,6 +149,21 @@ describe('public-experience dependency preflight', () => {
     })).toEqual([])
   })
 
+  it('accepts the bounded V3.2 evidence workflow and measurement harness', () => {
+    expect(validateR0PullRequest({
+      baseSha: sha('a'),
+      headSha: sha('b'),
+      mainSha: sha('a'),
+      scope: 'public-experience-dependencies',
+      changedFiles: ['.github/workflows/e2e-smoke.yml', 'scripts/ci/measure-public-experience-budget.mjs'],
+      mergeBaseSha: sha('a'),
+      headIsDescendant: true,
+      ...publicDeclaration,
+      taskId: 'S4-10,S4-11,S4-12,S5-01',
+      expectedCategories: ['workflow', 'ci'],
+    })).toEqual([])
+  })
+
   it('rejects missing or forged declarations and ancestry', () => {
     const errors = validateR0PullRequest({
       baseSha: sha('a'),

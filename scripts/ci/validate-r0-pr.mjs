@@ -14,9 +14,9 @@ const ALLOWED_R0_PATHS = [
 ]
 
 const ALLOWED_PUBLIC_EXPERIENCE_PATHS = [
-  /^\.github\/workflows\/ci-router\.yml$/,
+  /^\.github\/workflows\/(ci-router|e2e-smoke)\.yml$/,
   /^\.github\/pull_request_template\.md$/,
-  /^scripts\/ci\/validate-(r0-pr|public-experience-evidence)\.mjs$/,
+  /^scripts\/ci\/(validate-(r0-pr|public-experience-evidence)|measure-public-experience-budget)\.mjs$/,
   /^tests\/ci\/validate-(r0-pr|public-experience-evidence)\.test\.ts$/,
   /^(package\.json|pnpm-lock\.yaml|next\.config\.ts)$/,
   /^src\/components\/(public|sections|discover|layout)\//,

@@ -43,6 +43,19 @@ jobs:
         env:
           PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/ms-playwright
         run: pnpm exec playwright test e2e/a11y.spec.ts
+      - name: Run V3.2 public experience acceptance
+        if: ${{ !cancelled() }}
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/ms-playwright
+        run: pnpm exec playwright test e2e/public-experience.spec.mjs
+      - name: Upload V3.2 public experience evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v32-public-experience-${{ github.sha }}
+          path: test-results/public-experience
+          if-no-files-found: error
+          retention-days: 14
       - name: Run V3.1 visual contract
         if: ${{ !cancelled() }}
         env:
