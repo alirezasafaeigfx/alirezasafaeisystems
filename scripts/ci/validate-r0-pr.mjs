@@ -17,7 +17,7 @@ const ALLOWED_PUBLIC_EXPERIENCE_PATHS = [
   /^\.github\/workflows\/(ci-router|e2e-smoke|lighthouse)\.yml$/,
   /^\.github\/pull_request_template\.md$/,
   /^scripts\/ci\/(validate-(r0-pr|public-experience-evidence)|measure-public-experience-budget)\.mjs$/,
-  /^tests\/ci\/(playwright-discover-fixture|validate-(r0-pr|public-experience-evidence))\.test\.ts$/,
+  /^tests\/ci\/(playwright-discover-fixture|public-experience-performance-contract|validate-(r0-pr|public-experience-evidence))\.test\.ts$/,
   /^(package\.json|pnpm-lock\.yaml|next\.config\.ts)$/,
   /^src\/components\/(public|sections|discover|layout)\//,
   /^src\/lib\/(system-scene|home-content|evidence|discover-labels)\.ts$/,
@@ -115,6 +115,16 @@ export function validateR0PullRequest({
   return errors
 }
 
+export function isGitAncestor(baseSha, headSha) {
+  try {
+    execFileSync('git', ['merge-base', '--is-ancestor', baseSha, headSha], { encoding: 'utf8' })
+    return true
+  } catch (error) {
+    if (error && typeof error === 'object' && 'status' in error && error.status === 1) return false
+    throw error
+  }
+}
+
 function changedFilesFromGit(baseSha, headSha) {
   return execFileSync('git', ['diff', '--name-only', `${baseSha}...${headSha}`], { encoding: 'utf8' })
     .split(/\r?\n/)
@@ -163,7 +173,7 @@ if (invokedPath && import.meta.url === invokedPath) {
     primaryConcern: declaration.primaryConcern ?? readOption('--primary-concern'),
     expectedCategories: declaration.expectedCategories ?? readOption('--expected-categories').split(',').map((item) => item.trim()).filter(Boolean),
     mergeBaseSha: execFileSync('git', ['merge-base', baseSha, headSha], { encoding: 'utf8' }).trim(),
-    headIsDescendant: execFileSync('git', ['merge-base', '--is-ancestor', baseSha, headSha], { encoding: 'utf8' }) === '',
+    headIsDescendant: isGitAncestor(baseSha, headSha),
   })
   if (errors.length) {
     for (const error of errors) console.error(`::error::${error}`)

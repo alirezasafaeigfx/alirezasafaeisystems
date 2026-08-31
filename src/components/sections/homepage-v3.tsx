@@ -35,10 +35,17 @@ const labels = {
     servicesEyebrow: 'خدمات اصلی',
     servicesTitle: 'برای مسئله‌های واقعی، راه‌حل فنی قابل اتکا می‌سازم',
     servicesDescription: 'از ساخت محصول جدید تا پایدارسازی و نجات سیستم موجود؛ هر مسیر با مسئله، محدودیت و نتیجه مورد انتظار شروع می‌شود.',
+    flagship: 'مطالعه موردی اصلی',
+    flagshipEyebrow: 'مطالعه موردی اصلی',
+    flagshipTitle: 'از مسیر آسیب‌پذیر تا انتشار قابل بررسی',
+    flagshipDescription: 'روایت مسئله، محدودیت، تشخیص، اصلاح و راستی‌آزمایی نجات بومی‌سازی زیرساخت.',
     projects: 'پروژه‌های منتخب',
     projectsEyebrow: 'کار منتخب',
     projectsTitle: 'محصول‌ها و سیستم‌هایی که می‌شود بررسی‌شان کرد',
     projectsDescription: 'به‌جای لیست طولانی مهارت‌ها، سه نمونه کار را با زمینه مسئله، نقش و تصمیم‌های فنی نشان می‌دهم.',
+    discoverTitle: 'راهنماها و ابزارهای قابل جست‌وجو',
+    discoverDescription: 'در Discover می‌توانید منابع منتشرشده را با جست‌وجو و دسته‌بندی پیدا کنید.',
+    discoverCta: 'مشاهده Discover',
     proof: 'شواهد واقعی',
     proofEyebrow: 'اثبات‌پذیر',
     proofTitle: 'شواهد به‌جای ادعا',
@@ -47,6 +54,7 @@ const labels = {
     aboutEyebrow: 'درباره من',
     aboutTitle: 'مهندسی برای من یعنی ساخت چیزی که بعد از تحویل هم قابل اتکا بماند',
     principles: 'شیوه همکاری',
+    finalAssessment: 'درخواست نهایی ارزیابی',
   },
   en: {
     hero: 'Alireza Safaei introduction',
@@ -57,10 +65,17 @@ const labels = {
     servicesEyebrow: 'Core services',
     servicesTitle: 'Engineering built around real product problems',
     servicesDescription: 'From a new product to stabilization or rescue work, every engagement starts with the problem, constraints, and the outcome that actually matters.',
+    flagship: 'Flagship case study',
+    flagshipEyebrow: 'Flagship case study',
+    flagshipTitle: 'From a fragile path to a reviewable release',
+    flagshipDescription: 'The problem, constraint, diagnosis, intervention, and verification path behind Infrastructure Localization Rescue.',
     projects: 'Selected projects',
     projectsEyebrow: 'Selected work',
     projectsTitle: 'Products and systems you can inspect',
     projectsDescription: 'Instead of a long skills inventory, these three examples show the problem context, my role, and the engineering decisions behind the work.',
+    discoverTitle: 'Searchable guides and tools',
+    discoverDescription: 'Discover published resources by search and category.',
+    discoverCta: 'Open Discover',
     proof: 'Real evidence',
     proofEyebrow: 'Reviewable',
     proofTitle: 'Evidence over claims',
@@ -69,6 +84,7 @@ const labels = {
     aboutEyebrow: 'About me',
     aboutTitle: 'Engineering means building something that remains dependable after handoff',
     principles: 'How I work',
+    finalAssessment: 'Final assessment request',
   },
 } as const
 
@@ -167,12 +183,12 @@ export function HomePageV3({ language }: HomePageV3Props) {
         </div>
       </section>
 
-      <section aria-label={copy.projects} className="public-section">
+      <section aria-label={copy.flagship} className="public-section">
         <div className="public-shell">
           <SectionHeading
-            eyebrow={copy.projectsEyebrow}
-            title={copy.projectsTitle}
-            description={copy.projectsDescription}
+            eyebrow={copy.flagshipEyebrow}
+            title={copy.flagshipTitle}
+            description={copy.flagshipDescription}
           />
           <div className="mt-8 rounded-[2rem] border border-primary/20 bg-primary/[0.035] p-4 shadow-[0_28px_80px_-60px_rgba(15,23,42,0.6)] md:p-8" data-testid="flagship-project">
             <ProjectShowcase
@@ -187,23 +203,6 @@ export function HomePageV3({ language }: HomePageV3Props) {
               locale={language}
               index="01"
             />
-          </div>
-          <div className="mt-10">
-            {content.projects.slice(1).map((project, index) => (
-              <ProjectShowcase
-                key={project.title}
-                title={project.title}
-                description={project.description}
-                role={project.role}
-                technologies={project.technologies}
-                href={withLocale(project.href, language)}
-                imageSrc={project.imageSrc}
-                imageAlt={project.imageAlt}
-                tone={projectTones[index + 1]}
-                locale={language}
-                index={`0${index + 2}`}
-              />
-            ))}
           </div>
         </div>
       </section>
@@ -246,6 +245,41 @@ export function HomePageV3({ language }: HomePageV3Props) {
         </div>
       </section>
 
+      <section aria-label={copy.projects} className="public-section">
+        <div className="public-shell">
+          <SectionHeading
+            eyebrow={copy.projectsEyebrow}
+            title={copy.projectsTitle}
+            description={copy.projectsDescription}
+          />
+          <div className="mt-10">
+            {content.projects.slice(1).map((project, index) => (
+              <ProjectShowcase
+                key={project.title}
+                title={project.title}
+                description={project.description}
+                role={project.role}
+                technologies={project.technologies}
+                href={withLocale(project.href, language)}
+                imageSrc={project.imageSrc}
+                imageAlt={project.imageAlt}
+                tone={projectTones[index + 1]}
+                locale={language}
+                index={`0${index + 2}`}
+              />
+            ))}
+          </div>
+          <article className="mt-8 rounded-[1.6rem] border border-border/70 bg-muted/22 p-6 md:p-8" data-testid="discover-preview">
+            <h3 className="text-xl font-black md:text-2xl">{copy.discoverTitle}</h3>
+            <p className="mt-3 max-w-2xl text-sm leading-7 text-muted-foreground md:text-base">{copy.discoverDescription}</p>
+            <Link href={withLocale('/discover', language)} className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-lg font-bold text-primary underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-ring">
+              {copy.discoverCta}
+              <ArrowUpLeft aria-hidden="true" className={isFa ? 'size-4' : 'size-4 rotate-90'} />
+            </Link>
+          </article>
+        </div>
+      </section>
+
       <section aria-label={copy.about} className="public-section">
         <div className="public-shell">
           <div>
@@ -278,6 +312,21 @@ export function HomePageV3({ language }: HomePageV3Props) {
                 ))}
               </ul>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section aria-label={copy.finalAssessment} className="public-section-compact border-t border-border/60 bg-primary/[0.045]">
+        <div className="public-shell">
+          <div className="rounded-[2rem] border border-primary/20 bg-background/80 p-6 text-center shadow-[0_28px_80px_-60px_rgba(15,23,42,0.6)] md:p-10">
+            <h2 className="public-display text-3xl font-black md:text-4xl">{content.contact.title}</h2>
+            <p className="mx-auto mt-4 max-w-2xl text-base leading-8 text-muted-foreground md:text-lg">{content.contact.description}</p>
+            <Button asChild size="lg" className="mt-6 min-h-12 rounded-xl px-6 font-extrabold">
+              <Link href={withLocale('/qualification?source=portfolio&placement=final&offer=request_assessment', language)}>
+                {content.hero.primaryCta}
+                <ArrowUpLeft aria-hidden="true" className={isFa ? 'size-4' : 'size-4 rotate-90'} />
+              </Link>
+            </Button>
           </div>
         </div>
       </section>

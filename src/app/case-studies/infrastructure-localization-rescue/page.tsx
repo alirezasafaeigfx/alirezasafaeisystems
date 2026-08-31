@@ -96,6 +96,21 @@ export default async function InfrastructureLocalizationRescueCaseStudyPage() {
   }
 
   const pageUrl = `${siteUrl}/${lang}/case-studies/infrastructure-localization-rescue`
+  const flowStages = lang === 'en'
+    ? [
+        { state: 'Pressure', title: 'Incident and constraint', detail: 'External access and an unclear release path created operational pressure.' },
+        { state: 'Diagnosis', title: 'Separate the failure chain', detail: 'Resolution, transport, runtime, and public verification became distinct checkpoints.' },
+        { state: 'Intervention', title: 'Replace the risky route', detail: 'A bounded release path made identity, health, and rollback responsibilities explicit.' },
+        { state: 'Stable', title: 'Confirm internal readiness', detail: 'Candidate identity, build, database preparation, and same-host health are checked.' },
+        { state: 'Evidence', title: 'Verify the public result', detail: 'Public browser evidence and independent review determine acceptance.' },
+      ]
+    : [
+        { state: 'فشار', title: 'رخداد و محدودیت', detail: 'دسترسی بیرونی و مسیر انتشار ناروشن، فشار عملیاتی ایجاد کرده بود.' },
+        { state: 'تشخیص', title: 'جداکردن زنجیره خرابی', detail: 'حل نام، انتقال نسخه، اجرای برنامه و بررسی عمومی به مراحل جدا تبدیل شدند.' },
+        { state: 'اصلاح', title: 'جایگزینی مسیر پرریسک', detail: 'مسیر انتشار محدود، شناسه نسخه، سلامت و مسئولیت بازگردانی را روشن کرد.' },
+        { state: 'پایدار', title: 'تأیید آمادگی داخلی', detail: 'شناسه نسخه، ساخت، آماده‌سازی پایگاه داده و سلامت روی میزبان بررسی می‌شود.' },
+        { state: 'شواهد', title: 'راستی‌آزمایی نتیجه عمومی', detail: 'شواهد مرورگر عمومی و بازبینی مستقل، پذیرش را مشخص می‌کنند.' },
+      ]
   const projectSchema = generateProjectSchema({
     name: 'Infrastructure Localization Rescue',
     description: 'A documented approach to a high-risk deployment stack under localization constraints; evidence review pending.',
@@ -129,6 +144,22 @@ export default async function InfrastructureLocalizationRescueCaseStudyPage() {
         <section className="space-y-3 rounded-xl border bg-card p-6 card-hover">
           <h2 className="text-xl font-semibold">{copy.hProblem}</h2>
           <p className="text-sm text-muted-foreground">{copy.pProblem}</p>
+        </section>
+
+        <section className="space-y-5 rounded-xl border bg-card p-6" data-testid="flagship-topology">
+          <div>
+            <p className="text-sm font-semibold text-primary">{lang === 'en' ? 'The same five-state system' : 'همان مسیر پنج‌مرحله‌ای'}</p>
+            <h2 className="mt-2 text-xl font-semibold">{lang === 'en' ? 'From operational pressure to reviewable evidence' : 'از فشار عملیاتی تا شواهد قابل بررسی'}</h2>
+          </div>
+          <ol className="grid gap-3 md:grid-cols-5">
+            {flowStages.map((stage, index) => (
+              <li key={stage.state} className="relative rounded-xl border border-primary/20 bg-primary/[0.035] p-4">
+                <span className="text-xs font-black text-primary">0{index + 1} · {stage.state}</span>
+                <h3 className="mt-3 text-sm font-bold leading-6">{stage.title}</h3>
+                <p className="mt-2 text-xs leading-6 text-muted-foreground">{stage.detail}</p>
+              </li>
+            ))}
+          </ol>
         </section>
 
         <section className="space-y-3 rounded-xl border bg-card p-6 card-hover">

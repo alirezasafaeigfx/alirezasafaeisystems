@@ -125,7 +125,9 @@ function getCases(lang: 'fa' | 'en'): CaseStudyItem[] {
 
 export default async function CaseStudiesPage() {
   const lang = await getRequestLanguage()
-  const cases = getCases(lang)
+  const cases = [...getCases(lang)].sort((left, right) =>
+    Number(right.href === '/case-studies/infrastructure-localization-rescue') - Number(left.href === '/case-studies/infrastructure-localization-rescue'),
+  )
   const withLocale = (path: string) => (lang === 'fa' ? path : `/${lang}${path}`)
 
   const copy = {

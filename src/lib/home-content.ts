@@ -49,7 +49,7 @@ export type HomeContent = {
 const content: Record<Language, HomeContent> = {
   fa: {
     hero: {
-      name: 'مهندسی تحریریه + رابط عملیاتی',
+      name: 'مهندسی نرم‌افزار و راه‌حل‌های قابل اجرا',
       title: 'سیستم‌های عملیاتی را قابل دیدن می‌کنم',
       description: 'به کسب‌وکارها کمک می‌کنم وقتی سایت یا محصولشان به مشکل می‌خورد، علت را بفهمند و مسیر فنی مطمئنی برای ادامه داشته باشند.',
       detail: 'مسئله و محدودیت واقعی را بررسی می‌کنیم، راه‌حل را روشن توضیح می‌دهم و نتیجه را با شواهد قابل بررسی تحویل می‌دهم.',
@@ -78,24 +78,24 @@ const content: Record<Language, HomeContent> = {
     ],
     projects: [
       {
-        title: 'پلتفرم PersianToolbox',
-        description: 'پلتفرم ابزارهای فارسی local-first با تجربه کاربری ساده و عملیات انتشار پایدار.',
-        role: 'معماری، طراحی رابط و آماده‌سازی انتشار',
-        technologies: ['Next.js', 'TypeScript'],
-        imageSrc: '/images/portfolio/persiantoolbox-showcase.png',
-        imageAlt: 'اسکرین‌شات صفحه اصلی PersianToolbox',
-        label: 'مشاهده مطالعه موردی',
-        href: '/case-studies/asdev-persiantoolbox-platform',
-      },
-      {
         title: 'نجات بومی‌سازی زیرساخت',
-        description: 'مطالعه موردی یک مسیر استقرار و حاکمیت که برای محدودیت‌های local-first و ریسک‌های عملیاتی بازطراحی شد.',
+        description: 'مطالعه موردی یک مسیر استقرار که برای محدودیت‌های دسترسی و ریسک‌های عملیاتی بازطراحی شد.',
         role: 'بازطراحی مسیر انتشار و آماده‌سازی بازگشت امن',
         technologies: ['Next.js', 'TypeScript', 'Nginx'],
         imageSrc: '/images/portfolio/infrastructure-localization-rescue.png',
         imageAlt: 'اسکرین‌شات مطالعه موردی نجات بومی‌سازی زیرساخت',
         label: 'مشاهده مطالعه موردی',
         href: '/case-studies/infrastructure-localization-rescue',
+      },
+      {
+        title: 'پلتفرم PersianToolbox',
+        description: 'پلتفرم ابزارهای فارسی که ابزارهای آن تا حد ممکن روی دستگاه کاربر اجرا می‌شوند.',
+        role: 'معماری، طراحی رابط و آماده‌سازی انتشار',
+        technologies: ['Next.js', 'TypeScript'],
+        imageSrc: '/images/portfolio/persiantoolbox-showcase.png',
+        imageAlt: 'اسکرین‌شات صفحه اصلی PersianToolbox',
+        label: 'مشاهده مطالعه موردی',
+        href: '/case-studies/asdev-persiantoolbox-platform',
       },
       {
         title: 'پلتفرم Audit Systems',
@@ -163,16 +163,6 @@ const content: Record<Language, HomeContent> = {
     ],
     projects: [
       {
-        title: 'PersianToolbox Platform',
-        description: 'A local-first Persian utility platform engineered to be fast, reliable, and intentionally simple for everyday users.',
-        role: 'Product engineering lead: architecture, frontend system design, QA governance, and operational deployment readiness.',
-        technologies: ['Next.js', 'TypeScript'],
-        imageSrc: '/images/portfolio/persiantoolbox-showcase.png',
-        imageAlt: 'PersianToolbox homepage screenshot',
-        label: 'View case study',
-        href: '/case-studies/asdev-persiantoolbox-platform',
-      },
-      {
         title: 'Infrastructure Localization Rescue',
         description: 'A case study for a localized release and governance path redesigned around operational risk and local-first constraints.',
         role: 'Infrastructure governance, release redesign, and rollback hardening.',
@@ -181,6 +171,16 @@ const content: Record<Language, HomeContent> = {
         imageAlt: 'Infrastructure Localization Rescue case study screenshot',
         label: 'View case study',
         href: '/case-studies/infrastructure-localization-rescue',
+      },
+      {
+        title: 'PersianToolbox Platform',
+        description: 'A Persian utility platform designed to run tools on the user\'s device where possible, with a simple and dependable experience.',
+        role: 'Product engineering lead: architecture, frontend system design, QA governance, and operational deployment readiness.',
+        technologies: ['Next.js', 'TypeScript'],
+        imageSrc: '/images/portfolio/persiantoolbox-showcase.png',
+        imageAlt: 'PersianToolbox homepage screenshot',
+        label: 'View case study',
+        href: '/case-studies/asdev-persiantoolbox-platform',
       },
       {
         title: 'Audit Systems Platform',

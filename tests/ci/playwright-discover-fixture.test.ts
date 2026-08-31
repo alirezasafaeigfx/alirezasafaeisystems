@@ -72,4 +72,12 @@ describe('Playwright Discover fixture isolation', () => {
     expect(workflow).toContain('HOSTNAME=127.0.0.1 PORT=3100 node scripts/start-playwright-server.mjs &')
     expect(workflow).not.toContain('PORT=3100 pnpm run start &')
   })
+
+  it('uses Persian fixture copy for the Persian Discover evidence capture', () => {
+    const seed = readFileSync(resolve(process.cwd(), 'scripts/test/seed-playwright-discover.mjs'), 'utf8')
+
+    expect(seed).toContain("title: 'منبع آزمایشی Playwright'")
+    expect(seed).toContain("category: 'آزمایش'")
+    expect(seed).not.toContain("title: 'Playwright Discover Resource'")
+  })
 })

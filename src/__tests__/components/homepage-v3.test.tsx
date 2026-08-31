@@ -50,12 +50,20 @@ describe('Homepage V3.2 positioning and proof', () => {
     const projects = screen.getByLabelText('پروژه‌های منتخب')
     const services = screen.getByLabelText('خدمات اصلی')
     const founder = screen.getByLabelText('درباره علیرضا صفایی')
+    const finalAssessment = screen.getByLabelText('درخواست نهایی ارزیابی')
 
     expect(hero.compareDocumentPosition(proof) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
-    expect(proof.compareDocumentPosition(projects) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
-    expect(projects.compareDocumentPosition(services) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
-    expect(services.compareDocumentPosition(founder) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
-    expect(within(projects).getByTestId('flagship-project')).toContainElement(within(projects).getByRole('heading', { name: /PersianToolbox/ }))
+    const flagship = screen.getByTestId('flagship-project')
+    expect(proof.compareDocumentPosition(flagship) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(flagship.compareDocumentPosition(services) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(services.compareDocumentPosition(projects) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(projects.compareDocumentPosition(founder) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(founder.compareDocumentPosition(finalAssessment) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(flagship).toContainElement(screen.getByRole('heading', { name: 'نجات بومی‌سازی زیرساخت' }))
+    expect(within(finalAssessment).getByRole('link', { name: 'درخواست بررسی سایت' })).toHaveAttribute(
+      'href',
+      '/qualification?source=portfolio&placement=final&offer=request_assessment',
+    )
   })
 
   it('renders three differentiated services and three visual project showcases', () => {
@@ -69,13 +77,16 @@ describe('Homepage V3.2 positioning and proof', () => {
 
     const projects = screen.getByLabelText('پروژه‌های منتخب')
     expect(within(projects).getAllByRole('article')).toHaveLength(3)
-    expect(within(projects).getAllByRole('img')).toHaveLength(3)
+    expect(within(projects).getAllByRole('img')).toHaveLength(2)
+    expect(within(projects).getByTestId('discover-preview')).toContainElement(
+      within(projects).getByRole('link', { name: 'مشاهده Discover' }),
+    )
     expect(
       within(projects).getByRole('img', { name: 'اسکرین‌شات صفحه اصلی PersianToolbox' }),
     ).toBeInTheDocument()
-    expect(
-      within(projects).getByRole('img', { name: 'اسکرین‌شات مطالعه موردی نجات بومی‌سازی زیرساخت' }),
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('flagship-project')).toContainElement(
+      screen.getByRole('img', { name: 'اسکرین‌شات مطالعه موردی نجات بومی‌سازی زیرساخت' }),
+    )
     expect(
       within(projects).getByRole('img', { name: 'اسکرین‌شات صفحه اصلی Audit Systems' }),
     ).toBeInTheDocument()

@@ -46,6 +46,7 @@ test('captures the authored FA and EN route composition at required widths', asy
         await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0)
       const hero = page.getByLabel(locale === 'fa' ? 'معرفی علیرضا صفایی' : 'Alireza Safaei introduction')
       const proof = page.getByLabel(locale === 'fa' ? 'شواهد واقعی' : 'Real evidence')
+      const flagship = page.getByLabel(locale === 'fa' ? 'مطالعه موردی اصلی' : 'Flagship case study')
       const projects = page.getByLabel(locale === 'fa' ? 'پروژه‌های منتخب' : 'Selected projects')
       const services = page.getByLabel(locale === 'fa' ? 'خدمات اصلی' : 'Core services')
       const founder = page.getByLabel(locale === 'fa' ? 'درباره علیرضا صفایی' : 'About Alireza Safaei')
@@ -55,12 +56,13 @@ test('captures the authored FA and EN route composition at required widths', asy
       await expect(founder.getByTestId('owner-portrait-frame')).toBeVisible()
       const order = await page.locator('main section').evaluateAll((sections) => sections.map((section) => section.getAttribute('aria-label')).filter(Boolean))
       const labels = locale === 'fa'
-        ? ['معرفی علیرضا صفایی', 'شواهد واقعی', 'پروژه‌های منتخب', 'خدمات اصلی', 'درباره علیرضا صفایی']
-        : ['Alireza Safaei introduction', 'Real evidence', 'Selected projects', 'Core services', 'About Alireza Safaei']
+        ? ['معرفی علیرضا صفایی', 'شواهد واقعی', 'مطالعه موردی اصلی', 'خدمات اصلی', 'پروژه‌های منتخب', 'درباره علیرضا صفایی', 'درخواست نهایی ارزیابی']
+        : ['Alireza Safaei introduction', 'Real evidence', 'Flagship case study', 'Core services', 'Selected projects', 'About Alireza Safaei', 'Final assessment request']
       expect(labels.every((label) => order.includes(label))).toBe(true)
       for (let index = 1; index < labels.length; index += 1) expect(order.indexOf(labels[index])).toBeGreaterThan(order.indexOf(labels[index - 1]))
       await expect(proof.getByRole('status')).toContainText(locale === 'fa' ? 'تأیید مستقل نشده' : 'independent approval')
-      await expect(projects.getByTestId('flagship-project')).toBeVisible()
+      await expect(flagship.getByTestId('flagship-project')).toBeVisible()
+      await expect(projects.getByTestId('discover-preview')).toBeVisible()
       await expect(services.getByRole('article')).toHaveCount(3)
         const file = `${locale}-${theme}-${viewport.name}-${viewport.width}.png`
         await page.screenshot({ path: resolve(evidenceDir, file), fullPage: true, animations: 'disabled' })
@@ -203,8 +205,8 @@ test('records the real GPU topology moving through all five states and back', as
   test.setTimeout(60_000)
   const context = await browser.newContext({
     baseURL,
-    viewport: { width: 390, height: 844 },
-    recordVideo: { dir: evidenceDir, size: { width: 390, height: 844 } },
+    viewport: { width: 390, height: 1200 },
+    recordVideo: { dir: evidenceDir, size: { width: 390, height: 1200 } },
   })
   const gpuPage = await context.newPage()
   await gpuPage.goto('/', { waitUntil: 'domcontentloaded' })
@@ -214,17 +216,41 @@ test('records the real GPU topology moving through all five states and back', as
   await launcher.getByRole('button', { name: 'مشاهده نمونه سه‌بعدی' }).click()
   const canvas = launcher.locator('canvas')
   await expect(canvas).toBeVisible()
+  await canvas.evaluate((element) => {
+    document.documentElement.style.scrollBehavior = 'auto'
+    window.scrollTo(0, element.getBoundingClientRect().top + window.scrollY - 120)
+  })
+  await gpuPage.waitForTimeout(100)
+  const canvasBox = await canvas.boundingBox()
+  const viewportHeight = await gpuPage.evaluate(() => window.innerHeight)
+  expect(canvasBox && canvasBox.y >= 0 && canvasBox.y + canvasBox.height <= viewportHeight).toBe(true)
   const buttons = scene.getByRole('group', { name: 'انتخاب مرحلهٔ مسیر' }).getByRole('button')
   for (const index of [0, 1, 2, 3, 4, 3, 2, 1, 0]) {
-    await buttons.nth(index).click()
+    await buttons.nth(index).evaluate((button) => button.click())
     await expect(canvas).toHaveAttribute('data-scene-state', ['pressure', 'diagnosis', 'intervention', 'stable', 'evidence'][index], { timeout: 2_000 })
-    await gpuPage.waitForTimeout(100)
+    await gpuPage.waitForTimeout(160)
   }
   await expect(canvas).toHaveAttribute('data-scene-state', 'pressure')
   const video = gpuPage.video()
   await gpuPage.close()
   await video?.saveAs(resolve(evidenceDir, 'three-state-interaction.webm'))
   await context.close()
+})
+
+test('keeps the complete native scene when the deferred GPU module is blocked', async ({ page }) => {
+  await page.goto('/', { waitUntil: 'domcontentloaded' })
+  const scene = page.getByTestId('operational-scene')
+  await scene.scrollIntoViewIfNeeded()
+  const launcher = scene.locator('[data-gpu-status]')
+  await page.route('**/*', async (route) => {
+    if (route.request().resourceType() === 'script') await route.abort()
+    else await route.continue()
+  })
+  await launcher.getByRole('button', { name: 'مشاهده نمونه سه‌بعدی' }).click()
+  await expect(launcher).toHaveAttribute('data-gpu-status', 'failed')
+  await expect(launcher.getByRole('status')).toContainText('نسخه دوبعدی بالا همچنان قابل استفاده است')
+  await expect(scene.getByRole('group', { name: 'انتخاب مرحلهٔ مسیر' }).getByRole('button')).toHaveCount(5)
+  await scene.screenshot({ path: resolve(evidenceDir, 'three-blocked-module-fallback.png'), animations: 'disabled' })
 })
 
 test('does not request the 3D island when reduced motion blocks activation', async ({ page }) => {
@@ -323,6 +349,7 @@ test('captures the truthful flagship route in both languages and print-safe redu
     const path = `${locale === 'en' ? '/en' : ''}/case-studies/infrastructure-localization-rescue`
     await page.goto(path, { waitUntil: 'domcontentloaded' })
     await expect(page.getByRole('heading', { level: 1 })).toContainText(locale === 'fa' ? 'نجات بومی‌سازی زیرساخت' : 'Infrastructure Localization Rescue')
+    await expect(page.getByTestId('flagship-topology').getByRole('listitem')).toHaveCount(5)
     await expect(page.getByRole('status')).toContainText(locale === 'fa' ? 'تا پایان بازبینی مستقل' : 'independent review')
     await page.screenshot({ path: resolve(evidenceDir, `flagship-${locale}-mobile.png`), fullPage: true, animations: 'disabled' })
   }
@@ -342,6 +369,9 @@ test('keeps Discover query and SEO truth under a controlled slow connection', as
   await page.goto('/discover?q=playwright', { waitUntil: 'domcontentloaded' })
   await expect(page.getByRole('heading', { level: 1 })).toContainText('ابزار را پیدا کن')
   await expect(page.getByRole('searchbox', { name: 'جستجوی منابع' })).toHaveValue('playwright')
+  await expect(page.getByRole('heading', { name: 'منبع آزمایشی Playwright' })).toBeVisible()
+  await expect(page.getByLabel('منبع: منبع آزمایشی Playwright').getByText('آزمایش', { exact: true })).toBeVisible()
+  await expect(page.getByText('Playwright Discover Resource')).toHaveCount(0)
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/)
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /\/discover$/)
   await page.screenshot({ path: resolve(evidenceDir, 'discover-fa-query-slow-network.png'), fullPage: true, animations: 'disabled' })

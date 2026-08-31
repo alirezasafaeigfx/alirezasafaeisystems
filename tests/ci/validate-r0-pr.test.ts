@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { validateR0PullRequest } from '../../scripts/ci/validate-r0-pr.mjs'
+import { isGitAncestor, validateR0PullRequest } from '../../scripts/ci/validate-r0-pr.mjs'
 
 const sha = (character: string) => character.repeat(40)
 const declaration = {
@@ -10,6 +10,11 @@ const declaration = {
 }
 
 describe('R0 bounded PR preflight', () => {
+  it('evaluates real git ancestry as text in the CLI path', () => {
+    expect(isGitAncestor('HEAD~1', 'HEAD')).toBe(true)
+    expect(isGitAncestor('HEAD', 'HEAD~1')).toBe(false)
+  })
+
   it('requires a canonical task declaration and expected path categories', () => {
     const errors = validateR0PullRequest({
       baseSha: sha('a'),
@@ -164,6 +169,7 @@ describe('public-experience dependency preflight', () => {
         '.github/workflows/lighthouse.yml',
         'scripts/ci/measure-public-experience-budget.mjs',
         'tests/ci/playwright-discover-fixture.test.ts',
+        'tests/ci/public-experience-performance-contract.test.ts',
       ],
       mergeBaseSha: sha('a'),
       headIsDescendant: true,

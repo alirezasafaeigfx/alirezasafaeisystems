@@ -41,3 +41,24 @@ test('reconciles the deferred Three.js scene after offscreen and document-visibi
   await expect(canvas).toHaveAttribute('data-scene-state', 'diagnosis')
   await expect(canvas).toHaveAttribute('data-render-active', 'false', { timeout: 2_000 })
 })
+
+test('releases the GPU route and can activate a clean scene after browser return', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto('/', { waitUntil: 'domcontentloaded' })
+  const firstLauncher = page.getByTestId('operational-scene').locator('[data-gpu-status]')
+  await firstLauncher.scrollIntoViewIfNeeded()
+  await firstLauncher.getByRole('button', { name: 'مشاهده نمونه سه‌بعدی' }).click()
+  await expect(firstLauncher.locator('canvas')).toBeVisible()
+
+  await page.goto('/case-studies/infrastructure-localization-rescue', { waitUntil: 'domcontentloaded' })
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('نجات بومی‌سازی زیرساخت')
+  await page.goBack({ waitUntil: 'domcontentloaded' })
+
+  const returnedScene = page.getByTestId('operational-scene')
+  const returnedLauncher = returnedScene.locator('[data-gpu-status]')
+  await returnedLauncher.scrollIntoViewIfNeeded()
+  await expect(returnedLauncher).toHaveAttribute('data-gpu-status', 'idle')
+  await returnedLauncher.getByRole('button', { name: 'مشاهده نمونه سه‌بعدی' }).click()
+  await expect(returnedLauncher.locator('canvas')).toBeVisible()
+  await expect(returnedLauncher.locator('canvas')).toHaveAttribute('data-render-active', 'false', { timeout: 2_000 })
+})

@@ -6,7 +6,7 @@ describe('home content', () => {
     const content = getHomeContent('fa')
 
     expect(content.hero).toMatchObject({
-      name: 'مهندسی تحریریه + رابط عملیاتی',
+      name: 'مهندسی نرم‌افزار و راه‌حل‌های قابل اجرا',
       title: 'سیستم‌های عملیاتی را قابل دیدن می‌کنم',
       primaryCta: 'درخواست بررسی سایت',
       secondaryCta: 'مشاهده پروژه‌ها',
@@ -41,5 +41,9 @@ describe('home content', () => {
     })
     expect((content as { services?: unknown[] }).services).toHaveLength(3)
     expect((content as { projects?: unknown[] }).projects).toHaveLength(3)
+    expect(content.projects[0]).toMatchObject({
+      title: 'نجات بومی‌سازی زیرساخت',
+      href: '/case-studies/infrastructure-localization-rescue',
+    })
   })
 })
