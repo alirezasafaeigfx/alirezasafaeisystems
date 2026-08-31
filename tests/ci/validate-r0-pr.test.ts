@@ -168,6 +168,7 @@ describe('public-experience dependency preflight', () => {
         '.github/workflows/e2e-smoke.yml',
         '.github/workflows/lighthouse.yml',
         'scripts/ci/measure-public-experience-budget.mjs',
+        'scripts/test/seed-playwright-discover.mjs',
         'tests/ci/playwright-discover-fixture.test.ts',
         'tests/ci/public-experience-performance-contract.test.ts',
       ],

@@ -17,6 +17,7 @@ const ALLOWED_PUBLIC_EXPERIENCE_PATHS = [
   /^\.github\/workflows\/(ci-router|e2e-smoke|lighthouse)\.yml$/,
   /^\.github\/pull_request_template\.md$/,
   /^scripts\/ci\/(validate-(r0-pr|public-experience-evidence)|measure-public-experience-budget)\.mjs$/,
+  /^scripts\/test\/seed-playwright-discover\.mjs$/,
   /^tests\/ci\/(playwright-discover-fixture|public-experience-performance-contract|validate-(r0-pr|public-experience-evidence))\.test\.ts$/,
   /^(package\.json|pnpm-lock\.yaml|next\.config\.ts)$/,
   /^src\/components\/(public|sections|discover|layout)\//,
@@ -30,7 +31,7 @@ const ALLOWED_PUBLIC_EXPERIENCE_PATHS = [
 
 const PATH_CATEGORIES = [
   ['workflow', /^\.github\/workflows\//],
-  ['ci', /^(scripts|tests)\/ci\//],
+  ['ci', /^(?:(scripts|tests)\/ci\/|scripts\/test\/seed-playwright-discover\.mjs$)/],
   ['governance', /^(docs\/(governance|automation)\/|\.github\/pull_request_template\.md$)/],
   ['report', /^docs\/reports\//],
   ['plan', /^docs\/superpowers\/plans\//],
