@@ -19,4 +19,9 @@ describe('V3.2 controlled performance contract', () => {
     expect(harness).toContain('candidate.allRunOverBudgetLongTasks')
     expect(harness).not.toContain('candidate.interactionLongTasks.some')
   })
+
+  it('waits for throttled script transfers before calculating initial JavaScript', () => {
+    expect(harness).toContain("page.goto(url, { waitUntil: 'networkidle' })")
+    expect(harness).not.toContain("page.goto(url, { waitUntil: 'domcontentloaded' })")
+  })
 })

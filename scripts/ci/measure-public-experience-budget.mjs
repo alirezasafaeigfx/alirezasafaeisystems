@@ -70,7 +70,7 @@ async function measure(browser, url) {
       scripts.push({ url: response.url(), bytes: null, gzipBytes: null })
     }
   })
-  await page.goto(url, { waitUntil: 'domcontentloaded' })
+  await page.goto(url, { waitUntil: 'networkidle' })
   await page.locator('main').waitFor()
   await page.waitForTimeout(750)
   let interactionMs = null
