@@ -22,9 +22,9 @@ const ALLOWED_PUBLIC_EXPERIENCE_PATHS = [
   /^src\/components\/(public|sections|discover|layout)\//,
   /^src\/lib\/(system-scene|home-content|evidence|discover-labels)\.ts$/,
   /^src\/generated\/sitemap-manifest\.json$/,
-  /^src\/app\/(globals\.css|audit-readiness\/page\.tsx|services\/page\.tsx|thank-you\/page\.tsx|discover\/\[slug\]\/page\.tsx|case-studies\/[^/]+\/page\.tsx)$/,
+  /^src\/app\/(globals\.css|loading\.tsx|audit-readiness\/page\.tsx|services\/page\.tsx|thank-you\/page\.tsx|discover\/\[slug\]\/page\.tsx|case-studies\/page\.tsx|case-studies\/[^/]+\/page\.tsx)$/,
   /^src\/__tests__\/(components|discover|lib)\//,
-  /^e2e\/(public-experience|smoke)\.spec\.mjs$/,
+  /^e2e\/(public-experience|system-core-3d-lifecycle|smoke)\.spec\.mjs$/,
   /^docs\/(engineering|execution|governance|roadmaps)\//,
 ]
 
