@@ -12,6 +12,8 @@ The owner has explicitly requested these documents, complete implementation rath
 
 ## Read once at session start
 
+For the owner's paired ASDEV/Audit mission, also read [paired experience contract v1](docs/engineering/PAIRED_PRODUCT_EXPERIENCE.md). Only the two explicitly named repositories are in scope, each through its own isolated branch, instructions and release gates. This does not authorize a third product, shared database/authentication changes, or deployment. EC tasks extend the canonical roadmap; do not restart PR #26 or mark Audit complete from this site's evidence.
+
 1. This file and the project rules.
 2. Roadmap current state and the next dependency-ready task card.
 3. Engineering sections relevant to that task; inspect the referenced source files.

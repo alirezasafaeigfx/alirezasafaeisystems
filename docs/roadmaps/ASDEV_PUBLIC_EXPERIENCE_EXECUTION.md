@@ -4,6 +4,20 @@ Revision: 2026-08-30, owner-requested experience recovery. This is the **only pu
 
 ## 1. Outcome, not a release checklist
 
+### 2026-08-31 paired-product extension
+
+The owner has explicitly included `alirezasafaeigfx/auditsystems` as the complementary product. Apply [paired experience contract v1](../engineering/PAIRED_PRODUCT_EXPERIENCE.md) without replacing S1–S5. At review, main remains `2fe4988`; implementation PR #26 is open at `72e634b`, with real but not fully accepted evidence. PR #27 addresses the unreliable dependency audit. Reconcile current state before continuing; no restart of completed implementation and no claim it is already deployed.
+
+| ID | Outcome | Dependency / ownership |
+|---|---|---|
+| EC-01 | Reconcile both candidates, security/truth blockers and CI | Existing #26/#27 + Audit AU-01/AU-02; safe design work may proceed |
+| EC-02 | Shared visual family, simple Persian, focused Audit UI | Reuse S1-08 and S4; Audit AU-03; does not wait for deployment |
+| EC-03 | One form owner per intent and language-safe round trip | EC-02; S1-04/07; Audit AU-04 |
+| EC-04 | Trustworthy report and clear implementation handoff | Audit AU-02/AU-05/AU-06; main S1-01/S2-05 |
+| EC-05 | Exact paired acceptance and separate governed releases | EC-01…04 plus existing S5 conditions; Audit AU-07 |
+
+The supporting contract contains task cards, paths, acceptance and four outcome batches. Audit executes its local queue. EC-05 is required for paired-program closure; it does not retroactively erase historically verified single-site releases. Do not mutate existing work-ledger evidence merely to reflect this planning revision.
+
 Create a distinctive, polished interactive site that makes engineering understandable to an ordinary Iranian visitor. Within the first viewport the visitor can understand what help is available and take the next step. The visual signature is a system under pressure becoming understandable, repaired and supported by evidence. Technical depth is optional; primary Persian is simple, natural and respectful.
 
 The owner's references inform authored typography, spatial continuity, purposeful motion and dedicated mobile behavior. Awards, “world-class” and numerical design scores are aspirations, not verifiable deliverables or guarantees. Do not copy reference sites or hide essential information behind a game/loader.

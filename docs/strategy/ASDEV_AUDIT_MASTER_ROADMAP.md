@@ -1,5 +1,7 @@
 # ASDEV Audit Master Roadmap
 
+> Historical ecosystem strategy, not the current public-experience execution queue. For the owner's 2026-08-31 two-project mission, use the [canonical ASDEV roadmap](../roadmaps/ASDEV_PUBLIC_EXPERIENCE_EXECUTION.md) and [paired experience contract](../engineering/PAIRED_PRODUCT_EXPERIENCE.md), plus Audit's local queue. Older PostgreSQL-migration/third-product tasks below are not admitted by this mission; ASDEV remains SQLite and Audit remains PostgreSQL. Historical completion/approval statements require current evidence and cannot grant runtime authorization.
+
 **Model:** Dependency-driven phases — no calendar promises  
 **Authority:** Canonical roadmap for the ASDEV ecosystem  
 **Product:** ASDEV Audit Platform (`auditsystems`)  
