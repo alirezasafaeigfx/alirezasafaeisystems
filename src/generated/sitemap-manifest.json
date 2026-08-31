@@ -43,7 +43,7 @@
   },
   {
     "route": "/fa/case-studies",
-    "lastModified": "2026-08-30T14:42:56-04:00",
+    "lastModified": "2026-08-31T05:29:17-04:00",
     "priority": 0.85,
     "changeFrequency": "monthly"
   },
@@ -61,7 +61,7 @@
   },
   {
     "route": "/fa/case-studies/infrastructure-localization-rescue",
-    "lastModified": "2026-08-30T19:55:18-04:00",
+    "lastModified": "2026-08-31T05:29:17-04:00",
     "priority": 0.8,
     "changeFrequency": "monthly"
   },
@@ -85,7 +85,7 @@
   },
   {
     "route": "/fa/case-studies/ci-cd-governance-hardening",
-    "lastModified": "2026-08-30T19:55:18-04:00",
+    "lastModified": "2026-08-31T05:29:17-04:00",
     "priority": 0.8,
     "changeFrequency": "monthly"
   },
