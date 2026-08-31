@@ -1,9 +1,11 @@
+import { execFileSync } from 'node:child_process'
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { gzipSync } from 'node:zlib'
 import { expect, test } from '@playwright/test'
 
-const evidenceDir = resolve(process.cwd(), 'test-results/public-experience')
+const candidateSha = process.env.PUBLIC_EXPERIENCE_CANDIDATE_SHA || execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim()
+const evidenceDir = resolve(process.cwd(), 'test-results/public-experience', candidateSha)
 const viewports = [
   { name: 'mobile', width: 390, height: 844 },
   { name: 'tablet', width: 768, height: 1024 },
