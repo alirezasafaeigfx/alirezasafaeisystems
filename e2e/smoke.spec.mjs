@@ -68,8 +68,8 @@ test.describe('smoke', () => {
     await page.setViewportSize({ width: 390, height: 844 })
     await page.goto('/discover/playwright-discover-resource?utm_source=instagram&utm_medium=social&utm_campaign=playwright&utm_content=reel-test')
 
-    await expect(page.locator('h1')).toContainText('Playwright Discover Resource')
-    await expect(page.getByText('This quick guide is seeded only for disposable browser testing.')).toBeVisible()
+    await expect(page.locator('h1')).toContainText('منبع آزمایشی Playwright')
+    await expect(page.getByText('این راهنما فقط در پایگاه داده موقت آزمون ساخته می‌شود.')).toBeVisible()
 
     const official = page.locator('a[href="https://example.com/tool"]')
     const telegramGuide = page.locator('a[href="https://t.me/asdev_test/123"]')
