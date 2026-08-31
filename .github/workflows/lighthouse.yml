@@ -17,6 +17,8 @@ jobs:
   lighthouse:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    env:
+      DATABASE_URL: file:${{ runner.temp }}/lighthouse.db
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -28,6 +30,8 @@ jobs:
           cache: 'pnpm'
           cache-dependency-path: pnpm-lock.yaml
       - run: pnpm install --frozen-lockfile
+      - name: Prepare disposable Lighthouse data
+        run: pnpm prisma db push --skip-generate --accept-data-loss && node scripts/test/seed-playwright-discover.mjs
       - name: Install Chromium for Lighthouse
         env:
           PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/ms-playwright
