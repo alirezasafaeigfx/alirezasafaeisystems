@@ -166,16 +166,19 @@ describe('public-experience dependency preflight', () => {
       changedFiles: [
         '.github/workflows/e2e-smoke.yml',
         '.github/workflows/lighthouse.yml',
+        'scripts/ci/create-public-experience-evidence-draft.mjs',
         'scripts/ci/measure-public-experience-budget.mjs',
         'scripts/test/seed-playwright-discover.mjs',
         'tests/ci/playwright-discover-fixture.test.ts',
         'tests/ci/public-experience-performance-contract.test.ts',
+        'src/components/analytics/tracked-link.tsx',
+        'e2e/homepage-hydration.spec.mjs',
       ],
       mergeBaseSha: sha('a'),
       headIsDescendant: true,
       ...publicDeclaration,
       taskId: 'S4-10,S4-11,S4-12,S5-01',
-      expectedCategories: ['workflow', 'ci'],
+      expectedCategories: ['workflow', 'ci', 'application'],
     })).toEqual([])
   })
 

@@ -16,16 +16,17 @@ const ALLOWED_R0_PATHS = [
 const ALLOWED_PUBLIC_EXPERIENCE_PATHS = [
   /^\.github\/workflows\/(ci-router|e2e-smoke|lighthouse)\.yml$/,
   /^\.github\/pull_request_template\.md$/,
-  /^scripts\/ci\/(validate-(r0-pr|public-experience-evidence)|measure-public-experience-budget)\.mjs$/,
+  /^scripts\/ci\/(validate-(r0-pr|public-experience-evidence)|measure-public-experience-budget|create-public-experience-evidence-draft)\.mjs$/,
   /^scripts\/test\/seed-playwright-discover\.mjs$/,
   /^tests\/ci\/(playwright-discover-fixture|public-experience-performance-contract|validate-(r0-pr|public-experience-evidence))\.test\.ts$/,
   /^(package\.json|pnpm-lock\.yaml|next\.config\.ts)$/,
   /^src\/components\/(public|sections|discover|layout)\//,
+  /^src\/components\/analytics\/tracked-link\.tsx$/,
   /^src\/lib\/(system-scene|home-content|evidence|discover-labels)\.ts$/,
   /^src\/generated\/sitemap-manifest\.json$/,
   /^src\/app\/(globals\.css|loading\.tsx|audit-readiness\/page\.tsx|services\/page\.tsx|thank-you\/page\.tsx|discover\/\[slug\]\/page\.tsx|case-studies\/page\.tsx|case-studies\/[^/]+\/page\.tsx)$/,
   /^src\/__tests__\/(components|discover|lib)\//,
-  /^e2e\/(public-experience|system-core-3d-lifecycle|smoke)\.spec\.mjs$/,
+  /^e2e\/(public-experience|system-core-3d-lifecycle|homepage-hydration|smoke)\.spec\.mjs$/,
   /^docs\/(engineering|execution|governance|roadmaps)\//,
 ]
 
