@@ -57,17 +57,17 @@ These are source/report findings, not a claim that this review workspace complet
 | Scope | State | Next action |
 |---|---|---|
 | DOCS-01 | INTEGRATED — independent review evidence UNVERIFIED | PR #18 merged into `GITHUB_MAIN` at `2fe4988841a36c7f4eaf1da47fb5bffe22d00547`; implementation dependencies are ready. GitHub reports no submitted PR reviews, so independent documentation acceptance remains an explicit evidence gap. |
-| S1-01/03 | REOPENED — provenance gap | Inspect real sources, strengthen publication contract |
-| S1-08 | PENDING — DOCS-01 integration | Plain-language FA/EN public surfaces |
+| S1-01/03 | IMPLEMENTED — acceptance review pending | Draft/unreviewed records are withheld; obtain real independent provenance before publication |
+| S1-08 | IMPLEMENTED — exact-candidate review pending | Re-run plain-language review on repaired candidate |
 | S1-02/04/05/07 | IMPLEMENTED / ACCEPTANCE REVIEW REQUIRED | Reuse satisfactory parts; close copy/action/analytics evidence gaps |
-| S2-01/02/05/06 | IMPLEMENTED / PARTIAL ACCEPTANCE | Verify facts and complete documentary/hierarchy after dependencies |
-| S3-01/04/05/06 | IMPLEMENTED / ACCEPTANCE REVIEW REQUIRED | Test actual media/copy/publication/SEO behavior; repair proven gaps |
+| S2-01/02/05/06 | IMPLEMENTED / PARTIAL ACCEPTANCE | Real FA/EN/print captures exist; independent evidence acceptance remains pending |
+| S3-01/04/05/06 | IMPLEMENTED / ACCEPTANCE REVIEW REQUIRED | Slow-network query/SEO behavior is covered; complete independent route review |
 | S3-03 | REUSE CANDIDATE — query regression constraint | Confirm current implementation/evidence before REUSED-DONE |
-| S4-01/02/03/05/06 | REOPENED — incomplete required experience | Complete visible composition and meaningful native interaction |
-| S4-07 | PENDING | Native benchmark after real implementation |
-| S4-10/11/12 | ADMITTED / DEPENDENCY-BLOCKED | Scoped advanced/GPU implementation and measured comparison |
-| S5-01 | PENDING — DOCS-01 integration | Early harness; final run after applicable implementation |
-| S5-02/03/04 | UNVERIFIED for completed experience | Full candidate matrix, review and current checks |
+| S4-01/02/03/05/06 | IMPLEMENTED — exact-candidate review pending | Inspect repaired landscape/no-JS and forward/back recordings |
+| S4-07 | PARTIAL — controlled profile added | Publish retrievable three-run baseline/candidate results and resolve unattributed-task limitations |
+| S4-10/11/12 | IMPLEMENTED — acceptance review pending | Re-review five GPU topologies, lifecycle, recordings and measured costs on exact candidate |
+| S5-01 | IMPLEMENTED — no accepted manifest | Validator rejects incomplete matrix, temporary URLs, generic review and mismatched SHA; durable accepted evidence still required |
+| S5-02/03/04 | REVIEW / UNVERIFIED | Full local matrix passes; exact-candidate hosted artifacts and accepted independent/owner dispositions remain pending |
 | S5-05/06/07 | HISTORICAL RELEASE DONE / FUTURE CANDIDATE PENDING | Preserve old release; new release only after product acceptance |
 
 Do not overwrite all S1–S5 rows with DONE based on one release. The roadmap dependency table and current verified evidence determine ready tasks. First implementation batch is S1-08 + S1-01 with non-overlapping ownership or sequential execution; S5-01 harness may begin independently.
@@ -91,6 +91,18 @@ Do not overwrite all S1–S5 rows with DONE based on one release. The roadmap de
 - Review limitation: GitHub PR metadata returned an empty submitted-review list. The successful CodeRabbit status is not substituted for a retrievable independent documentation-review disposition; that criterion remains `UNVERIFIED`.
 - Repository rule observation: the active main-governance ruleset is `protect-main-release-governance`; the legacy branch-protection endpoint returned no classic protection object. No settings were changed.
 - Runtime/data effect: none. This reconciliation makes `DOCS-01` integration-dependent tasks ready; it does not establish application experience acceptance.
+
+## Admitted implementation record — 2026-08-31
+
+- Repository/environments: `alirezasafaeigfx/alirezasafaeisystems`; isolated `LOCAL_PC` branch `feat/v3-2-admitted-implementation`; immutable base `GITHUB_MAIN` `2fe4988841a36c7f4eaf1da47fb5bffe22d00547`. The dirty owner checkout was not modified.
+- Implementation candidate: `8aff64380631f70c582486858f7bc0b7436b65bb` (PR #26). It includes plain public copy and evidence withholding, authored FA/EN Home/mobile composition, finite Anime.js five-state motion, deferred real Three.js five-state topology, lifecycle cleanup, no-JS/reduced-motion/WebGL failure paths, flagship/Discover route evidence, controlled performance profiling and fail-closed manifest validation.
+- Independent review: agent identity `Goodall`, type `independent-agent`, scope `6e6f67a40570aa031115c6e6ea6197d18f715b69`, disposition `CHANGES_REQUESTED`. P0: none. P1 findings covered security-gate truth, no-JS visibility, validator integrity, GPU lifecycle/orientation, performance evidence and Persian/documentary truth. Candidate `8aff64380631f70c582486858f7bc0b7436b65bb` repairs the implementation findings but has not yet received an accepted exact-SHA re-review.
+- Verified locally after repair: focused Vitest 21/21; public-experience plus lifecycle Playwright 11/11; lint 0 errors with 3 existing warnings; type-check pass; build pass; full Vitest 436/436 after the known SQLite/WAL contract test first timed out under load and then passed alone 5/5 and in the repeated full run.
+- Evidence state: actual FA/EN light/dark Home matrix at 390/768/1440, five native states, forward/back native and GPU WebM recordings, five GPU topology captures, mobile/landscape/desktop GPU captures, visible no-JS route, FA/EN/print flagship and slow-network Discover query/SEO captures are generated locally. They are not called durable or accepted until an exact-candidate hosted artifact is retrieved, hashed and independently accepted.
+- Security/release limitation: separate PR #27 (`d76e5a6828269caff8515689f324a906066a4e4c`) makes the pnpm audit parser fail closed and therefore correctly reports current high-severity production dependency advisories. No merge, deployment, migration or rollback exercise was attempted.
+- Performance limitation: the controlled three-run harness now records network/CPU profile, long-animation-frame attribution and median/p95 frame timing, but exact retrievable baseline/candidate output for this repaired SHA remains pending. Missing or unattributed evidence is `UNVERIFIED`, not PASS.
+- Rollback: revert the coherent public-experience commits; the native semantic scene and static content remain the non-GPU fallback. No runtime/data rollback applies before deployment.
+- Next dependency: publish and retrieve exact-candidate CI evidence, run the controlled immutable-base comparison, obtain independent re-review, repair any remaining finding, then request owner visual disposition. Release remains blocked by real security findings and absent accepted durable manifest.
 
 ## Update protocol
 
