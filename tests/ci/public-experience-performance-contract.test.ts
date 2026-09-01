@@ -48,4 +48,18 @@ describe('V3.2 controlled performance contract', () => {
     expect(runner).toContain("'--candidate-url'")
     expect(harness).toContain('for (let index = 0; index < 3; index += 1)')
   })
+
+  it('fails closed for dirty sources, missing metrics, and unready child processes', () => {
+    expect(runner).toContain("['status', '--porcelain']")
+    expect(runner).toContain('candidate worktree must be clean')
+    expect(runner).toContain('server exited before readiness')
+    expect(harness).toContain('sourceDirty: false')
+    expect(harness).toContain('process.exitCode = 2')
+    expect(harness).toContain('frameTimeP95Ms === null')
+  })
+
+  it('waits for the complete animation-frame sample before collecting metrics', () => {
+    expect(harness).toContain('new Promise((resolve)')
+    expect(harness).toContain('await frameSample')
+  })
 })

@@ -50,7 +50,7 @@ async function measure(browser, url) {
         })))
       }).observe({ type: 'long-animation-frame', buffered: true })
     }
-    window.__startBudgetFrameSample = (durationMs) => {
+    window.__startBudgetFrameSample = (durationMs) => new Promise((resolve) => {
       window.__budgetFrameTimes = []
       let previous
       const started = performance.now()
@@ -58,9 +58,10 @@ async function measure(browser, url) {
         if (previous !== undefined) window.__budgetFrameTimes.push(now - previous)
         previous = now
         if (now - started < durationMs) requestAnimationFrame(sample)
+        else resolve()
       }
       requestAnimationFrame(sample)
-    }
+    })
   })
   page.on('response', async (response) => {
     if (response.request().resourceType() !== 'script') return
@@ -78,7 +79,7 @@ async function measure(browser, url) {
   const stateButtons = page.locator('[data-testid="operational-scene"] [role="group"] button')
   if (await stateButtons.count() >= 2) {
     await stateButtons.nth(1).scrollIntoViewIfNeeded()
-    await page.evaluate(() => window.__startBudgetFrameSample(700))
+    const frameSample = page.evaluate(() => window.__startBudgetFrameSample(700))
     await page.evaluate(() => { window.__budgetInteractionWindow = { start: performance.now(), end: null } })
     interactionMs = await stateButtons.nth(1).evaluate((button) => new Promise((resolve) => {
       const startedAt = performance.now()
@@ -87,6 +88,7 @@ async function measure(browser, url) {
     }))
     await page.locator('[data-testid="operational-scene"]').waitFor({ state: 'visible' })
     await page.waitForTimeout(500)
+    await frameSample
     await page.evaluate(() => { window.__budgetInteractionWindow.end = performance.now() })
   }
   const performance = await page.evaluate(() => ({
@@ -140,7 +142,7 @@ async function measureProfile(browser, url) {
     allRunAttributableLongAnimationFrames: longAnimationFrames.filter((frame) => frame.blockingDuration > 50 && frame.scripts.some((script) => script.sourceURL)),
     interactionLongAnimationFrames: runs.flatMap((run, runIndex) => run.longAnimationFrames.filter((frame) => run.interactionWindow && frame.startTime + frame.duration >= run.interactionWindow.start && frame.startTime <= run.interactionWindow.end).map((frame) => ({ run: runIndex + 1, ...frame }))),
     interactionLongTasks: runs.flatMap((run, runIndex) => run.longTasks.filter((task) => run.interactionWindow && task.startTime + task.duration >= run.interactionWindow.start && task.startTime <= run.interactionWindow.end).map((task) => ({ run: runIndex + 1, ...task }))),
-    frameTimeMedianMs: median(runs.flatMap((run) => run.frameTimes)),
+    frameTimeMedianMs: runs.flatMap((run) => run.frameTimes).length ? median(runs.flatMap((run) => run.frameTimes)) : null,
     frameTimeP95Ms: percentile(runs.flatMap((run) => run.frameTimes), 0.95),
     profile: { cpuSlowdownMultiplier: 4, latencyMs: 150, downloadBytesPerSecond: 200_000, uploadBytesPerSecond: 93_750, downloadMbitPerSecond: 1.6, uploadKbitPerSecond: 750 },
   }
@@ -167,10 +169,16 @@ try {
     candidate,
     initialJavaScriptDeltaGzipBytes: candidate.gzipBytes - baseline.gzipBytes,
     budgetGzipBytes: 30 * 1024,
+    capturedAt: new Date().toISOString(),
+    browser: { name: 'chromium', version: browser.version() },
+    runner: { platform: process.platform, arch: process.arch, cpus: await import('node:os').then(({ cpus }) => cpus().length), memoryBytes: (await import('node:os')).totalmem() },
+    toolchain: { node: process.version },
+    sourceDirty: false,
   }
   await mkdir(dirname(output), { recursive: true })
   await writeFile(output, `${JSON.stringify(report, null, 2)}\n`)
   if (baseline.missingBodies || candidate.missingBodies) process.exitCode = 2
+  if (!baseline.medianLcp || !candidate.medianLcp || baseline.frameTimeP95Ms === null || candidate.frameTimeP95Ms === null) process.exitCode = 2
   if (report.initialJavaScriptDeltaGzipBytes > report.budgetGzipBytes) process.exitCode = 1
   if (candidate.medianLcp > 2500 || candidate.maxCls > 0.1 || (candidate.maxInteractionMs !== null && candidate.maxInteractionMs > 200)) process.exitCode = 1
   if (candidate.allRunAttributableLongAnimationFrames.length || (candidate.frameTimeP95Ms !== null && candidate.frameTimeP95Ms > 50)) process.exitCode = 1
