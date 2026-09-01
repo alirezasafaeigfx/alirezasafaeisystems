@@ -1,8 +1,34 @@
 # V3.2 work ledger — reconciled state
 
-Updated: 2026-08-30. Single writer: ORCH. Task authority: [canonical roadmap](../roadmaps/ASDEV_PUBLIC_EXPERIENCE_EXECUTION.md). This ledger records evidence and uncertainty; it cannot lower acceptance criteria.
+Updated: 2026-09-01. Single writer: ORCH. Task authority: [canonical roadmap](../roadmaps/ASDEV_PUBLIC_EXPERIENCE_EXECUTION.md). This ledger records evidence and uncertainty; it cannot lower acceptance criteria.
 
 ## Current verdict
+
+### Implementation complete / performance acceptance failed — 2026-09-01T16:17:30Z
+
+- Task: `EC-01` Three.js connection continuity; executor/session: Codex coordinator with bounded implementation worker.
+- Base/candidate: existing PR #26 branch `feat/v3-2-admitted-implementation`, start `72e634bc403c3038b546de10a2ebfca37db8ca2e`; current candidate `589112862e5ad0fcb82238e945614eb4b8656608` on base `2fe4988841a36c7f4eaf1da47fb5bffe22d00547`.
+- Proven gap: Three.js `0.185.1` reuses the initial four-vertex `position` buffer in `BufferGeometry.setFromPoints`; six/eight-vertex route states are truncated with a warning and reverse transitions can retain stale vertices.
+- Changed paths: deferred Three route geometry/helper and tests; Home initial-chunk artifact verifier/build hook; candidate-bound three-run performance workflow/harness/tests. PR #27 and GR-01 remain separate.
+- Reused evidence: PR #26 focused CI-contract tests passed 15/15 at the start SHA; existing topology/lifecycle tests remain regression inputs but do not prove buffer contents.
+- Acceptance evidence: actual-Three `4→6→8→4` buffer/draw-range/exact bounds tests; stable buffer/bounds identities; paused/resumed label continuity; fresh build scans all 13 Home initial candidates and excludes deferred Three attribution; performance evidence binds immutable base/candidate SHAs, rejects dirty sources, uses three runs and writes PASS/FAIL/UNVERIFIED JSON. Focused 23/23, type check, lint (0 errors/3 pre-existing warnings), build and independent review PASS. Full suite is PARTIAL: all scoped tests pass; unrelated backup/deploy contract timed out twice at 15 seconds and was not rerun unchanged.
+- Hosted performance witness: run `33530073463`, artifact `9809470836`, base `2fe4988841a36c7f4eaf1da47fb5bffe22d00547`, candidate `e5cace271f5bc78aa31508ef601cd65af832b734`. Three-run JSON recorded JS delta `-4142` gzip bytes, candidate median LCP `1136ms`, max lab interaction `33.2ms`, frame p95 `16.8ms`, and nine attributable long-animation frames with blocking duration above `50ms` (maximum `181.734ms`). Verdict remains `FAIL` for the long-animation-frame budget; the frozen base lacks the new scene controls, so candidate `589112862e5ad0fcb82238e945614eb4b8656608` corrects that false `UNVERIFIED` classification without lowering the long-task budget. PR #26 is open and unmerged; no deploy/live claim.
+
+### 2026-08-31 current-state overlay
+
+Rechecked GitHub: main is `2fe4988841a36c7f4eaf1da47fb5bffe22d00547`; DOCS-01/PR #18 is merged. PR #26 is open at `72e634bc403c3038b546de10a2ebfca37db8ca2e`, with substantial new implementation, not accepted/deployed proof. The paired docs PR #28 began this extension at `f7abc0d9041ee0d085cdd1ea8d7b998d07418faa`; companion Audit PR #1 began at `415e9b371aa9721626d46967aaa0f07ed94e9cc1`, both Draft. Fetch current successors before execution.
+
+The source findings and S rows below describe the earlier frozen baseline unless explicitly reconciled to the PR #26 successor. **Do not restart those implementations from the old next-action text.** Retain accepted code/evidence, repair remaining criteria and keep merge/runtime identity separate. This docs update makes no new app-fix, deployment, performance, user-test or ranking claim.
+
+| Current scope | State | Next action |
+|---|---|---|
+| DOCS-01 | INTEGRATED — PR #18 | Reuse; do not wait or implement again |
+| S1–S4 / S5 tooling | PR #26 IMPLEMENTED IN PART / ACCEPTANCE OPEN | Compare actual code/artifacts to criteria; repair only demonstrated gaps |
+| EC-01…05 | OPEN — paired implementation/acceptance | Follow current roadmap; preserve #26/#27 and Audit ownership |
+| GR-01…06 | OPEN — quality/SEO/content/measurement extension | First current baseline/criteria, then dependency-ready implementation; growth observation later |
+| Pair release / search outcomes | UNVERIFIED for new candidates | No inference from main, CI or earlier release |
+
+Task claim/checkpoint fields: ID, executor/session, base and candidate, owned paths, missing criterion, reused evidence and equivalence, exact next action, commands/results, artifacts/hashes, independent review, blockers/retry trigger, merge/runtime/observation status separately. One coordinator writes this ledger. Update only for real state changes; after two identical failed attempts without new evidence, block that action and continue independent ready work.
 
 **Historical Production release: successful. Complete requested public experience: not accepted; implementation and evidence gaps remain.** This documentation revision does not implement animations, install dependencies, benchmark a new candidate or deploy anything.
 
@@ -52,11 +78,11 @@ These are source/report findings, not a claim that this review workspace complet
 - The non-required semantic-release TLS timeout is recorded history, not a visual blocker and not an excuse to rerun Production.
 - No claim of field INP, real-device performance, human comprehension testing, complete independent design acceptance or actual new rollback drill is established by the pasted S5 report.
 
-## Active state registry
+## Earlier baseline state registry — current overlay takes precedence
 
 | Scope | State | Next action |
 |---|---|---|
-| DOCS-01 | REVIEW — documentation alignment | Independent consistency review and governed integration; resulting commit identified by PR metadata |
+| DOCS-01 | INTEGRATED — PR #18 | Verified merged at `2fe4988841a36c7f4eaf1da47fb5bffe22d00547`; reuse |
 | S1-01/03 | REOPENED — provenance gap | Inspect real sources, strengthen publication contract |
 | S1-08 | PENDING — DOCS-01 integration | Plain-language FA/EN public surfaces |
 | S1-02/04/05/07 | IMPLEMENTED / ACCEPTANCE REVIEW REQUIRED | Reuse satisfactory parts; close copy/action/analytics evidence gaps |
@@ -70,9 +96,9 @@ These are source/report findings, not a claim that this review workspace complet
 | S5-02/03/04 | UNVERIFIED for completed experience | Full candidate matrix, review and current checks |
 | S5-05/06/07 | HISTORICAL RELEASE DONE / FUTURE CANDIDATE PENDING | Preserve old release; new release only after product acceptance |
 
-Do not overwrite all S1–S5 rows with DONE based on one release. The roadmap dependency table and current verified evidence determine ready tasks. First implementation batch is S1-08 + S1-01 with non-overlapping ownership or sequential execution; S5-01 harness may begin independently.
+Do not overwrite all S1–S5 rows with DONE based on one release. The current overlay, roadmap dependencies and verified evidence determine ready tasks. The old S1-08/S1-01 starting sequence is historical: reconcile PR #26/#27, reuse its work and repair the first ready missing criterion instead.
 
-## DOCS-01 bounded change record
+## DOCS-01 historical bounded change record — integrated by PR #18
 
 - Base: main `39c09b43191822d70c30f7fa8ae51dadb36d37b7`.
 - Proven gap: old agent/rules contradict actual SQLite/tooling/autonomy; roadmap treats Gate A as terminal; ledger confuses release success with experience acceptance; no complete stack/skills/report-inspection contract.

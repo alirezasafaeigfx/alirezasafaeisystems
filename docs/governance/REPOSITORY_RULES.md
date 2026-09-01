@@ -1,10 +1,12 @@
 # Project rules — ASDEV public experience
 
-Updated: 2026-08-30. Scope: this repository's public website and its delivery contract.
+Updated: 2026-08-31. Scope: this repository's public website and its paired quality/growth delivery contract.
 
 ## 1. Purpose and precedence
 
 The owner wants a visually distinctive, professionally engineered, interactive site that ordinary Iranian visitors can understand. Quality, clarity, correctness and performance are simultaneous requirements. Technology novelty and small diffs are not outcomes by themselves.
+
+The [shared quality/growth contract](../strategy/PAIRED_QUALITY_GROWTH_CONTRACT.md) adds complete utility, SEO, substantive Persian content, reliability and evidence-based category leadership. The canonical roadmap alone admits GR tasks. Aesthetic distinction and search rank cannot be certified by green CI; rank one is not guaranteed. Do not count one reused deliverable as two implementations.
 
 [AGENTS.md](../../AGENTS.md) is the entry point. The [canonical roadmap](../roadmaps/ASDEV_PUBLIC_EXPERIENCE_EXECUTION.md) selects work; the [engineering guide](../engineering/PUBLIC_EXPERIENCE_ENGINEERING.md) defines technical choices; the [sprint cards](../execution/V3_2_AGENT_SPRINTS.md) specify execution; the [ledger](../execution/V3_2_WORK_LEDGER.md) records evidence, not authority to redefine requirements.
 
@@ -100,3 +102,11 @@ Behavior changes: focused red/green tests, browser exercise, type-check and lint
 Docs-only changes: inspect complete diff, links, path existence, task/dependency consistency, contradictory rules, safety boundaries and secrets. Report local app tests as not run/not applicable, not passed. Actual required hosted checks remain mandatory; report their observed results separately.
 
 Expired artifacts, inaccessible local paths and unavailable tools are explicit evidence gaps. Store deliverable evidence durably as CI artifacts or an approved persistent location, with commit-bound manifest and hashes. Do not upload secrets, cookies, customer data or unredacted authenticated traces.
+
+## 10. Search, content and autonomous progress
+
+Use appropriate visible, truthful metadata/schema and public route policies. Keep private/draft/utility pages out of intended indexing without weakening access. Do not mass-publish AI filler, buy links, fabricate testimonials/metrics, hide failing pages, or duplicate Audit's primary search intent. A valid technical SEO report is not proof of indexing, traffic or rank.
+
+Distinguish independent copy review from consented user testing and lab measurements from field data. Record source/window/cohort/denominator for growth. Future observation may remain pending after implementation/release; do not label it PASS or loop indefinitely waiting for traffic.
+
+The [paired loop prompt](../../prompts/codex/PAIRED_SITES_YOLO_LOOP.md) governs resumption, task claims, unchanged-evidence reuse and bounded retries. Existing authorizations apply within their scope. No routine permission questions; no silent expansion of authorization, repeated deterministic failures, scheduler creation or fabricated completion.

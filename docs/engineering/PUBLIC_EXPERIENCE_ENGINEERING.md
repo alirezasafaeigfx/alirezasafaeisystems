@@ -1,6 +1,8 @@
 # Public experience engineering guide
 
-Updated: 2026-08-30. Design and implementation contract for the [canonical roadmap](../roadmaps/ASDEV_PUBLIC_EXPERIENCE_EXECUTION.md), not another task queue.
+Updated: 2026-08-31. Design and implementation contract for the [canonical roadmap](../roadmaps/ASDEV_PUBLIC_EXPERIENCE_EXECUTION.md), not another task queue.
+
+The [shared quality/growth contract](../strategy/PAIRED_QUALITY_GROWTH_CONTRACT.md) extends this guide to technical SEO, useful Persian content, reliability and measurement. Keep the stricter budgets below. [GR task cards](../execution/QUALITY_GROWTH_SPRINTS.md) map these concerns to actual sources/tests. Historical version tables describe their stated baseline; PR #26 now contains substantial later implementation and must be inspected before repeating any admission/prototype task.
 
 ## 1. Product outcome and visual direction
 
@@ -55,7 +57,7 @@ Do not add GSAP, Framer Motion, Anime.js, React Three Fiber and a physics engine
 
 For `S4-10` / `S4-11`, the owner-requested engineering revision admits bounded evaluation and a prototype; production adoption still requires measured acceptance. Dependency installation is part of its specific implementation PR, not this docs revision. Record version, license, imports, alternatives considered, actual compressed cost, maintenance/security observations and rollback. Do not assume all third-party assets share the code library's license.
 
-Known CI blocker: `ci-router.yml` routes every package/lockfile change through `validate-r0-pr.mjs`, whose R0 allowlist rejects release/application categories. `S4-10` must first introduce and test an explicit bounded public-experience dependency scope while retaining the old fail-closed infrastructure path. No disabling checks, hidden dependency install or passing a false R0 declaration.
+Historical CI blocker at `39c09b4`: package/lockfile changes were routed into an R0-only allowlist that rejected release/application categories. PR #26 already introduces `public-experience-dependencies` with bounded paths and S4-10/11/12 admission. Inspect and reuse that implementation/tests, rather than reintroducing it. GR-01 may extend only missing EC/GR criteria/admission under a bounded concern with negative tests; no disabled checks, hidden install or false R0/S4 declaration.
 
 ## 4. Source map and boundaries
 
@@ -75,6 +77,8 @@ Known CI blocker: `ci-router.yml` routes every package/lockfile change through `
 | Current coverage | `src/__tests__/components/homepage-v3.test.tsx`, `operational-scene.test.tsx`, `src/__tests__/lib/evidence.test.ts`, `e2e/public-v31-visual.spec.ts` |
 
 Proposed files belong to their task, and are not claimed to exist: `src/lib/system-scene.ts`, `src/lib/public-copy.ts`, `src/components/public/system-scene-controls.tsx`, `src/components/public/system-core-3d.tsx`, `src/components/public/flagship-preview.tsx`, `e2e/public-experience.spec.ts`, `e2e/public-experience-live.spec.ts`, `scripts/ci/validate-public-experience-evidence.mjs`. Reuse an equivalent existing file if found; document that mapping once rather than duplicate it.
+
+Current continuation mapping: PR #26 already has `src/lib/system-scene.ts`, `src/components/public/system-core-3d.tsx`, its launcher, `e2e/public-experience.spec.mjs`, `e2e/system-core-3d-lifecycle.spec.mjs` and the evidence/budget scripts. These supersede matching proposals above. Reuse the actual `.mjs` tests; do not create duplicate `.ts` suites because an older card named one. Verify whether a distinct read-only live spec is still missing before adding it.
 
 ## 5. Scene contract
 
@@ -170,11 +174,11 @@ pnpm install --frozen-lockfile
 pnpm type-check
 pnpm lint
 pnpm exec vitest run src/__tests__/components/homepage-v3.test.tsx src/__tests__/components/operational-scene.test.tsx src/__tests__/lib/evidence.test.ts
-pnpm exec playwright test e2e/public-experience.spec.ts --config=playwright.config.mjs
+pnpm exec playwright test e2e/public-experience.spec.mjs --config=playwright.config.mjs
 pnpm build
 ```
 
-The new E2E path is created by the sprint tasks before running it; absence is not a skip that passes. Browser installation/network failure is a tool blocker, not proof of UI correctness. Never redirect the full existing fixture-writing visual suite to Production. The planned live spec must be read-only and use `PLAYWRIGHT_DISABLE_WEBSERVER=true` with explicit public base URL and no fixture creation/submission.
+Use the actual PR #26 successor test path after safely bringing that implementation into the task branch; this docs branch alone does not contain the application changes. A missing suite is not a skip that passes. Browser installation/network failure is a tool blocker, not proof of UI correctness. Never redirect the full existing fixture-writing visual suite to Production. Any distinct live spec must be read-only and use `PLAYWRIGHT_DISABLE_WEBSERVER=true` with explicit public base URL and no fixture creation/submission.
 
 Publish durable sanitized screenshots, motion recordings, traces and raw performance results with candidate SHA and hashes. An owner-PC temp folder alone is not a final evidence handoff. [Report review protocol](../governance/CODEX_REPORT_REVIEW.md) defines the manifest and verification.
 
@@ -195,3 +199,13 @@ Use actual installed skills/tools; names vary by executor. Never invent availabi
 | Connected repository | GitHub tools or authenticated Git CLI with correct repo scope |
 
 If a specialized tool is missing, use an equivalent available capability and disclose the substitution. No paid service, new account, hosted runtime dependency, API key purchase or external messaging is assumed. Inspect resources/licenses before copying examples. Do not use a research article as authoritative API documentation.
+
+## 11. SEO, content and measurement implementation
+
+Reuse `src/lib/seo.ts`, App Router metadata/robots/sitemap, existing Discover query handling, `src/lib/blog.ts`/Admin publication path, analytics client/API and web-vitals component. GR-02 owns cross-template SEO regression, GR-03 content/source records, GR-04 actual task utility and GR-05 measurement truth. No SEO plugin, CMS migration or new analytics provider is required.
+
+Check server HTML and rendered DOM/HTTP behavior. A web text extract can omit JSON-LD; it cannot prove schema absence. Keep public content crawlable without motion/3D. Private routes require real authorization regardless of robots/noindex. Test intended indexed routes and excluded utility/draft/private routes separately, including locale/query variants.
+
+Use the shared contract's checked Google Search Central/web.dev/W3C sources, then official version-specific framework documentation for implementation. Automated Lighthouse/axe/schema helpers assist verification; they do not prove Google indexing, human comprehension, visual distinction or field outcomes. New packages require a real gap, compatible exact pin/license/security review and admitted scope.
+
+GR-01 extends the actual evidence validator from PR #26 only after reading its current interface. Preserve its valid strict checks, add new mapped criteria and reject unknown IDs without pretending that new policy is already enforced. Scope code/test/tooling units separately from final product/release/field outcomes.

@@ -1,16 +1,20 @@
 # ASDEV — Agent execution contract
 
-Updated: 2026-08-30. Repository: `alirezasafaeigfx/alirezasafaeisystems`.
+Updated: 2026-08-31. Repository: `alirezasafaeigfx/alirezasafaeisystems`.
 
 ## Mission and authority
 
 Deliver the approved public experience: distinctive engineering-led visual design, meaningful interaction, strong mobile composition, and plain conversational Persian for nontechnical Iranian visitors. The site must help people understand the service, inspect trustworthy work, and request a website assessment. A functioning deployment is not proof that this experience is complete.
+
+The paired mission also requires useful complete functionality, technical SEO, substantive Persian content, reliability and measured progress toward category leadership. Apply the [shared quality/growth contract](docs/strategy/PAIRED_QUALITY_GROWTH_CONTRACT.md). “Best” and “rank one” are ambitions requiring scoped evidence, never guaranteed outcomes. Implementation acceptance, verified release and observed search/customer outcomes are separate.
 
 Instruction order: platform safety and current explicit owner instructions; this file and [project rules](docs/governance/REPOSITORY_RULES.md); [public-experience roadmap](docs/roadmaps/ASDEV_PUBLIC_EXPERIENCE_EXECUTION.md); [engineering guide](docs/engineering/PUBLIC_EXPERIENCE_ENGINEERING.md); [sprint task cards](docs/execution/V3_2_AGENT_SPRINTS.md); [work ledger](docs/execution/V3_2_WORK_LEDGER.md). The roadmap alone selects public-experience work. Supporting plans and historical queues cannot create another queue.
 
 The owner has explicitly requested these documents, complete implementation rather than token changes, controlled autonomy, honest reporting, and independent verification of Codex reports. This does not authorize unrelated products, destructive operations, fabricated evidence, or bypassing repository protections.
 
 ## Read once at session start
+
+For the owner's paired ASDEV/Audit mission, also read [paired experience contract v2](docs/engineering/PAIRED_PRODUCT_EXPERIENCE.md) and the shared quality/growth contract. Only the two explicitly named repositories are in scope, each through its own isolated branch, instructions and release gates. This does not authorize a third product, shared database/authentication changes, or deployment. EC/GR tasks extend the canonical roadmap; do not restart PR #26 or mark Audit complete from this site's evidence. Relevant GR cards are in [QUALITY_GROWTH_SPRINTS.md](docs/execution/QUALITY_GROWTH_SPRINTS.md).
 
 1. This file and the project rules.
 2. Roadmap current state and the next dependency-ready task card.
@@ -50,6 +54,8 @@ For each task:
 
 Documentation-only tasks use link, consistency, diff and secret checks; do not claim application tests ran locally or repeat the full local suite merely for prose changes. Actual required hosted checks still run and must pass even when they include application tests/builds.
 
+Execute using [PAIRED_SITES_YOLO_LOOP.md](prompts/codex/PAIRED_SITES_YOLO_LOOP.md). Reconcile once, then start a real ready gap in the same run. Claim task/path ownership before edits. After two identical unsuccessful attempts without new evidence, diagnose/block that lane and continue another; do not repeatedly re-plan, reinstall, poll or rerun unchanged work. Checkpoint exact next action and evidence before context limits. No safe ready work or future traffic means a precise stop/checkpoint, not an infinite loop or a new scheduler.
+
 ## Copy is part of the product
 
 - Public Persian must be simple, natural, respectful and understandable without technical training.
@@ -62,6 +68,8 @@ Documentation-only tasks use link, consistency, diff and secret checks; do not c
 ## Completion and reporting
 
 Track separate dimensions: implementation, visual/interaction, copy/comprehension, accessibility, performance, release and artifact availability. Use `PASS`, `FAIL`, `UNVERIFIED`, or justified `NOT_APPLICABLE` for each. Overall `DONE` requires all applicable acceptance criteria, not just green CI.
+
+Also track utility/correctness, technical SEO, content quality and observed growth independently. No measured query/ranking/traffic claim without source, dates and cohort. Reuse actual analytics/SEO/content systems; no fake testimonials, mass filler, bought links or invented user studies. Missing field data can leave growth pending after code acceptance; it cannot be mislabeled PASS.
 
 Every report must include task IDs; base/candidate/merged/release SHAs separately; changed paths; commands with actual exit codes/counts; artifact links and hashes; failures/skips; reviewer identity/type; actual deployment identity and rollback evidence when relevant; and the next real action.
 
