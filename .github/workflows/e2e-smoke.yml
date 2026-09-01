@@ -58,6 +58,13 @@ jobs:
       - name: Skip performance comparison without immutable pull-request base
         if: ${{ github.event_name != 'pull_request' && !cancelled() }}
         run: echo "UNVERIFIED performance comparison skipped; event has no immutable pull-request base SHA."
+      - name: Map performance chunk witnesses to build modules
+        if: ${{ github.event_name == 'pull_request' && always() && hashFiles('test-results/public-experience/performance-comparison.json') != '' }}
+        run: >-
+          node scripts/ci/inspect-public-experience-build.mjs
+          --build-dir .next
+          --report test-results/public-experience/performance-comparison.json
+          --output test-results/public-experience/build-attribution.json
       - name: Run smoke tests
         env:
           PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/ms-playwright
