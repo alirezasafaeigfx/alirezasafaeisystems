@@ -1,6 +1,7 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import * as THREE from 'three'
-import { SYSTEM_SCENE_STATES, syncRouteGeometry, transitionScene } from '@/lib/system-scene'
+import { SYSTEM_SCENE_STATES, transitionScene } from '@/lib/system-scene'
+import { SYSTEM_CORE_ROUTE_CAPACITY, SYSTEM_CORE_STATE_LAYOUTS, SYSTEM_CORE_STATE_TOPOLOGIES, syncRouteGeometry } from '@/lib/system-route-geometry'
 
 describe('system scene state model', () => {
   it('moves forward and backward without leaving the five-state boundaries', () => {
@@ -17,38 +18,53 @@ describe('system scene state model', () => {
 
   it('synchronizes route geometry across changing vertex counts without stale positions', () => {
     const geometry = new THREE.BufferGeometry()
-    const points = (count: number) => Array.from({ length: count }, (_, index) => new THREE.Vector3(index + 0.25, index * 2, -index))
+    const points = (state: keyof typeof SYSTEM_CORE_STATE_LAYOUTS) => SYSTEM_CORE_STATE_TOPOLOGIES[state].edges.flatMap(([from, to]) => [from, to]).map((index) => {
+      const [x, y, z] = SYSTEM_CORE_STATE_LAYOUTS[state][index]
+      return new THREE.Vector3(x, y, z)
+    })
+    const values = (state: keyof typeof SYSTEM_CORE_STATE_LAYOUTS) => points(state).flatMap((point) => [point.x, point.y, point.z]).map((value) => Number(value.toFixed(4)))
+    const activeValues = (state: keyof typeof SYSTEM_CORE_STATE_LAYOUTS) => Array.from(geometry.getAttribute('position').array).slice(0, points(state).length * 3).map((value) => Number(value.toFixed(4)))
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
 
-    syncRouteGeometry(geometry, points(4))
+    const sync = (state: keyof typeof SYSTEM_CORE_STATE_LAYOUTS) => syncRouteGeometry(geometry, points(state), SYSTEM_CORE_ROUTE_CAPACITY)
+    sync('pressure')
     const initialAttribute = geometry.getAttribute('position')
-    expect(initialAttribute.count).toBe(4)
-    expect(Array.from(initialAttribute.array)).toEqual(points(4).flatMap((point) => [point.x, point.y, point.z]))
+    expect(initialAttribute.count).toBe(8)
+    expect(activeValues('pressure')).toEqual(values('pressure'))
     expect(geometry.drawRange).toMatchObject({ start: 0, count: 4 })
 
-    syncRouteGeometry(geometry, points(4).map((point) => point.clone().addScalar(0.5)))
+    syncRouteGeometry(geometry, points('pressure').map((point) => point.clone().addScalar(0.5)), SYSTEM_CORE_ROUTE_CAPACITY)
     expect(geometry.getAttribute('position')).toBe(initialAttribute)
 
-    syncRouteGeometry(geometry, points(6))
+    sync('intervention')
     const expandedAttribute = geometry.getAttribute('position')
-    expect(expandedAttribute.count).toBe(6)
-    expect(Array.from(expandedAttribute.array)).toEqual(points(6).flatMap((point) => [point.x, point.y, point.z]))
+    expect(expandedAttribute.count).toBe(8)
+    expect(activeValues('intervention')).toEqual(values('intervention'))
     expect(geometry.drawRange).toMatchObject({ start: 0, count: 6 })
-    expect(geometry.boundingBox?.max.toArray()).toEqual([5.25, 10, -0])
+    expect(geometry.boundingBox?.max.toArray()).toEqual([2.8, 0.7, 0.5])
     expect(Number.isFinite(geometry.boundingSphere?.radius ?? Number.NaN)).toBe(true)
 
-    syncRouteGeometry(geometry, points(8))
+    sync('evidence')
     const finalAttribute = geometry.getAttribute('position')
     expect(finalAttribute.count).toBe(8)
-    expect(Array.from(finalAttribute.array)).toEqual(points(8).flatMap((point) => [point.x, point.y, point.z]))
+    expect(activeValues('evidence')).toEqual(values('evidence'))
     expect(geometry.drawRange).toMatchObject({ start: 0, count: 8 })
 
-    syncRouteGeometry(geometry, points(4))
+    sync('pressure')
     const shortenedValues = Array.from(geometry.getAttribute('position').array)
-    expect(geometry.getAttribute('position').count).toBe(4)
-    expect(shortenedValues).toEqual(points(4).flatMap((point) => [point.x, point.y, point.z]))
-    expect(shortenedValues).not.toContain(7.25)
+    expect(geometry.getAttribute('position').count).toBe(8)
+    expect(shortenedValues.slice(0, 12).map((value) => Number(value.toFixed(4)))).toEqual(values('pressure'))
     expect(geometry.drawRange).toMatchObject({ start: 0, count: 4 })
-    expect(geometry.boundingBox?.max.toArray()).toEqual([3.25, 6, -0])
+    expect(geometry.boundingBox?.max.toArray()).toEqual([1.1, 0.7, 0.4])
+    expect(warn).not.toHaveBeenCalled()
+    const stableAttribute = geometry.getAttribute('position')
+    for (let cycle = 0; cycle < 5; cycle += 1) {
+      sync('intervention')
+      sync('evidence')
+      sync('pressure')
+    }
+    expect(geometry.getAttribute('position')).toBe(stableAttribute)
     geometry.dispose()
+    warn.mockRestore()
   })
 })

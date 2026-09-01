@@ -2,30 +2,13 @@
 
 import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
-import { syncRouteGeometry, type SystemSceneState } from '@/lib/system-scene'
+import { SYSTEM_CORE_ROUTE_CAPACITY, SYSTEM_CORE_STATE_LAYOUTS, SYSTEM_CORE_STATE_TOPOLOGIES, syncRouteGeometry } from '@/lib/system-route-geometry'
+import type { SystemSceneState } from '@/lib/system-scene'
 
 type SystemCore3dProps = {
   state: SystemSceneState
   isFa: boolean
   onFailure: () => void
-}
-
-type TopologyEdge = [number, number]
-
-const stateLayouts: Record<SystemSceneState, Array<[number, number, number]>> = {
-  pressure: [[-2.7, 0.7, 0], [-0.8, -0.5, 0.4], [1.1, 0.65, -0.2], [2.8, -0.65, 0]],
-  diagnosis: [[-2.7, 0, 0], [-0.8, 1.05, 0.8], [1.1, 0.15, -0.7], [2.8, 0, 0]],
-  intervention: [[-2.7, -0.35, 0], [-0.8, 0.7, -0.5], [1.1, 0.7, 0.5], [2.8, -0.35, 0]],
-  stable: [[-2.7, 0, 0], [-0.8, 0, 0], [1.1, 0, 0], [2.8, 0, 0]],
-  evidence: [[-2.7, 0, 0], [-0.8, 0, 0], [1.1, 0, 0], [2.8, 0.7, 0.7]],
-}
-
-const stateTopologies: Record<SystemSceneState, { edges: TopologyEdge[]; signature: string }> = {
-  pressure: { edges: [[0, 1], [1, 2]], signature: 'input-diagnosis|diagnosis-release' },
-  diagnosis: { edges: [[0, 1], [1, 3]], signature: 'input-diagnosis|diagnosis-evidence' },
-  intervention: { edges: [[0, 1], [1, 3], [3, 2]], signature: 'input-diagnosis|diagnosis-evidence|evidence-release' },
-  stable: { edges: [[0, 1], [1, 2], [2, 3]], signature: 'input-diagnosis|diagnosis-release|release-evidence' },
-  evidence: { edges: [[0, 1], [1, 2], [2, 3], [3, 1]], signature: 'input-diagnosis|diagnosis-release|release-evidence|evidence-diagnosis' },
 }
 
 const stateLabels: Record<SystemSceneState, { fa: string; en: string }> = {
@@ -117,12 +100,12 @@ export function SystemCore3d({ state, isFa, onFailure }: SystemCore3dProps) {
       render()
     }
     const updateRoute = (routeState: SystemSceneState) => {
-      const topology = stateTopologies[routeState]
-      syncRouteGeometry(lineGeometry, topology.edges.flatMap(([from, to]) => [nodes[from].position, nodes[to].position]))
+      const topology = SYSTEM_CORE_STATE_TOPOLOGIES[routeState]
+      syncRouteGeometry(lineGeometry, topology.edges.flatMap(([from, to]) => [nodes[from].position, nodes[to].position]), SYSTEM_CORE_ROUTE_CAPACITY)
       canvas.dataset.sceneTopology = topology.signature
     }
     const placeImmediately = () => {
-      nodes.forEach((node, index) => node.position.set(...stateLayouts[stateRef.current][index]))
+      nodes.forEach((node, index) => node.position.set(...SYSTEM_CORE_STATE_LAYOUTS[stateRef.current][index]))
       updateRoute(stateRef.current)
       render()
       canvas.dataset.renderActive = 'false'
@@ -140,7 +123,7 @@ export function SystemCore3d({ state, isFa, onFailure }: SystemCore3dProps) {
       cancelAnimationFrame(frame)
       const from = nodes.map((node) => node.position.clone())
       const targetState = stateRef.current
-      const target = stateLayouts[targetState].map(([x, y, z]) => new THREE.Vector3(x, y, z))
+      const target = SYSTEM_CORE_STATE_LAYOUTS[targetState].map(([x, y, z]) => new THREE.Vector3(x, y, z))
       animationStart = performance.now()
       canvas.dataset.renderActive = 'true'
       canvas.dataset.renderPaused = 'none'
