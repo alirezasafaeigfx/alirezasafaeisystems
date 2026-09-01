@@ -4,6 +4,15 @@ Updated: 2026-08-31. Single writer: ORCH. Task authority: [canonical roadmap](..
 
 ## Current verdict
 
+### Active claim — 2026-09-01T10:43:06Z
+
+- Task: `EC-01` Three.js connection continuity; executor/session: Codex coordinator with bounded implementation worker.
+- Base/candidate: existing PR #26 branch `feat/v3-2-admitted-implementation`, start `72e634bc403c3038b546de10a2ebfca37db8ca2e`; candidate pending.
+- Proven gap: Three.js `0.185.1` reuses the initial four-vertex `position` buffer in `BufferGeometry.setFromPoints`; six/eight-vertex route states are truncated with a warning and reverse transitions can retain stale vertices.
+- Owned paths: `src/components/public/system-core-3d.tsx`, one focused route-buffer helper if required, and its focused unit test. PR #27, evidence/performance workflow paths and GR-01 paths are not owned by this unit.
+- Reused evidence: PR #26 focused CI-contract tests passed 15/15 at the start SHA; existing topology/lifecycle tests remain regression inputs but do not prove buffer contents.
+- Acceptance: red/green actual-Three geometry test across `4→6→8→4`, exact endpoint/count/draw-range/bounds checks, no Three.js buffer warning, focused regressions, independent review, and normal PR #26 checks. Rollback is a bounded code/test revert with the existing semantic fallback retained.
+
 ### 2026-08-31 current-state overlay
 
 Rechecked GitHub: main is `2fe4988841a36c7f4eaf1da47fb5bffe22d00547`; DOCS-01/PR #18 is merged. PR #26 is open at `72e634bc403c3038b546de10a2ebfca37db8ca2e`, with substantial new implementation, not accepted/deployed proof. The paired docs PR #28 began this extension at `f7abc0d9041ee0d085cdd1ea8d7b998d07418faa`; companion Audit PR #1 began at `415e9b371aa9721626d46967aaa0f07ed94e9cc1`, both Draft. Fetch current successors before execution.
