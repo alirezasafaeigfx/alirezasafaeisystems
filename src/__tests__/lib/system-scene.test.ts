@@ -1,9 +1,15 @@
+import { readFileSync } from 'node:fs'
 import { describe, expect, it, vi } from 'vitest'
 import * as THREE from 'three'
 import { SYSTEM_SCENE_STATES, transitionScene } from '@/lib/system-scene'
 import { SYSTEM_CORE_ROUTE_CAPACITY, SYSTEM_CORE_STATE_LAYOUTS, SYSTEM_CORE_STATE_TOPOLOGIES, syncRouteGeometry } from '@/lib/system-route-geometry'
 
 describe('system scene state model', () => {
+  it('keeps the native scene state module free of runtime Three imports', () => {
+    const source = readFileSync(new URL('../../../lib/system-scene.ts', import.meta.url), 'utf8')
+    expect(source).not.toMatch(/from ['"]three['"]|require\(['"]three['"]\)/)
+  })
+
   it('moves forward and backward without leaving the five-state boundaries', () => {
     expect(SYSTEM_SCENE_STATES).toHaveLength(5)
     expect(transitionScene('pressure', { type: 'previous' })).toBe('pressure')
