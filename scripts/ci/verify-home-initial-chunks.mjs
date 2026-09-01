@@ -3,19 +3,25 @@ import { fileURLToPath } from 'node:url'
 import { resolve } from 'node:path'
 import vm from 'node:vm'
 
-const FORBIDDEN = /WebGLRenderer|Float32BufferAttribute|system-route-geometry|syncRouteGeometry|THREE\./
+const DEFERRED_THREE_MODULE = /\[project\]\/((node_modules\/(?:.*\/)?three\/)|(src\/(lib\/system-route-geometry|components\/public\/system-core-3d)))/
 
 export function verifyHomeInitialChunks(rootDir = process.cwd()) {
   const manifestPath = resolve(rootDir, '.next/server/app/page_client-reference-manifest.js')
   if (!existsSync(manifestPath)) throw new Error(`Home client-reference manifest not found: ${manifestPath}`)
+  const buildManifestPath = resolve(rootDir, '.next/server/app/page/build-manifest.json')
+  if (!existsSync(buildManifestPath)) throw new Error(`Home build manifest not found: ${buildManifestPath}`)
   const context = {}
   context.globalThis = context
   vm.runInNewContext(readFileSync(manifestPath, 'utf8'), context, { filename: manifestPath })
   const manifest = context.__RSC_MANIFEST?.['/page']
-  const chunks = manifest?.entryJSFiles?.['[project]/src/app/page']
+  const entryJSFiles = manifest?.entryJSFiles
+  const pageEntries = ['[project]/src/app/layout', '[project]/src/app/error', '[project]/src/app/page']
+    .flatMap((entry) => entryJSFiles?.[entry] ?? [])
+  const rootMainFiles = JSON.parse(readFileSync(buildManifestPath, 'utf8')).rootMainFiles ?? []
+  const chunks = [...new Set([...rootMainFiles, ...pageEntries])]
   if (!Array.isArray(chunks) || chunks.length === 0) throw new Error('Home initial entry chunks are missing from the client-reference manifest')
   const offenders = chunks.map((chunk) => ({ chunk, source: readFileSync(resolve(rootDir, '.next', chunk), 'utf8') }))
-    .filter(({ source }) => FORBIDDEN.test(source))
+    .filter(({ source }) => DEFERRED_THREE_MODULE.test(source))
     .map(({ chunk }) => chunk)
   if (offenders.length) throw new Error(`Home initial entry includes deferred Three route code: ${offenders.join(', ')}`)
   return chunks

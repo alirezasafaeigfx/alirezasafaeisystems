@@ -32,6 +32,10 @@ describe('system scene state model', () => {
     })
     const values = (state: keyof typeof SYSTEM_CORE_STATE_LAYOUTS) => points(state).flatMap((point) => [point.x, point.y, point.z]).map((value) => Number(value.toFixed(4)))
     const activeValues = (state: keyof typeof SYSTEM_CORE_STATE_LAYOUTS) => Array.from(geometry.getAttribute('position').array).slice(0, points(state).length * 3).map((value) => Number(value.toFixed(4)))
+    const expectSphere = (center: [number, number, number], radius: number) => {
+      geometry.boundingSphere?.center.toArray().forEach((value, index) => expect(value).toBeCloseTo(center[index], 10))
+      expect(geometry.boundingSphere?.radius).toBeCloseTo(radius, 10)
+    }
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
 
     const sync = (state: keyof typeof SYSTEM_CORE_STATE_LAYOUTS) => {
@@ -47,6 +51,7 @@ describe('system scene state model', () => {
     const sphere = geometry.boundingSphere
     expect(bounds?.min.toArray()).toEqual([-2.7, -0.5, -0.2])
     expect(bounds?.max.toArray()).toEqual([1.1, 0.7, 0.4])
+    expectSphere([-0.8, 0.1, 0.1], Math.sqrt(4.0025))
 
     sync('intervention')
     const expandedAttribute = geometry.getAttribute('position')
@@ -56,7 +61,7 @@ describe('system scene state model', () => {
     expect(geometry.boundingBox?.max.toArray()).toEqual([2.8, 0.7, 0.5])
     expect(geometry.boundingBox).toBe(bounds)
     expect(geometry.boundingSphere).toBe(sphere)
-    expect(Number.isFinite(geometry.boundingSphere?.radius ?? Number.NaN)).toBe(true)
+    expectSphere([0.05, 0.175, 0], Math.sqrt(7.838125))
 
     sync('evidence')
     const finalAttribute = geometry.getAttribute('position')
@@ -65,6 +70,7 @@ describe('system scene state model', () => {
     expect(geometry.drawRange).toMatchObject({ start: 0, count: 8 })
     expect(geometry.boundingBox?.min.toArray()).toEqual([-2.7, 0, 0])
     expect(geometry.boundingBox?.max.toArray()).toEqual([2.8, 0.7, 0.7])
+    expectSphere([0.05, 0.35, 0.35], Math.sqrt(7.8075))
 
     sync('pressure')
     const shortenedValues = Array.from(geometry.getAttribute('position').array)
@@ -73,6 +79,7 @@ describe('system scene state model', () => {
     expect(geometry.drawRange).toMatchObject({ start: 0, count: 4 })
     expect(geometry.boundingBox?.min.toArray()).toEqual([-2.7, -0.5, -0.2])
     expect(geometry.boundingBox?.max.toArray()).toEqual([1.1, 0.7, 0.4])
+    expectSphere([-0.8, 0.1, 0.1], Math.sqrt(4.0025))
     expect(warn).not.toHaveBeenCalled()
     const stableAttribute = geometry.getAttribute('position')
     for (let cycle = 0; cycle < 5; cycle += 1) {
