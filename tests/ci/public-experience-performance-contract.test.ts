@@ -42,6 +42,12 @@ describe('V3.2 controlled performance contract', () => {
     expect(workflow).toContain('if-no-files-found: error')
   })
 
+  it('checks the immutable candidate before workflow steps create evidence artifacts', () => {
+    expect(workflow.indexOf('Run immutable three-run public experience performance comparison')).toBeLessThan(
+      workflow.indexOf('Run smoke tests'),
+    )
+  })
+
   it('builds both immutable revisions in isolated worktrees and uses three-run profiling', () => {
     expect(runner).toContain("['worktree', 'add', '--detach'")
     expect(runner).toContain("'--baseline-url'")

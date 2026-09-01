@@ -44,6 +44,20 @@ jobs:
         env:
           PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/ms-playwright
         run: pnpm exec playwright install chromium
+      - name: Run immutable three-run public experience performance comparison
+        if: ${{ github.event_name == 'pull_request' && !cancelled() }}
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/ms-playwright
+          PUBLIC_EXPERIENCE_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PUBLIC_EXPERIENCE_CANDIDATE_SHA: ${{ github.event.pull_request.head.sha }}
+        run: >-
+          node scripts/ci/run-public-experience-comparison.mjs
+          --base-sha "$PUBLIC_EXPERIENCE_BASE_SHA"
+          --candidate-sha "$PUBLIC_EXPERIENCE_CANDIDATE_SHA"
+          --output test-results/public-experience/performance-comparison.json
+      - name: Skip performance comparison without immutable pull-request base
+        if: ${{ github.event_name != 'pull_request' && !cancelled() }}
+        run: echo "UNVERIFIED performance comparison skipped; event has no immutable pull-request base SHA."
       - name: Run smoke tests
         env:
           PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/ms-playwright
@@ -67,20 +81,6 @@ jobs:
           node scripts/ci/create-public-experience-evidence-draft.mjs
           S2-01 S2-02 S2-05 S2-06 S3-01 S3-03 S3-04 S3-05 S3-06
           S4-01 S4-02 S4-03 S4-05 S4-06 S4-07 S4-10 S4-11 S4-12
-      - name: Run immutable three-run public experience performance comparison
-        if: ${{ github.event_name == 'pull_request' && !cancelled() }}
-        env:
-          PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/ms-playwright
-          PUBLIC_EXPERIENCE_BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          PUBLIC_EXPERIENCE_CANDIDATE_SHA: ${{ github.event.pull_request.head.sha }}
-        run: >-
-          node scripts/ci/run-public-experience-comparison.mjs
-          --base-sha "$PUBLIC_EXPERIENCE_BASE_SHA"
-          --candidate-sha "$PUBLIC_EXPERIENCE_CANDIDATE_SHA"
-          --output test-results/public-experience/performance-comparison.json
-      - name: Skip performance comparison without immutable pull-request base
-        if: ${{ github.event_name != 'pull_request' && !cancelled() }}
-        run: echo "UNVERIFIED performance comparison skipped; event has no immutable pull-request base SHA."
       - name: Validate supplied complete V3.2 evidence manifest
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.evidence_manifest != '' && !cancelled() }}
         env:
