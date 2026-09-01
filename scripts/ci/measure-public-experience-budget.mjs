@@ -1,4 +1,5 @@
-import { writeFile } from 'node:fs/promises'
+import { mkdir, writeFile } from 'node:fs/promises'
+import { dirname } from 'node:path'
 import { gzipSync } from 'node:zlib'
 import { chromium } from '@playwright/test'
 
@@ -147,9 +148,11 @@ async function measureProfile(browser, url) {
 
 const baselineUrl = readArgument('--baseline-url')
 const candidateUrl = readArgument('--candidate-url')
+const baselineSha = readArgument('--baseline-sha')
+const candidateSha = readArgument('--candidate-sha')
 const output = readArgument('--output')
-if (!baselineUrl || !candidateUrl || !output) {
-  throw new Error('Usage: --baseline-url URL --candidate-url URL --output FILE')
+if (!baselineUrl || !candidateUrl || !/^[0-9a-f]{40}$/i.test(baselineSha ?? '') || !/^[0-9a-f]{40}$/i.test(candidateSha ?? '') || !output) {
+  throw new Error('Usage: --baseline-url URL --candidate-url URL --baseline-sha SHA --candidate-sha SHA --output FILE')
 }
 
 const browser = await chromium.launch({ headless: true })
@@ -157,11 +160,15 @@ try {
   const baseline = await measureProfile(browser, baselineUrl)
   const candidate = await measureProfile(browser, candidateUrl)
   const report = {
+    schemaVersion: 1,
+    baseSha: baselineSha,
+    candidateSha: candidateSha,
     baseline,
     candidate,
     initialJavaScriptDeltaGzipBytes: candidate.gzipBytes - baseline.gzipBytes,
     budgetGzipBytes: 30 * 1024,
   }
+  await mkdir(dirname(output), { recursive: true })
   await writeFile(output, `${JSON.stringify(report, null, 2)}\n`)
   if (baseline.missingBodies || candidate.missingBodies) process.exitCode = 2
   if (report.initialJavaScriptDeltaGzipBytes > report.budgetGzipBytes) process.exitCode = 1
