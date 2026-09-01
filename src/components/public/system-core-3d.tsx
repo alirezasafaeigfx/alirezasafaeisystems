@@ -18,6 +18,7 @@ const stateLabels: Record<SystemSceneState, { fa: string; en: string }> = {
   stable: { fa: 'سایت دوباره درست کار می‌کند', en: 'The path is stable again' },
   evidence: { fa: 'نتیجه را با شواهد بررسی می‌کنیم', en: 'We inspect the evidence' },
 }
+const LABEL_TRANSITION = 'left 420ms cubic-bezier(0.22, 1, 0.36, 1), top 420ms cubic-bezier(0.22, 1, 0.36, 1)'
 
 export function SystemCore3d({ state, isFa, onFailure }: SystemCore3dProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -42,9 +43,10 @@ export function SystemCore3d({ state, isFa, onFailure }: SystemCore3dProps) {
     camera.lookAt(0, 0, 0)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5))
     renderer.outputColorSpace = THREE.SRGBColorSpace
-    labelRefs.current.forEach((label) => {
-      if (label) label.style.transition = 'left 420ms cubic-bezier(0.22, 1, 0.36, 1), top 420ms cubic-bezier(0.22, 1, 0.36, 1)'
+    const setLabelTransition = (enabled: boolean) => labelRefs.current.forEach((label) => {
+      if (label) label.style.transition = enabled ? LABEL_TRANSITION : 'none'
     })
+    setLabelTransition(true)
 
     scene.add(new THREE.AmbientLight(0xffffff, 1.8))
     const keyLight = new THREE.DirectionalLight(0x68d8ff, 3.4)
@@ -81,6 +83,8 @@ export function SystemCore3d({ state, isFa, onFailure }: SystemCore3dProps) {
     const setPaused = () => {
       const reason = pauseReason()
       cancelAnimationFrame(frame)
+      setLabelTransition(false)
+      renderLabels()
       canvas.dataset.renderActive = 'false'
       if (reason) canvas.dataset.renderPaused = reason
     }
@@ -132,6 +136,7 @@ export function SystemCore3d({ state, isFa, onFailure }: SystemCore3dProps) {
       const from = nodes.map((node) => node.position.clone())
       const targetState = stateRef.current
       const target = SYSTEM_CORE_STATE_LAYOUTS[targetState].map(([x, y, z]) => new THREE.Vector3(x, y, z))
+      setLabelTransition(true)
       renderLabels(target)
       animationStart = performance.now()
       canvas.dataset.renderActive = 'true'
