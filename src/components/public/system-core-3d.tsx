@@ -101,7 +101,7 @@ export function SystemCore3d({ state, isFa, onFailure }: SystemCore3dProps) {
     }
     const updateRoute = (routeState: SystemSceneState) => {
       const topology = SYSTEM_CORE_STATE_TOPOLOGIES[routeState]
-      syncRouteGeometry(lineGeometry, topology.edges.flatMap(([from, to]) => [nodes[from].position, nodes[to].position]), SYSTEM_CORE_ROUTE_CAPACITY)
+      syncRouteGeometry(lineGeometry, nodes, topology.edges, SYSTEM_CORE_ROUTE_CAPACITY)
       canvas.dataset.sceneTopology = topology.signature
     }
     const placeImmediately = () => {

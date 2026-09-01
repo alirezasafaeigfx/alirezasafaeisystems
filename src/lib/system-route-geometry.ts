@@ -21,19 +21,47 @@ export const SYSTEM_CORE_STATE_TOPOLOGIES: Record<SystemSceneState, { edges: Top
 
 export const SYSTEM_CORE_ROUTE_CAPACITY = 8
 
-export function syncRouteGeometry(geometry: BufferGeometry, points: readonly Vector3[], capacity = points.length): void {
-  const vertexCount = points.length
+export function syncRouteGeometry(geometry: BufferGeometry, nodes: readonly { position: Vector3 }[], edges: readonly TopologyEdge[], capacity = edges.length * 2): void {
+  const vertexCount = edges.length * 2
   const current = geometry.getAttribute('position')
   if (!current || current.count < vertexCount || current.count < capacity) {
     const attribute = new Float32BufferAttribute(Math.max(vertexCount, capacity) * 3, 3)
-    points.forEach((point, index) => attribute.setXYZ(index, point.x, point.y, point.z))
-    attribute.needsUpdate = true
     geometry.setAttribute('position', attribute)
-  } else {
-    points.forEach((point, index) => current.setXYZ(index, point.x, point.y, point.z))
-    current.needsUpdate = true
   }
+  const position = geometry.getAttribute('position')
+  let vertexIndex = 0
+  let minX = Infinity
+  let minY = Infinity
+  let minZ = Infinity
+  let maxX = -Infinity
+  let maxY = -Infinity
+  let maxZ = -Infinity
+  for (const [from, to] of edges) {
+    for (let endpoint = 0; endpoint < 2; endpoint += 1) {
+      const nodeIndex = endpoint === 0 ? from : to
+      const point = nodes[nodeIndex].position
+      position.setXYZ(vertexIndex, point.x, point.y, point.z)
+      vertexIndex += 1
+      minX = Math.min(minX, point.x); minY = Math.min(minY, point.y); minZ = Math.min(minZ, point.z)
+      maxX = Math.max(maxX, point.x); maxY = Math.max(maxY, point.y); maxZ = Math.max(maxZ, point.z)
+    }
+  }
+  position.needsUpdate = true
+  const boundingBox = geometry.boundingBox ?? new Box3()
+  geometry.boundingBox = boundingBox
+  boundingBox.min.set(minX, minY, minZ)
+  boundingBox.max.set(maxX, maxY, maxZ)
+  const boundingSphere = geometry.boundingSphere ?? new Sphere()
+  geometry.boundingSphere = boundingSphere
+  const center = boundingSphere.center
+  center.set((minX + maxX) / 2, (minY + maxY) / 2, (minZ + maxZ) / 2)
+  let radiusSq = 0
+  for (const [from, to] of edges) {
+    for (let endpoint = 0; endpoint < 2; endpoint += 1) {
+      const nodeIndex = endpoint === 0 ? from : to
+      radiusSq = Math.max(radiusSq, center.distanceToSquared(nodes[nodeIndex].position))
+    }
+  }
+  boundingSphere.radius = Math.sqrt(radiusSq)
   geometry.setDrawRange(0, vertexCount)
-  geometry.boundingBox = new Box3().setFromPoints([...points])
-  geometry.boundingSphere = new Sphere().setFromPoints([...points])
 }

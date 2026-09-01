@@ -18,7 +18,7 @@
   "scripts": {
     "dev": "next dev -p 3000 2>&1 | tee dev.log",
     "prebuild": "node scripts/generate-sitemap-manifest.mjs",
-    "build": "next build && node scripts/copy-next-standalone.mjs",
+    "build": "next build && node scripts/copy-next-standalone.mjs && node scripts/ci/verify-home-initial-chunks.mjs",
     "start": "NODE_ENV=production node .next/standalone/server.js 2>&1 | tee server.log",
     "postinstall": "prisma generate",
     "lint": "eslint .",
