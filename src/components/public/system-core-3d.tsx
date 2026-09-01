@@ -42,6 +42,9 @@ export function SystemCore3d({ state, isFa, onFailure }: SystemCore3dProps) {
     camera.lookAt(0, 0, 0)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5))
     renderer.outputColorSpace = THREE.SRGBColorSpace
+    labelRefs.current.forEach((label) => {
+      if (label) label.style.transition = 'left 420ms cubic-bezier(0.22, 1, 0.36, 1), top 420ms cubic-bezier(0.22, 1, 0.36, 1)'
+    })
 
     scene.add(new THREE.AmbientLight(0xffffff, 1.8))
     const keyLight = new THREE.DirectionalLight(0x68d8ff, 3.4)
@@ -85,11 +88,11 @@ export function SystemCore3d({ state, isFa, onFailure }: SystemCore3dProps) {
     const render = () => {
       renderer.render(scene, camera)
     }
-    const renderLabels = () => {
-      nodes.forEach((node, index) => {
+    const renderLabels = (positions: ReadonlyArray<THREE.Vector3> = nodes.map((node) => node.position)) => {
+      positions.forEach((position, index) => {
         const label = labelRefs.current[index]
         if (!label) return
-        projectedLabelPosition.copy(node.position).project(camera)
+        projectedLabelPosition.copy(position).project(camera)
         label.style.left = `${(projectedLabelPosition.x * 0.5 + 0.5) * canvas.clientWidth}px`
         label.style.top = `${(-projectedLabelPosition.y * 0.5 + 0.5) * canvas.clientHeight}px`
       })
@@ -129,6 +132,7 @@ export function SystemCore3d({ state, isFa, onFailure }: SystemCore3dProps) {
       const from = nodes.map((node) => node.position.clone())
       const targetState = stateRef.current
       const target = SYSTEM_CORE_STATE_LAYOUTS[targetState].map(([x, y, z]) => new THREE.Vector3(x, y, z))
+      renderLabels(target)
       animationStart = performance.now()
       canvas.dataset.renderActive = 'true'
       canvas.dataset.renderPaused = 'none'

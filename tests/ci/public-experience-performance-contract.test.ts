@@ -55,11 +55,31 @@ describe('V3.2 controlled performance contract', () => {
     expect(runner).toContain('server exited before readiness')
     expect(harness).toContain('sourceDirty: false')
     expect(harness).toContain('process.exitCode = 2')
-    expect(harness).toContain('frameTimeP95Ms === null')
+    expect(harness).toContain('requiredMetricsAvailable')
   })
 
   it('waits for the complete animation-frame sample before collecting metrics', () => {
     expect(harness).toContain('new Promise((resolve)')
     expect(harness).toContain('await frameSample')
+  })
+
+  it('uses isolated dynamic ports and the built standalone servers', () => {
+    expect(runner).toContain("server.listen(0, '127.0.0.1'")
+    expect(runner).toContain("resolve(cwd, '.next/standalone')")
+    expect(runner).toContain("spawn(process.execPath, ['server.js']")
+    expect(runner).not.toContain('3101')
+    expect(runner).not.toContain('3102')
+  })
+
+  it('persists an explicit PASS, FAIL, or UNVERIFIED verdict', () => {
+    expect(harness).toContain("const verdict = unsupportedReasons.length ? 'UNVERIFIED' : failedBudgets.length ? 'FAIL' : 'PASS'")
+    expect(harness).toContain("requiredControlsAvailable")
+    expect(harness).toContain("runs.every((run) => run.requiredControlsAvailable)")
+    expect(harness).toContain("runs.every((run) => run.lcp > 0 && run.frameTimes.length > 0 && run.loafSupported)")
+    expect(harness).toContain("required-run-metrics-unavailable")
+    expect(harness).toContain("required-scene-controls-missing")
+    expect(harness).toContain('unsupportedReasons')
+    expect(harness).toContain('failedBudgets')
+    expect(harness).toContain('cacheProfile')
   })
 })

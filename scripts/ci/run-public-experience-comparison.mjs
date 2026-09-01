@@ -4,6 +4,7 @@ import { resolve } from 'node:path'
 import { spawn } from 'node:child_process'
 import { execFile } from 'node:child_process'
 import { promisify } from 'node:util'
+import { createServer } from 'node:net'
 
 const exec = promisify(execFile)
 const SHA = /^[0-9a-f]{40}$/i
@@ -29,16 +30,26 @@ let worktreeAdded = false
 const run = async (command, args, cwd) => {
   await exec(command, args, { cwd, env: { ...process.env } })
 }
+const reservePort = () => new Promise((resolvePort, reject) => {
+  const server = createServer()
+  server.once('error', reject)
+  server.listen(0, '127.0.0.1', () => {
+    const address = server.address()
+    if (!address || typeof address === 'string') return reject(new Error('unable to reserve comparison port'))
+    server.close((error) => error ? reject(error) : resolvePort(address.port))
+  })
+})
 const start = (cwd, port) => {
-  const child = spawn(pnpm, ['start'], { cwd, env: { ...process.env, PORT: String(port), HOSTNAME: '127.0.0.1' }, stdio: 'inherit', detached: process.platform !== 'win32' })
+  const standalone = resolve(cwd, '.next/standalone')
+  const child = spawn(process.execPath, ['server.js'], { cwd: standalone, env: { ...process.env, PORT: String(port), HOSTNAME: '127.0.0.1' }, stdio: 'inherit', detached: process.platform !== 'win32' })
   child.on('error', (error) => { child.spawnFailure = error })
   processes.push(child)
   return child
 }
-const waitFor = async (url) => {
+const waitFor = async (url, child) => {
   const deadline = Date.now() + 60_000
   while (Date.now() < deadline) {
-    if (processes.some((child) => child.exitCode !== null || child.spawnFailure)) throw new Error('server exited before readiness')
+    if (child.exitCode !== null || child.spawnFailure) throw new Error('server exited before readiness')
     try {
       const response = await fetch(url)
       if (response.ok) return
@@ -53,11 +64,15 @@ try {
   await run(pnpm, ['install', '--frozen-lockfile'], worktree)
   await run(pnpm, ['build'], worktree)
   await run(pnpm, ['build'], root)
-  start(worktree, 3101)
-  start(root, 3102)
-  await waitFor('http://127.0.0.1:3101/')
-  await waitFor('http://127.0.0.1:3102/')
-  await run(process.execPath, [resolve(root, 'scripts/ci/measure-public-experience-budget.mjs'), '--baseline-url', 'http://127.0.0.1:3101/', '--candidate-url', 'http://127.0.0.1:3102/', '--baseline-sha', baseSha, '--candidate-sha', candidateSha, '--output', resolve(root, output)], root)
+  const baselinePort = await reservePort()
+  const candidatePort = await reservePort()
+  const baselineServer = start(worktree, baselinePort)
+  const candidateServer = start(root, candidatePort)
+  const baselineUrl = `http://127.0.0.1:${baselinePort}/`
+  const candidateUrl = `http://127.0.0.1:${candidatePort}/`
+  await waitFor(baselineUrl, baselineServer)
+  await waitFor(candidateUrl, candidateServer)
+  await run(process.execPath, [resolve(root, 'scripts/ci/measure-public-experience-budget.mjs'), '--baseline-url', baselineUrl, '--candidate-url', candidateUrl, '--baseline-sha', baseSha, '--candidate-sha', candidateSha, '--output', resolve(root, output)], root)
 } finally {
   for (const child of processes) if (child.exitCode === null) {
     if (process.platform === 'win32') await exec('taskkill', ['/pid', String(child.pid), '/t', '/f']).catch(() => {})

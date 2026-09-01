@@ -23,6 +23,7 @@ async function measure(browser, url) {
     window.__budgetInteractionWindow = null
     window.__budgetLayoutShift = 0
     window.__budgetLcp = 0
+    window.__budgetLoafSupported = PerformanceObserver.supportedEntryTypes.includes('long-animation-frame')
     new PerformanceObserver((list) => {
       window.__budgetLongTasks.push(...list.getEntries().map((entry) => ({
         startTime: entry.startTime,
@@ -40,7 +41,7 @@ async function measure(browser, url) {
     new PerformanceObserver((list) => {
       window.__budgetLcp = list.getEntries().at(-1)?.startTime ?? window.__budgetLcp
     }).observe({ type: 'largest-contentful-paint', buffered: true })
-    if (PerformanceObserver.supportedEntryTypes.includes('long-animation-frame')) {
+    if (window.__budgetLoafSupported) {
       new PerformanceObserver((list) => {
         window.__budgetLongAnimationFrames.push(...list.getEntries().map((entry) => ({
           startTime: entry.startTime,
@@ -77,7 +78,8 @@ async function measure(browser, url) {
   await page.waitForTimeout(750)
   let interactionMs = null
   const stateButtons = page.locator('[data-testid="operational-scene"] [role="group"] button')
-  if (await stateButtons.count() >= 2) {
+  const requiredControlsAvailable = await stateButtons.count() >= 2
+  if (requiredControlsAvailable) {
     await stateButtons.nth(1).scrollIntoViewIfNeeded()
     const frameSample = page.evaluate(() => window.__startBudgetFrameSample(700))
     await page.evaluate(() => { window.__budgetInteractionWindow = { start: performance.now(), end: null } })
@@ -93,6 +95,7 @@ async function measure(browser, url) {
   }
   const performance = await page.evaluate(() => ({
     lcp: window.__budgetLcp,
+    loafSupported: window.__budgetLoafSupported,
     cls: window.__budgetLayoutShift,
     longTasks: window.__budgetLongTasks,
     longAnimationFrames: window.__budgetLongAnimationFrames,
@@ -106,6 +109,7 @@ async function measure(browser, url) {
     missingBodies: scripts.filter((script) => script.bytes === null).length,
     ...performance,
     interactionMs,
+    requiredControlsAvailable,
   }
   await context.close()
   return result
@@ -136,6 +140,8 @@ async function measureProfile(browser, url) {
     maxCls: Math.max(...runs.map((run) => run.cls)),
     maxInteractionMs: interactionRuns.length ? Math.max(...interactionRuns) : null,
     missingBodies: runs.reduce((sum, run) => sum + run.missingBodies, 0),
+    requiredControlsAvailable: runs.every((run) => run.requiredControlsAvailable),
+    requiredMetricsAvailable: runs.every((run) => run.lcp > 0 && run.frameTimes.length > 0 && run.loafSupported),
     longTasks,
     longAnimationFrames,
     allRunOverBudgetLongTasks: longTasks.filter((task) => task.duration > 50),
@@ -161,6 +167,19 @@ const browser = await chromium.launch({ headless: true })
 try {
   const baseline = await measureProfile(browser, baselineUrl)
   const candidate = await measureProfile(browser, candidateUrl)
+  const unsupportedReasons = []
+  if (baseline.missingBodies || candidate.missingBodies) unsupportedReasons.push('script-response-body-missing')
+  if (!baseline.requiredControlsAvailable || !candidate.requiredControlsAvailable) unsupportedReasons.push('required-scene-controls-missing')
+  if (!baseline.requiredMetricsAvailable || !candidate.requiredMetricsAvailable) unsupportedReasons.push('required-run-metrics-unavailable')
+  if (candidate.allRunOverBudgetLongTasks.length && candidate.allRunAttributableLongAnimationFrames.length === 0) unsupportedReasons.push('long-task-attribution-unavailable')
+  const failedBudgets = []
+  if (candidate.gzipBytes - baseline.gzipBytes > 30 * 1024) failedBudgets.push('initial-javascript-delta')
+  if (candidate.medianLcp > 2500) failedBudgets.push('lcp')
+  if (candidate.maxCls > 0.1) failedBudgets.push('cls')
+  if (candidate.maxInteractionMs === null || candidate.maxInteractionMs > 200) failedBudgets.push('interaction')
+  if (candidate.allRunAttributableLongAnimationFrames.length) failedBudgets.push('long-animation-frame')
+  if (candidate.frameTimeP95Ms !== null && candidate.frameTimeP95Ms > 50) failedBudgets.push('frame-time-p95')
+  const verdict = unsupportedReasons.length ? 'UNVERIFIED' : failedBudgets.length ? 'FAIL' : 'PASS'
   const report = {
     schemaVersion: 1,
     baseSha: baselineSha,
@@ -173,16 +192,16 @@ try {
     browser: { name: 'chromium', version: browser.version() },
     runner: { platform: process.platform, arch: process.arch, cpus: await import('node:os').then(({ cpus }) => cpus().length), memoryBytes: (await import('node:os')).totalmem() },
     toolchain: { node: process.version },
+    cacheProfile: { browserContext: 'new-per-run', httpCache: 'empty-context-default' },
     sourceDirty: false,
+    verdict,
+    unsupportedReasons,
+    failedBudgets,
   }
   await mkdir(dirname(output), { recursive: true })
   await writeFile(output, `${JSON.stringify(report, null, 2)}\n`)
-  if (baseline.missingBodies || candidate.missingBodies) process.exitCode = 2
-  if (!baseline.medianLcp || !candidate.medianLcp || baseline.frameTimeP95Ms === null || candidate.frameTimeP95Ms === null) process.exitCode = 2
-  if (report.initialJavaScriptDeltaGzipBytes > report.budgetGzipBytes) process.exitCode = 1
-  if (candidate.medianLcp > 2500 || candidate.maxCls > 0.1 || (candidate.maxInteractionMs !== null && candidate.maxInteractionMs > 200)) process.exitCode = 1
-  if (candidate.allRunAttributableLongAnimationFrames.length || (candidate.frameTimeP95Ms !== null && candidate.frameTimeP95Ms > 50)) process.exitCode = 1
-  if (candidate.allRunOverBudgetLongTasks.length && candidate.allRunAttributableLongAnimationFrames.length === 0 && !process.exitCode) process.exitCode = 2
+  if (verdict === 'UNVERIFIED') process.exitCode = 2
+  else if (verdict === 'FAIL') process.exitCode = 1
 } finally {
   await browser.close()
 }
