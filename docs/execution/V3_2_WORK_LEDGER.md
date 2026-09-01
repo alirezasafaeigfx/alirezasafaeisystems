@@ -4,14 +4,15 @@ Updated: 2026-09-01. Single writer: ORCH. Task authority: [canonical roadmap](..
 
 ## Current verdict
 
-### Implementation complete / hosted acceptance pending — 2026-09-01T15:57:17Z
+### Implementation complete / performance acceptance failed — 2026-09-01T16:17:30Z
 
 - Task: `EC-01` Three.js connection continuity; executor/session: Codex coordinator with bounded implementation worker.
-- Base/candidate: existing PR #26 branch `feat/v3-2-admitted-implementation`, start `72e634bc403c3038b546de10a2ebfca37db8ca2e`; candidate `93c0260f7369acf81c48fc92719740e477bd3194` on base `2fe4988841a36c7f4eaf1da47fb5bffe22d00547`.
+- Base/candidate: existing PR #26 branch `feat/v3-2-admitted-implementation`, start `72e634bc403c3038b546de10a2ebfca37db8ca2e`; current candidate `589112862e5ad0fcb82238e945614eb4b8656608` on base `2fe4988841a36c7f4eaf1da47fb5bffe22d00547`.
 - Proven gap: Three.js `0.185.1` reuses the initial four-vertex `position` buffer in `BufferGeometry.setFromPoints`; six/eight-vertex route states are truncated with a warning and reverse transitions can retain stale vertices.
 - Changed paths: deferred Three route geometry/helper and tests; Home initial-chunk artifact verifier/build hook; candidate-bound three-run performance workflow/harness/tests. PR #27 and GR-01 remain separate.
 - Reused evidence: PR #26 focused CI-contract tests passed 15/15 at the start SHA; existing topology/lifecycle tests remain regression inputs but do not prove buffer contents.
-- Acceptance evidence: actual-Three `4→6→8→4` buffer/draw-range/exact bounds tests; stable buffer/bounds identities; paused/resumed label continuity; fresh build scans all 13 Home initial candidates and excludes deferred Three attribution; performance evidence binds immutable base/candidate SHAs, rejects dirty sources, uses three runs and writes PASS/FAIL/UNVERIFIED JSON. Focused 23/23, type check, lint (0 errors/3 pre-existing warnings), build and independent review PASS. Full suite is PARTIAL: all scoped tests pass; unrelated backup/deploy contract timed out twice at 15 seconds and was not rerun unchanged. PR #26 hosted checks are pending; no merge/deploy/live claim.
+- Acceptance evidence: actual-Three `4→6→8→4` buffer/draw-range/exact bounds tests; stable buffer/bounds identities; paused/resumed label continuity; fresh build scans all 13 Home initial candidates and excludes deferred Three attribution; performance evidence binds immutable base/candidate SHAs, rejects dirty sources, uses three runs and writes PASS/FAIL/UNVERIFIED JSON. Focused 23/23, type check, lint (0 errors/3 pre-existing warnings), build and independent review PASS. Full suite is PARTIAL: all scoped tests pass; unrelated backup/deploy contract timed out twice at 15 seconds and was not rerun unchanged.
+- Hosted performance witness: run `33530073463`, artifact `9809470836`, base `2fe4988841a36c7f4eaf1da47fb5bffe22d00547`, candidate `e5cace271f5bc78aa31508ef601cd65af832b734`. Three-run JSON recorded JS delta `-4142` gzip bytes, candidate median LCP `1136ms`, max lab interaction `33.2ms`, frame p95 `16.8ms`, and nine attributable long-animation frames with blocking duration above `50ms` (maximum `181.734ms`). Verdict remains `FAIL` for the long-animation-frame budget; the frozen base lacks the new scene controls, so candidate `589112862e5ad0fcb82238e945614eb4b8656608` corrects that false `UNVERIFIED` classification without lowering the long-task budget. PR #26 is open and unmerged; no deploy/live claim.
 
 ### 2026-08-31 current-state overlay
 
