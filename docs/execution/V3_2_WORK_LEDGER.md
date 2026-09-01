@@ -1,17 +1,17 @@
 # V3.2 work ledger — reconciled state
 
-Updated: 2026-08-31. Single writer: ORCH. Task authority: [canonical roadmap](../roadmaps/ASDEV_PUBLIC_EXPERIENCE_EXECUTION.md). This ledger records evidence and uncertainty; it cannot lower acceptance criteria.
+Updated: 2026-09-01. Single writer: ORCH. Task authority: [canonical roadmap](../roadmaps/ASDEV_PUBLIC_EXPERIENCE_EXECUTION.md). This ledger records evidence and uncertainty; it cannot lower acceptance criteria.
 
 ## Current verdict
 
-### Active claim — 2026-09-01T10:43:06Z
+### Implementation complete / hosted acceptance pending — 2026-09-01T15:57:17Z
 
 - Task: `EC-01` Three.js connection continuity; executor/session: Codex coordinator with bounded implementation worker.
-- Base/candidate: existing PR #26 branch `feat/v3-2-admitted-implementation`, start `72e634bc403c3038b546de10a2ebfca37db8ca2e`; candidate pending.
+- Base/candidate: existing PR #26 branch `feat/v3-2-admitted-implementation`, start `72e634bc403c3038b546de10a2ebfca37db8ca2e`; candidate `93c0260f7369acf81c48fc92719740e477bd3194` on base `2fe4988841a36c7f4eaf1da47fb5bffe22d00547`.
 - Proven gap: Three.js `0.185.1` reuses the initial four-vertex `position` buffer in `BufferGeometry.setFromPoints`; six/eight-vertex route states are truncated with a warning and reverse transitions can retain stale vertices.
-- Owned paths: `src/components/public/system-core-3d.tsx`, one focused route-buffer helper if required, and its focused unit test. PR #27, evidence/performance workflow paths and GR-01 paths are not owned by this unit.
+- Changed paths: deferred Three route geometry/helper and tests; Home initial-chunk artifact verifier/build hook; candidate-bound three-run performance workflow/harness/tests. PR #27 and GR-01 remain separate.
 - Reused evidence: PR #26 focused CI-contract tests passed 15/15 at the start SHA; existing topology/lifecycle tests remain regression inputs but do not prove buffer contents.
-- Acceptance: red/green actual-Three geometry test across `4→6→8→4`, exact endpoint/count/draw-range/bounds checks, no Three.js buffer warning, focused regressions, independent review, and normal PR #26 checks. Rollback is a bounded code/test revert with the existing semantic fallback retained.
+- Acceptance evidence: actual-Three `4→6→8→4` buffer/draw-range/exact bounds tests; stable buffer/bounds identities; paused/resumed label continuity; fresh build scans all 13 Home initial candidates and excludes deferred Three attribution; performance evidence binds immutable base/candidate SHAs, rejects dirty sources, uses three runs and writes PASS/FAIL/UNVERIFIED JSON. Focused 23/23, type check, lint (0 errors/3 pre-existing warnings), build and independent review PASS. Full suite is PARTIAL: all scoped tests pass; unrelated backup/deploy contract timed out twice at 15 seconds and was not rerun unchanged. PR #26 hosted checks are pending; no merge/deploy/live claim.
 
 ### 2026-08-31 current-state overlay
 
