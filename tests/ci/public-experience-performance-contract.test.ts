@@ -88,4 +88,12 @@ describe('V3.2 controlled performance contract', () => {
     expect(harness).toContain('failedBudgets')
     expect(harness).toContain('cacheProfile')
   })
+
+  it('requires interaction instrumentation from the candidate without inventing it for the frozen baseline', () => {
+    expect(harness).toContain("candidate.runs.every((run) => run.requiredControlsAvailable)")
+    expect(harness).toContain("baseline.runs.every((run) => run.lcp > 0 && run.loafSupported)")
+    expect(harness).toContain("candidate.runs.every((run) => run.lcp > 0 && run.frameTimes.length > 0 && run.loafSupported)")
+    expect(harness).toContain("if (!candidateControlsAvailable) unsupportedReasons.push('required-scene-controls-missing')")
+    expect(harness).toContain('candidate.allRunAttributableLongAnimationFrames.length) failedBudgets')
+  })
 })

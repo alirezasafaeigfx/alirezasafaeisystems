@@ -167,10 +167,13 @@ const browser = await chromium.launch({ headless: true })
 try {
   const baseline = await measureProfile(browser, baselineUrl)
   const candidate = await measureProfile(browser, candidateUrl)
+  const candidateControlsAvailable = candidate.runs.every((run) => run.requiredControlsAvailable)
+  const baselineMetricsAvailable = baseline.runs.every((run) => run.lcp > 0 && run.loafSupported)
+  const candidateMetricsAvailable = candidate.runs.every((run) => run.lcp > 0 && run.frameTimes.length > 0 && run.loafSupported)
   const unsupportedReasons = []
   if (baseline.missingBodies || candidate.missingBodies) unsupportedReasons.push('script-response-body-missing')
-  if (!baseline.requiredControlsAvailable || !candidate.requiredControlsAvailable) unsupportedReasons.push('required-scene-controls-missing')
-  if (!baseline.requiredMetricsAvailable || !candidate.requiredMetricsAvailable) unsupportedReasons.push('required-run-metrics-unavailable')
+  if (!candidateControlsAvailable) unsupportedReasons.push('required-scene-controls-missing')
+  if (!baselineMetricsAvailable || !candidateMetricsAvailable) unsupportedReasons.push('required-run-metrics-unavailable')
   if (candidate.allRunOverBudgetLongTasks.length && candidate.allRunAttributableLongAnimationFrames.length === 0) unsupportedReasons.push('long-task-attribution-unavailable')
   const failedBudgets = []
   if (candidate.gzipBytes - baseline.gzipBytes > 30 * 1024) failedBudgets.push('initial-javascript-delta')
