@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
-import type { SystemSceneState } from '@/lib/system-scene'
+import { syncRouteGeometry, type SystemSceneState } from '@/lib/system-scene'
 
 type SystemCore3dProps = {
   state: SystemSceneState
@@ -118,7 +118,7 @@ export function SystemCore3d({ state, isFa, onFailure }: SystemCore3dProps) {
     }
     const updateRoute = (routeState: SystemSceneState) => {
       const topology = stateTopologies[routeState]
-      lineGeometry.setFromPoints(topology.edges.flatMap(([from, to]) => [nodes[from].position, nodes[to].position]))
+      syncRouteGeometry(lineGeometry, topology.edges.flatMap(([from, to]) => [nodes[from].position, nodes[to].position]))
       canvas.dataset.sceneTopology = topology.signature
     }
     const placeImmediately = () => {
