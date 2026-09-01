@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { describe, expect, it, vi } from 'vitest'
 import * as THREE from 'three'
 import { SYSTEM_SCENE_STATES, transitionScene } from '@/lib/system-scene'
@@ -6,7 +7,7 @@ import { SYSTEM_CORE_ROUTE_CAPACITY, SYSTEM_CORE_STATE_LAYOUTS, SYSTEM_CORE_STAT
 
 describe('system scene state model', () => {
   it('keeps the native scene state module free of runtime Three imports', () => {
-    const source = readFileSync(new URL('../../../lib/system-scene.ts', import.meta.url), 'utf8')
+    const source = readFileSync(resolve(process.cwd(), 'src/lib/system-scene.ts'), 'utf8')
     expect(source).not.toMatch(/from ['"]three['"]|require\(['"]three['"]\)/)
   })
 
