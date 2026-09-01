@@ -72,6 +72,7 @@ export function SystemCore3d({ state, isFa, onFailure }: SystemCore3dProps) {
     let intersecting = true
     let documentVisible = document.visibilityState !== 'hidden'
     let settledState: SystemSceneState | null = null
+    const projectedLabelPosition = new THREE.Vector3()
 
     const pauseReason = () => documentVisible ? (intersecting ? null : 'offscreen') : 'hidden'
     const setPaused = () => {
@@ -83,12 +84,14 @@ export function SystemCore3d({ state, isFa, onFailure }: SystemCore3dProps) {
 
     const render = () => {
       renderer.render(scene, camera)
+    }
+    const renderLabels = () => {
       nodes.forEach((node, index) => {
         const label = labelRefs.current[index]
         if (!label) return
-        const projected = node.position.clone().project(camera)
-        label.style.left = `${(projected.x * 0.5 + 0.5) * canvas.clientWidth}px`
-        label.style.top = `${(-projected.y * 0.5 + 0.5) * canvas.clientHeight}px`
+        projectedLabelPosition.copy(node.position).project(camera)
+        label.style.left = `${(projectedLabelPosition.x * 0.5 + 0.5) * canvas.clientWidth}px`
+        label.style.top = `${(-projectedLabelPosition.y * 0.5 + 0.5) * canvas.clientHeight}px`
       })
     }
     const resize = () => {
@@ -98,6 +101,7 @@ export function SystemCore3d({ state, isFa, onFailure }: SystemCore3dProps) {
       camera.aspect = width / height
       camera.updateProjectionMatrix()
       render()
+      renderLabels()
     }
     const updateRoute = (routeState: SystemSceneState) => {
       const topology = SYSTEM_CORE_STATE_TOPOLOGIES[routeState]
@@ -108,6 +112,7 @@ export function SystemCore3d({ state, isFa, onFailure }: SystemCore3dProps) {
       nodes.forEach((node, index) => node.position.set(...SYSTEM_CORE_STATE_LAYOUTS[stateRef.current][index]))
       updateRoute(stateRef.current)
       render()
+      renderLabels()
       canvas.dataset.renderActive = 'false'
       canvas.dataset.renderPaused = 'none'
       canvas.dataset.sceneState = stateRef.current
@@ -143,6 +148,7 @@ export function SystemCore3d({ state, isFa, onFailure }: SystemCore3dProps) {
         render()
         if (progress < 1) frame = requestAnimationFrame(step)
         else {
+          renderLabels()
           canvas.dataset.renderActive = 'false'
           canvas.dataset.sceneState = targetState
           settledState = targetState
