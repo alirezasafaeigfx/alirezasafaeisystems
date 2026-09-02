@@ -26,11 +26,17 @@ describe('Playwright Discover fixture isolation', () => {
     expect(config).toContain("const playwrightDatabaseUrl = `file:${resolve(process.cwd(), 'test-results/playwright.db')}`")
   })
 
-  it('runs both smoke and accessibility browser contracts in the E2E workflow', () => {
+  it('runs both smoke and accessibility browser contracts in the E2E workflow without persisting checkout credentials', () => {
     const workflow = readFileSync(resolve(process.cwd(), '.github/workflows/e2e-smoke.yml'), 'utf8')
+    const checkoutIndex = workflow.indexOf('- uses: actions/checkout@v4')
+    const setupIndex = workflow.indexOf('- uses: pnpm/action-setup@v4')
+    const checkoutBlock = workflow.slice(checkoutIndex, setupIndex)
 
     expect(workflow).toContain('pnpm run test:e2e:smoke')
     expect(workflow).toContain('pnpm exec playwright test e2e/a11y.spec.ts')
+    expect(checkoutIndex).toBeGreaterThan(-1)
+    expect(setupIndex).toBeGreaterThan(checkoutIndex)
+    expect(checkoutBlock).toContain('persist-credentials: false')
   })
 
   it('creates and seeds the disposable database before the final CI build and keeps that build after enterprise verification', () => {
@@ -58,12 +64,15 @@ describe('Playwright Discover fixture isolation', () => {
     const disposableDatabase = 'DATABASE_URL: "file:${{ github.workspace }}/test-results/playwright.db"'
     const seedIndex = workflow.indexOf('- name: Prepare disposable Lighthouse data')
     const collectIndex = workflow.indexOf('- name: Run Lighthouse CI')
+    const seedBlock = workflow.slice(seedIndex, collectIndex)
 
     expect(workflow).toContain(disposableDatabase)
     expect(workflow).not.toContain('DATABASE_URL: file:${{ runner.temp }}/lighthouse.db')
     expect(seedIndex).toBeGreaterThan(-1)
     expect(collectIndex).toBeGreaterThan(seedIndex)
-    expect(workflow.slice(seedIndex, collectIndex)).toContain('node scripts/test/seed-playwright-discover.mjs')
+    expect(seedBlock).toContain('mkdir -p "$GITHUB_WORKSPACE/test-results"')
+    expect(seedBlock).toContain('pnpm prisma db push --skip-generate --accept-data-loss')
+    expect(seedBlock).toContain('node scripts/test/seed-playwright-discover.mjs')
   })
 
   it('starts Browser Smoke with the same direct standalone launcher contract used by E2E and production', () => {
