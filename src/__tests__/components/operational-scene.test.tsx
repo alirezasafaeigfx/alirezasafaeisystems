@@ -1,4 +1,5 @@
 import { fireEvent, render, screen, within } from '@testing-library/react'
+import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { OperationalScene } from '@/components/public/operational-scene'
 
@@ -11,6 +12,14 @@ describe('Gate A operational scene', () => {
     expect(screen.getByRole('img', { name: /See the problem, then follow the repair/ })).toBeInTheDocument()
     expect(screen.getAllByText('The system is under pressure')).not.toHaveLength(0)
     expect(screen.queryByText('WebGL')).not.toBeInTheDocument()
+  })
+
+  it('ships the complete no-JS explanation in SSR markup without a hydration snapshot flip', () => {
+    const html = renderToStaticMarkup(<OperationalScene isFa />)
+
+    expect(html).toContain('<noscript>')
+    expect(html).toContain('data-testid="operational-scene-fallback"')
+    expect(html).toContain('این نمونهٔ آموزشی بدون تعامل هم کامل است')
   })
 
   it('keeps rapid state selection deterministic while the finite morph is active', () => {
