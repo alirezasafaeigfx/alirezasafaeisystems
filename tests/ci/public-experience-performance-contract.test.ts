@@ -25,9 +25,12 @@ describe('V3.2 controlled performance contract', () => {
     expect(harness).not.toContain('candidate.interactionLongTasks.some')
   })
 
-  it('waits for throttled script transfers before calculating initial JavaScript', () => {
+  it('waits for throttled script transfers and every response-body handler before calculating initial JavaScript', () => {
     expect(harness).toContain("page.goto(url, { waitUntil: 'networkidle' })")
     expect(harness).not.toContain("page.goto(url, { waitUntil: 'domcontentloaded' })")
+    expect(harness).toContain('pendingScriptBodies')
+    expect(harness).toContain('pendingScriptBodies.add')
+    expect(harness).toContain('await Promise.allSettled([...pendingScriptBodies])')
   })
 
   it('records immutable base and candidate identities in the raw report', () => {
@@ -51,12 +54,20 @@ describe('V3.2 controlled performance contract', () => {
     )
   })
 
-  it('builds both immutable revisions in isolated worktrees and supplies candidate build ownership', () => {
-    expect(runner).toContain("['worktree', 'add', '--detach'")
+  it('builds the candidate against the actual merge-base in an isolated worktree', () => {
+    expect(runner).toContain("['merge-base', baseSha, candidateSha]")
+    expect(runner).toContain('const baselineSha')
+    expect(runner).toContain("['worktree', 'add', '--detach', worktree, baselineSha]")
     expect(runner).toContain("'--baseline-url'")
     expect(runner).toContain("'--candidate-url'")
+    expect(runner).toContain("'--baseline-sha', baselineSha")
     expect(runner).toContain("'--candidate-build-dir'")
     expect(harness).toContain('for (let index = 0; index < 3; index += 1)')
+  })
+
+  it('bounds each readiness request so the overall deadline can be re-evaluated', () => {
+    expect(runner).toContain('AbortSignal.timeout(5_000)')
+    expect(runner).toContain('const deadline = Date.now() + 60_000')
   })
 
   it('fails closed for dirty sources, missing metrics, and unready child processes', () => {
