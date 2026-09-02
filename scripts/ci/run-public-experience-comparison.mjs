@@ -22,7 +22,8 @@ const checkedOut = (await exec('git', ['rev-parse', 'HEAD'], { cwd: root })).std
 if (checkedOut !== candidateSha) throw new Error(`candidate SHA ${candidateSha} does not match checked-out commit ${checkedOut}`)
 const dirty = (await exec('git', ['status', '--porcelain'], { cwd: root })).stdout.trim()
 if (dirty) throw new Error('candidate worktree must be clean before performance build')
-await exec('git', ['merge-base', '--is-ancestor', baseSha, candidateSha], { cwd: root })
+const baselineSha = (await exec('git', ['merge-base', baseSha, candidateSha], { cwd: root })).stdout.trim()
+if (!SHA.test(baselineSha)) throw new Error(`unable to resolve merge-base for ${baseSha} and ${candidateSha}`)
 
 const worktree = await mkdtemp(resolve(tmpdir(), 'asdev-public-baseline-'))
 const processes = []
@@ -51,7 +52,7 @@ const waitFor = async (url, child) => {
   while (Date.now() < deadline) {
     if (child.exitCode !== null || child.spawnFailure) throw new Error('server exited before readiness')
     try {
-      const response = await fetch(url)
+      const response = await fetch(url, { signal: AbortSignal.timeout(5_000) })
       if (response.ok) return
     } catch {}
     await new Promise((resolvePromise) => setTimeout(resolvePromise, 500))
@@ -59,7 +60,7 @@ const waitFor = async (url, child) => {
   throw new Error(`server did not become ready: ${url}`)
 }
 try {
-  await exec('git', ['worktree', 'add', '--detach', worktree, baseSha], { cwd: root })
+  await exec('git', ['worktree', 'add', '--detach', worktree, baselineSha], { cwd: root })
   worktreeAdded = true
   await run(pnpm, ['install', '--frozen-lockfile'], worktree)
   await run(pnpm, ['build'], worktree)
@@ -76,7 +77,7 @@ try {
     resolve(root, 'scripts/ci/measure-public-experience-budget.mjs'),
     '--baseline-url', baselineUrl,
     '--candidate-url', candidateUrl,
-    '--baseline-sha', baseSha,
+    '--baseline-sha', baselineSha,
     '--candidate-sha', candidateSha,
     '--candidate-build-dir', resolve(root, '.next'),
     '--output', resolve(root, output),
