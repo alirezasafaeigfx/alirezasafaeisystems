@@ -4,6 +4,7 @@ import { resolve } from 'node:path'
 import vm from 'node:vm'
 
 const DEFERRED_THREE_MODULE = /\[project\]\/((node_modules\/(?:.*\/)?three\/)|(src\/(?:lib\/system-route-geometry|components\/public\/system-core-3d)(?:\.[cm]?[jt]sx?|\/)))/
+const DEFERRED_MOTION_RUNTIME = /\[project\]\/node_modules\/(?:.*\/)?animejs\//
 const REQUIRED_HOME_ENTRIES = ['[project]/src/app/layout', '[project]/src/app/error', '[project]/src/app/page']
 
 export function verifyHomeInitialChunks(rootDir = process.cwd()) {
@@ -30,14 +31,15 @@ export function verifyHomeInitialChunks(rootDir = process.cwd()) {
   }
   const chunks = [...new Set([...rootMainFiles, ...pageEntries])]
   if (!Array.isArray(chunks) || chunks.length === 0) throw new Error('Home initial entry chunks are missing from the client-reference manifest')
-  const offenders = chunks.map((chunk) => ({ chunk, source: readFileSync(resolve(rootDir, '.next', chunk), 'utf8') }))
-    .filter(({ source }) => DEFERRED_THREE_MODULE.test(source))
-    .map(({ chunk }) => chunk)
-  if (offenders.length) throw new Error(`Home initial entry includes deferred Three route code: ${offenders.join(', ')}`)
+  const sources = chunks.map((chunk) => ({ chunk, source: readFileSync(resolve(rootDir, '.next', chunk), 'utf8') }))
+  const threeOffenders = sources.filter(({ source }) => DEFERRED_THREE_MODULE.test(source)).map(({ chunk }) => chunk)
+  if (threeOffenders.length) throw new Error(`Home initial entry includes deferred Three route code: ${threeOffenders.join(', ')}`)
+  const motionOffenders = sources.filter(({ source }) => DEFERRED_MOTION_RUNTIME.test(source)).map(({ chunk }) => chunk)
+  if (motionOffenders.length) throw new Error(`Home initial entry includes deferred motion runtime: ${motionOffenders.join(', ')}`)
   return chunks
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const chunks = verifyHomeInitialChunks()
-  process.stdout.write(`Home initial chunks contain no deferred Three route code (${chunks.length} chunks).\n`)
+  process.stdout.write(`Home initial chunks contain no deferred Three route code or motion runtime (${chunks.length} chunks).\n`)
 }
