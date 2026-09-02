@@ -1,8 +1,6 @@
 'use client'
 
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
-import { animate } from 'animejs/animation'
-import { morphTo } from 'animejs/svg'
 import { transitionScene, SYSTEM_SCENE_STATES, type SystemSceneState } from '@/lib/system-scene'
 import { SystemCore3dLauncher } from './system-core-3d-launcher'
 
@@ -44,29 +42,38 @@ export function OperationalScene({ isFa }: OperationalSceneProps) {
   const currentIndex = SYSTEM_SCENE_STATES.indexOf(state)
   const data = sceneData[state]
   const motionPathRef = useRef<SVGPathElement>(null)
-  const targetPathRef = useRef<SVGPathElement>(null)
-  const move = (event: Parameters<typeof transitionScene>[1]) => setState((current) => transitionScene(current, event))
+  const hasInteractedRef = useRef(false)
+  const move = (event: Parameters<typeof transitionScene>[1]) => {
+    hasInteractedRef.current = true
+    setState((current) => transitionScene(current, event))
+  }
 
   useEffect(() => {
     const motionPath = motionPathRef.current
-    const targetPath = targetPathRef.current
-    if (!motionPath || !targetPath) return
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      motionPath.setAttribute('d', data.path)
-      return
-    }
-    const motion = animate(motionPath, {
-      d: morphTo(targetPath, 0.28),
-      duration: 420,
-      ease: 'inOut(3)',
-    })
+    if (!motionPath || !hasInteractedRef.current) return
+    if (typeof motionPath.animate !== 'function' || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    let disposed = false
+    let motion: { cancel: () => unknown } | undefined
+    void import('animejs/waapi')
+      .then(({ waapi }) => {
+        if (disposed) return
+        motion = waapi.animate(motionPath, {
+          opacity: [0.42, 1],
+          duration: 320,
+          ease: 'ease-out',
+        })
+      })
+      .catch(() => undefined)
+
     return () => {
-      motion.cancel()
+      disposed = true
+      motion?.cancel()
     }
   }, [data.path])
 
   return (
-    <figure className="operational-scene scroll-mt-20 rounded-2xl border border-primary/15 bg-primary/[0.04] p-4 sm:p-5" aria-labelledby="operational-scene-title" data-testid="operational-scene" data-state={state} data-scene-mode="native" data-motion-engine="animejs" data-topology="delivery-network">
+    <figure className="operational-scene scroll-mt-20 rounded-2xl border border-primary/15 bg-primary/[0.04] p-4 sm:p-5" aria-labelledby="operational-scene-title" data-testid="operational-scene" data-state={state} data-scene-mode="native" data-motion-engine="animejs" data-motion-mode="deferred-waapi" data-topology="delivery-network">
       <figcaption>
         <p className="public-kicker">{copy.label}</p>
         <h2 id="operational-scene-title" className="mt-2 text-lg font-black sm:text-xl">{copy.title}</h2>
@@ -98,8 +105,7 @@ export function OperationalScene({ isFa }: OperationalSceneProps) {
       <svg className={`${interactive ? '' : 'hidden '}mt-5 h-auto w-full overflow-visible`} viewBox="0 0 640 112" role="img" aria-labelledby="operational-scene-title operational-scene-description">
         <desc id="operational-scene-description">{copy.topology.join(' → ')} · {copy.states[currentIndex]}</desc>
         <path data-testid="operational-scene-path" className="operational-scene__path opacity-0" d={data.path} pathLength="1" />
-        <path ref={motionPathRef} aria-hidden="true" className="operational-scene__path" d={sceneData.pressure.path} pathLength="1" />
-        <path ref={targetPathRef} aria-hidden="true" className="opacity-0" d={data.path} />
+        <path ref={motionPathRef} aria-hidden="true" className="operational-scene__path" d={data.path} pathLength="1" />
         {copy.topology.map((node, index) => {
           const x = 48 + index * 181.3
           const active = data.activeNodes.includes(index)
