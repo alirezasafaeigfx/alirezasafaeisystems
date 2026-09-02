@@ -72,7 +72,7 @@ export function OperationalSceneEnhancer() {
         const active = activeNodes.has(nodeIndex)
         node.dataset.active = String(active)
         node.classList.toggle('is-active', active)
-        node.querySelector('circle')?.setAttribute('r', String(active && state === 'pressure' ? 22 : 18))
+        node.querySelector('circle')?.setAttribute('r', String(active ? 22 : 18))
       })
       previous.disabled = currentIndex === 0
       next.disabled = currentIndex === buttons.length - 1
