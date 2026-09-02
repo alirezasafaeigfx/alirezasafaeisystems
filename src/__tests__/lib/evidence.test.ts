@@ -15,31 +15,44 @@ const acceptedEvidence: EvidenceRecord = {
   reviewedAt: '2026-08-30',
 }
 
+const approval = {
+  reviewArtifactUrl: 'https://github.com/alirezasafaeigfx/alirezasafaeisystems/pull/26#pullrequestreview-1234567890',
+  reviewArtifactSha256: 'a'.repeat(64),
+  reviewedCandidateSha: 'b'.repeat(40),
+  reviewedEvidenceId: acceptedEvidence.id,
+}
+
 describe('typed public evidence', () => {
-  it('publishes accepted evidence only when every provenance field is present', () => {
-    expect(isPublishableEvidence(acceptedEvidence)).toBe(true)
+  it('publishes accepted evidence only when every provenance and immutable approval field is present', () => {
+    expect(isPublishableEvidence({ ...acceptedEvidence, ...approval })).toBe(true)
+    expect(isPublishableEvidence(acceptedEvidence)).toBe(false)
+    expect(isPublishableEvidence({ ...acceptedEvidence, ...approval, reviewedEvidenceId: 'different-evidence' })).toBe(false)
+    expect(isPublishableEvidence({ ...acceptedEvidence, ...approval, reviewedCandidateSha: 'not-a-sha' })).toBe(false)
+    expect(isPublishableEvidence({ ...acceptedEvidence, ...approval, reviewArtifactSha256: 'not-a-hash' })).toBe(false)
+    expect(isPublishableEvidence({ ...acceptedEvidence, ...approval, reviewArtifactUrl: '' })).toBe(false)
   })
 
   it('rejects unreviewed or incomplete evidence', () => {
-    expect(isPublishableEvidence({ ...acceptedEvidence, reviewState: 'draft' })).toBe(false)
-    expect(isPublishableEvidence({ ...acceptedEvidence, method: '' })).toBe(false)
+    expect(isPublishableEvidence({ ...acceptedEvidence, ...approval, reviewState: 'draft' })).toBe(false)
+    expect(isPublishableEvidence({ ...acceptedEvidence, ...approval, method: '' })).toBe(false)
   })
 
   it('rejects an accepted claim without a retrievable source or independent review identity', () => {
-    expect(isPublishableEvidence({ ...acceptedEvidence, sourceUrl: '' })).toBe(false)
-    expect(isPublishableEvidence({ ...acceptedEvidence, reviewedBy: '' })).toBe(false)
-    expect(isPublishableEvidence({ ...acceptedEvidence, reviewedAt: 'not-a-date' })).toBe(false)
-    expect(isPublishableEvidence({ ...acceptedEvidence, reviewedAt: '2026-02-31' })).toBe(false)
-    expect(isPublishableEvidence({ ...acceptedEvidence, verificationDate: '2026-99-99' })).toBe(false)
-    expect(isPublishableEvidence({ ...acceptedEvidence, reviewedBy: 'Independent public-content reviewer' })).toBe(false)
-    expect(isPublishableEvidence({ ...acceptedEvidence, source: 'Accepted infrastructure rescue evidence record' })).toBe(false)
-    expect(isPublishableEvidence({ ...acceptedEvidence, source: 'رکورد پذیرفته‌شده شواهد عمومی' })).toBe(false)
+    expect(isPublishableEvidence({ ...acceptedEvidence, ...approval, sourceUrl: '' })).toBe(false)
+    expect(isPublishableEvidence({ ...acceptedEvidence, ...approval, reviewedBy: '' })).toBe(false)
+    expect(isPublishableEvidence({ ...acceptedEvidence, ...approval, reviewedAt: 'not-a-date' })).toBe(false)
+    expect(isPublishableEvidence({ ...acceptedEvidence, ...approval, reviewedAt: '2026-02-31' })).toBe(false)
+    expect(isPublishableEvidence({ ...acceptedEvidence, ...approval, verificationDate: '2026-99-99' })).toBe(false)
+    expect(isPublishableEvidence({ ...acceptedEvidence, ...approval, reviewedBy: 'Independent public-content reviewer' })).toBe(false)
+    expect(isPublishableEvidence({ ...acceptedEvidence, ...approval, source: 'Accepted infrastructure rescue evidence record' })).toBe(false)
+    expect(isPublishableEvidence({ ...acceptedEvidence, ...approval, source: 'رکورد پذیرفته‌شده شواهد عمومی' })).toBe(false)
   })
 
   it('rejects unsupported quantitative claims with malformed or conflicting periods', () => {
-    expect(isPublishableEvidence({ ...acceptedEvidence, value: '180m → 55m', period: 'Published reference' })).toBe(false)
-    expect(isPublishableEvidence({ ...acceptedEvidence, value: '0 in final 21 days', period: 'Six-week intervention window' })).toBe(false)
-    expect(isPublishableEvidence({ ...acceptedEvidence, value: '55m', period: 'before: 2026-08-30; after: 2026-08-01' })).toBe(false)
-    expect(isPublishableEvidence({ ...acceptedEvidence, value: '۱۸۰ دقیقه', period: 'بررسی عمومی' })).toBe(false)
+    expect(isPublishableEvidence({ ...acceptedEvidence, ...approval, value: '180m → 55m', period: 'Published reference' })).toBe(false)
+    expect(isPublishableEvidence({ ...acceptedEvidence, ...approval, value: '0 in final 21 days', period: 'Six-week intervention window' })).toBe(false)
+    expect(isPublishableEvidence({ ...acceptedEvidence, ...approval, value: '55m', period: 'before: 2026-08-30; after: 2026-08-01' })).toBe(false)
+    expect(isPublishableEvidence({ ...acceptedEvidence, ...approval, value: '55m', period: 'before: 2026-02-31; after: 2026-03-02', quantitativeSourceUrl: acceptedEvidence.sourceUrl })).toBe(false)
+    expect(isPublishableEvidence({ ...acceptedEvidence, ...approval, value: '۱۸۰ دقیقه', period: 'بررسی عمومی' })).toBe(false)
   })
 })
