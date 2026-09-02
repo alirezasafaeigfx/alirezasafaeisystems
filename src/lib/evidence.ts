@@ -13,8 +13,11 @@ export type EvidenceRecord = {
   reviewedBy?: string
   reviewedAt?: string
   quantitativeSourceUrl?: string
+  reviewProvider?: 'github-pull-request-review'
   reviewArtifactUrl?: string
   reviewArtifactSha256?: string
+  reviewArtifactReviewer?: string
+  reviewerIdentityUrl?: string
   reviewedCandidateSha?: string
   reviewedEvidenceId?: string
 }
@@ -22,6 +25,8 @@ export type EvidenceRecord = {
 const isoDatePattern = /^\d{4}-\d{2}-\d{2}$/
 const sha1Pattern = /^[0-9a-f]{40}$/i
 const sha256Pattern = /^[0-9a-f]{64}$/i
+const githubLoginPattern = /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?$/
+const githubPullReviewPattern = /^https:\/\/github\.com\/[^/\s]+\/[^/\s]+\/pull\/\d+#pullrequestreview-\d+$/i
 
 function isValidIsoDate(value: string): boolean {
   if (!isoDatePattern.test(value)) return false
@@ -40,12 +45,21 @@ function isRetrievableSource(sourceUrl: string): boolean {
   }
 }
 
+function hasTrustedReviewerIdentity(record: EvidenceRecord): boolean {
+  const reviewer = record.reviewedBy?.trim() ?? ''
+  if (!githubLoginPattern.test(reviewer)) return false
+  if (record.reviewArtifactReviewer?.trim() !== reviewer) return false
+  return record.reviewerIdentityUrl?.trim() === `https://github.com/${reviewer}`
+}
+
 function hasImmutableApproval(record: EvidenceRecord): boolean {
   return (
-    isRetrievableSource(record.reviewArtifactUrl?.trim() ?? '') &&
+    record.reviewProvider === 'github-pull-request-review' &&
+    githubPullReviewPattern.test(record.reviewArtifactUrl?.trim() ?? '') &&
     sha256Pattern.test(record.reviewArtifactSha256?.trim() ?? '') &&
     sha1Pattern.test(record.reviewedCandidateSha?.trim() ?? '') &&
-    record.reviewedEvidenceId?.trim() === record.id.trim()
+    record.reviewedEvidenceId?.trim() === record.id.trim() &&
+    hasTrustedReviewerIdentity(record)
   )
 }
 
@@ -66,9 +80,6 @@ export function isPublishableEvidence(record: EvidenceRecord): boolean {
   return (
     record.reviewState === 'accepted' &&
     isRetrievableSource(record.sourceUrl?.trim() ?? '') &&
-    Boolean(record.reviewedBy?.trim()) &&
-    !/^(self|author|owner)$/i.test(record.reviewedBy?.trim() ?? '') &&
-    !/^(independent .*reviewer|بازبینی مستقل.*)$/i.test(record.reviewedBy?.trim() ?? '') &&
     isValidIsoDate(record.reviewedAt?.trim() ?? '') &&
     isValidIsoDate(record.verificationDate.trim()) &&
     hasImmutableApproval(record) &&
