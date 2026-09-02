@@ -32,7 +32,7 @@ describe('Gate A operational scene', () => {
     expect(within(scene).getByTestId('operational-scene-path')).toHaveAttribute('d', 'M48 56 H592')
   })
 
-  it('changes geometry and explanatory meaning across five selectable states', () => {
+  it('changes geometry, active-node emphasis, and explanatory meaning across five selectable states', () => {
     render(<OperationalScene isFa={false} />)
     const scene = screen.getByTestId('operational-scene')
     const svg = within(scene).getByRole('img')
@@ -44,6 +44,13 @@ describe('Gate A operational scene', () => {
     expect(scene).toHaveAttribute('data-state', 'diagnosis')
     expect(path.getAttribute('d')).not.toBe(pressurePath)
     expect(within(scene).getAllByText(/We isolate the part causing the failure/)).not.toHaveLength(0)
+    const diagnosisNodes = [...scene.querySelectorAll<SVGGElement>('[data-scene-node]')]
+    expect(diagnosisNodes[0]).toHaveAttribute('data-active', 'false')
+    expect(diagnosisNodes[0]?.querySelector('circle')).toHaveAttribute('r', '18')
+    expect(diagnosisNodes[1]).toHaveAttribute('data-active', 'true')
+    expect(diagnosisNodes[1]?.querySelector('circle')).toHaveAttribute('r', '22')
+    expect(diagnosisNodes[2]).toHaveAttribute('data-active', 'true')
+    expect(diagnosisNodes[2]?.querySelector('circle')).toHaveAttribute('r', '22')
 
     fireEvent.click(within(scene).getByRole('button', { name: 'Next state' }))
     expect(scene).toHaveAttribute('data-state', 'intervention')
