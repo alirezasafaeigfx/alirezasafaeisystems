@@ -77,6 +77,7 @@ test('releases the GPU route and can activate a clean scene after browser return
   await page.goto('/case-studies/infrastructure-localization-rescue', { waitUntil: 'domcontentloaded' })
   await expect(page.getByRole('heading', { level: 1 })).toContainText('نجات بومی‌سازی زیرساخت')
   await page.goBack({ waitUntil: 'domcontentloaded' })
+  await page.reload({ waitUntil: 'domcontentloaded' })
 
   const returnedScene = page.getByTestId('operational-scene')
   const returnedLauncher = returnedScene.locator('[data-gpu-status]')
