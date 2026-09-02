@@ -5,7 +5,7 @@ import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 describe('public experience build attribution', () => {
-  it('maps observed chunk witnesses to their manifest role and source modules', () => {
+  it('maps observed LoAF and diagnostic CPU chunk witnesses to their manifest role and source modules', () => {
     const root = mkdtempSync(join(tmpdir(), 'asdev-build-attribution-'))
     const buildDir = join(root, '.next')
     const chunkDir = join(buildDir, 'static', 'chunks')
@@ -15,14 +15,23 @@ describe('public experience build attribution', () => {
     writeFileSync(join(manifestDir, 'build-manifest.json'), JSON.stringify({
       rootMainFiles: ['static/chunks/react-runtime.js'],
       polyfillFiles: ['static/chunks/polyfill.js'],
+      lowPriorityFiles: ['static/chunks/anime-runtime.js'],
     }))
     writeFileSync(join(chunkDir, 'react-runtime.js'), 'hydrateRoot rendererPackageName:"react-dom"')
     writeFileSync(join(chunkDir, 'polyfill.js'), 'String.prototype.trimStart Promise.prototype.finally var(--next-error-title)')
+    writeFileSync(join(chunkDir, 'anime-runtime.js'), 'animejs animation runtime')
     const report = join(root, 'performance.json')
-    writeFileSync(report, JSON.stringify({ candidate: { allRunAttributableLongAnimationFrames: [
-      { scripts: [{ sourceURL: 'http://127.0.0.1/_next/static/chunks/react-runtime.js' }] },
-      { scripts: [{ sourceURL: 'http://127.0.0.1/_next/static/chunks/polyfill.js' }] },
-    ] } }))
+    writeFileSync(report, JSON.stringify({
+      candidate: {
+        allRunAttributableLongAnimationFrames: [
+          { scripts: [{ sourceURL: 'http://127.0.0.1/_next/static/chunks/react-runtime.js' }] },
+          { scripts: [{ sourceURL: 'http://127.0.0.1/_next/static/chunks/polyfill.js' }] },
+        ],
+        diagnosticCpuHotspots: [
+          { url: 'http://127.0.0.1/_next/static/chunks/anime-runtime.js', selfTimeMicroseconds: 82_000 },
+        ],
+      },
+    }))
 
     const output = join(root, 'attribution.json')
     execFileSync(process.execPath, [
@@ -43,6 +52,11 @@ describe('public experience build attribution', () => {
           file: 'static/chunks/polyfill.js',
           manifestRoles: ['polyfillFiles'],
           sourceModules: ['browser-polyfills', 'next-error-boundary'],
+        },
+        {
+          file: 'static/chunks/anime-runtime.js',
+          manifestRoles: ['lowPriorityFiles'],
+          sourceModules: ['animejs'],
         },
       ],
     })
