@@ -13,8 +13,8 @@ export async function generateMetadata(): Promise<Metadata> {
     title: lang === 'fa' ? 'کیس استادی: سخت‌سازی حکمرانی CI/CD' : 'Case Study: CI/CD Governance Hardening',
     description:
       lang === 'fa'
-        ? 'چگونه کیفیت انتشار و مالکیت از طریق دروازه‌های سیاست CI/CD قابل اجرا پایدار شد.'
-        : 'How release quality and ownership were stabilized through enforceable CI/CD policy gates.',
+        ? 'روایت سخت‌سازی حاکمیت CI/CD؛ بازبینی مستقل شواهد عمومی هنوز در انتظار است.'
+        : 'A CI/CD governance hardening narrative; independent evidence review remains pending.',
     alternates: {
       canonical: `${siteUrl}/${lang}/case-studies/ci-cd-governance-hardening`,
     },
@@ -54,7 +54,7 @@ export default async function CiCdGovernanceHardeningPage() {
     hResult: lang === 'en' ? 'Result' : 'نتیجه',
     pResult:
       lang === 'en'
-        ? 'No accepted quantitative outcome is published for this case until independent review is complete.'
+        ? 'No accepted quantitative outcome is published for this case until independent evidence review remains pending.'
         : 'تا پایان بازبینی مستقل، هیچ نتیجه کمّی یا ادعای آمادگی بازگردانی نسخه برای این مورد منتشر نمی‌شود.',
     hRole: lang === 'en' ? 'Role' : 'نقش',
     pRole:
@@ -66,12 +66,12 @@ export default async function CiCdGovernanceHardeningPage() {
     hProof: lang === 'en' ? 'Proof' : 'شواهد',
     pProof:
       lang === 'en'
-        ? 'Release dashboard snapshots, CI pass/fail history, and drill evidence were shared in weekly governance reviews.'
-        : 'رکوردهای داشبورد انتشار، تاریخچه نتیجه بررسی خودکار و مستند تمرین بازگردانی نسخه، پیش از عرضه عمومی به بازبینی مستقل نیاز دارند.',
+        ? 'Public workflow records exist, but independent evidence review remains pending; they are not presented as accepted proof.'
+        : 'رکوردهای عمومی گردش‌کار وجود دارند، اما بازبینی مستقل شواهد هنوز در انتظار است و این رکوردها به‌عنوان شاهد پذیرفته‌شده عرضه نمی‌شوند.',
     hLessons: lang === 'en' ? 'Lessons & Tradeoffs' : 'درس‌ها و ملاحظه‌ها',
     pLessons:
       lang === 'en'
-        ? 'Stricter gates slightly increased pre-release effort but removed far larger post-release firefighting costs.'
+        ? 'Stricter gates require more pre-release discipline; the effect and cost tradeoff in this case have not been independently accepted.'
         : 'دروازه‌های سخت‌گیرانه، کار پیش از انتشار را بیشتر می‌کنند؛ نسبت اثر و هزینه در این مورد هنوز به‌طور مستقل تأیید نشده است.',
     back: lang === 'en' ? 'Back to case studies' : 'بازگشت به مطالعات موردی',
     ctaAudit: lang === 'en' ? 'Request a website review' : 'درخواست بررسی سایت',
@@ -83,14 +83,14 @@ export default async function CiCdGovernanceHardeningPage() {
   const pageUrl = `${siteUrl}/${lang}/case-studies/ci-cd-governance-hardening`
   const projectSchema = generateProjectSchema({
     name: 'CI/CD Governance Hardening',
-    description: 'Operational and governance hardening for high-stakes release pipelines.',
+    description: 'A CI/CD governance hardening narrative; independent evidence review remains pending.',
     url: lang === 'fa' ? '/case-studies/ci-cd-governance-hardening' : `/${lang}/case-studies/ci-cd-governance-hardening`,
     technologies: ['GitHub Actions', 'Playwright', 'Lighthouse CI', 'Nginx', 'Node.js'],
   })
 
   const articleSchema = generateArticleSchema({
     title: 'Case Study: CI/CD Governance Hardening',
-    description: 'How release quality and ownership were stabilized through enforceable CI/CD policy gates.',
+    description: 'A CI/CD governance hardening narrative; independent evidence review remains pending.',
     publishDate: '2026-02-10',
     modifiedDate: '2026-02-16',
     author: 'Alireza Safaei',
