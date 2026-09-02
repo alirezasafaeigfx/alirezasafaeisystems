@@ -13,6 +13,10 @@ export type EvidenceRecord = {
   reviewedBy?: string
   reviewedAt?: string
   quantitativeSourceUrl?: string
+  reviewArtifactUrl?: string
+  reviewArtifactSha256?: string
+  reviewedCandidateSha?: string
+  reviewedEvidenceId?: string
 }
 
 const isoDatePattern = /^\d{4}-\d{2}-\d{2}$/
