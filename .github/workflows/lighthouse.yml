@@ -31,7 +31,10 @@ jobs:
           cache-dependency-path: pnpm-lock.yaml
       - run: pnpm install --frozen-lockfile
       - name: Prepare disposable Lighthouse data
-        run: pnpm prisma db push --skip-generate --accept-data-loss && node scripts/test/seed-playwright-discover.mjs
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/test-results"
+          pnpm prisma db push --skip-generate --accept-data-loss
+          node scripts/test/seed-playwright-discover.mjs
       - name: Install Chromium for Lighthouse
         env:
           PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/ms-playwright
