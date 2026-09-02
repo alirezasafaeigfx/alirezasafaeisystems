@@ -1,8 +1,8 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { Component, useCallback, useState, type ErrorInfo, type ReactNode } from 'react'
-import type { SystemSceneState } from '@/lib/system-scene'
+import { Component, useCallback, useEffect, useRef, useState, type ErrorInfo, type ReactNode } from 'react'
+import { SYSTEM_SCENE_STATES, type SystemSceneState } from '@/lib/system-scene'
 
 const SystemCore3d = dynamic(
   () => import('./system-core-3d').then((module) => module.SystemCore3d),
@@ -34,6 +34,8 @@ class PrototypeErrorBoundary extends Component<{ children: ReactNode; onFailure:
 
 export function SystemCore3dLauncher({ state, isFa }: SystemCore3dLauncherProps) {
   const [status, setStatus] = useState<PrototypeStatus>('idle')
+  const [sceneState, setSceneState] = useState<SystemSceneState>(state)
+  const containerRef = useRef<HTMLElement>(null)
   const handleFailure = useCallback(() => setStatus('failed'), [])
   const copy = isFa
     ? {
@@ -54,6 +56,26 @@ export function SystemCore3dLauncher({ state, isFa }: SystemCore3dLauncherProps)
         failed: 'The 3D view stopped; the complete 2D version remains available above.',
         note: 'Optional; loaded only after you choose it.',
       }
+
+  useEffect(() => setSceneState(state), [state])
+
+  useEffect(() => {
+    const root = containerRef.current?.closest<HTMLElement>('[data-testid="operational-scene"]')
+    if (!root) return
+
+    const syncState = (value: unknown) => {
+      if (typeof value !== 'string') return
+      if (!SYSTEM_SCENE_STATES.includes(value as SystemSceneState)) return
+      setSceneState(value as SystemSceneState)
+    }
+    syncState(root.dataset.state)
+
+    const onState = (event: Event) => {
+      syncState((event as CustomEvent<{ state?: string }>).detail?.state)
+    }
+    root.addEventListener('asdev:scene-state', onState)
+    return () => root.removeEventListener('asdev:scene-state', onState)
+  }, [])
 
   const activate = () => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -78,11 +100,11 @@ export function SystemCore3dLauncher({ state, isFa }: SystemCore3dLauncherProps)
       : copy.failed
 
   return (
-    <section className="mt-5 rounded-xl border border-border/70 bg-background/70 p-3" data-gpu-status={status}>
+    <section ref={containerRef} className="mt-5 rounded-xl border border-border/70 bg-background/70 p-3" data-gpu-status={status}>
       {status === 'active' ? (
         <>
           <PrototypeErrorBoundary onFailure={handleFailure}>
-            <SystemCore3d state={state} isFa={isFa} onFailure={handleFailure} />
+            <SystemCore3d state={sceneState} isFa={isFa} onFailure={handleFailure} />
           </PrototypeErrorBoundary>
           <button type="button" className="mt-3 min-h-11 rounded-lg border border-border/70 px-3 text-xs font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" onClick={() => setStatus('idle')}>
             {copy.close}

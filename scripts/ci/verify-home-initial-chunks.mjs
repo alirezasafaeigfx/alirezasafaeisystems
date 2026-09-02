@@ -5,6 +5,7 @@ import vm from 'node:vm'
 
 const DEFERRED_THREE_MODULE = /\[project\]\/((node_modules\/(?:.*\/)?three\/)|(src\/(?:lib\/system-route-geometry|components\/public\/system-core-3d)(?:\.[cm]?[jt]sx?|\/)))/
 const DEFERRED_MOTION_RUNTIME = /\[project\]\/node_modules\/(?:.*\/)?animejs\//
+const HYDRATION_HEAVY_SCENE_SHELL = /\[project\]\/src\/components\/public\/operational-scene\.tsx/
 const REQUIRED_HOME_ENTRIES = ['[project]/src/app/layout', '[project]/src/app/error', '[project]/src/app/page']
 
 export function verifyHomeInitialChunks(rootDir = process.cwd()) {
@@ -36,10 +37,12 @@ export function verifyHomeInitialChunks(rootDir = process.cwd()) {
   if (threeOffenders.length) throw new Error(`Home initial entry includes deferred Three route code: ${threeOffenders.join(', ')}`)
   const motionOffenders = sources.filter(({ source }) => DEFERRED_MOTION_RUNTIME.test(source)).map(({ chunk }) => chunk)
   if (motionOffenders.length) throw new Error(`Home initial entry includes deferred motion runtime: ${motionOffenders.join(', ')}`)
+  const sceneShellOffenders = sources.filter(({ source }) => HYDRATION_HEAVY_SCENE_SHELL.test(source)).map(({ chunk }) => chunk)
+  if (sceneShellOffenders.length) throw new Error(`Home initial entry includes hydration-heavy scene shell: ${sceneShellOffenders.join(', ')}`)
   return chunks
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const chunks = verifyHomeInitialChunks()
-  process.stdout.write(`Home initial chunks contain no deferred Three route code or motion runtime (${chunks.length} chunks).\n`)
+  process.stdout.write(`Home initial chunks contain no deferred Three route code, motion runtime, or hydration-heavy scene shell (${chunks.length} chunks).\n`)
 }
