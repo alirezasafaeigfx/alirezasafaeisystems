@@ -59,20 +59,28 @@ describe('Playwright Discover fixture isolation', () => {
     expect(workflow).not.toContain('DATABASE_URL: "file:${{ github.workspace }}/prisma/dev.db"')
   })
 
-  it('gives Lighthouse a job-scope-safe disposable Discover database before collection', () => {
+  it('gives the exact Lighthouse preparation and collection steps the same job-scoped disposable Discover database', () => {
     const workflow = readFileSync(resolve(process.cwd(), '.github/workflows/lighthouse.yml'), 'utf8')
     const disposableDatabase = 'DATABASE_URL: "file:${{ github.workspace }}/test-results/playwright.db"'
+    const stepsIndex = workflow.indexOf('    steps:')
     const seedIndex = workflow.indexOf('- name: Prepare disposable Lighthouse data')
+    const chromiumIndex = workflow.indexOf('- name: Install Chromium for Lighthouse')
     const collectIndex = workflow.indexOf('- name: Run Lighthouse CI')
-    const seedBlock = workflow.slice(seedIndex, collectIndex)
+    const seedBlock = workflow.slice(seedIndex, chromiumIndex)
+    const collectBlock = workflow.slice(collectIndex)
+    const jobPrefix = workflow.slice(0, stepsIndex)
 
-    expect(workflow).toContain(disposableDatabase)
-    expect(workflow).not.toContain('DATABASE_URL: file:${{ runner.temp }}/lighthouse.db')
-    expect(seedIndex).toBeGreaterThan(-1)
-    expect(collectIndex).toBeGreaterThan(seedIndex)
+    expect(stepsIndex).toBeGreaterThan(-1)
+    expect(jobPrefix).toContain(disposableDatabase)
+    expect(seedIndex).toBeGreaterThan(stepsIndex)
+    expect(chromiumIndex).toBeGreaterThan(seedIndex)
+    expect(collectIndex).toBeGreaterThan(chromiumIndex)
     expect(seedBlock).toContain('mkdir -p "$GITHUB_WORKSPACE/test-results"')
     expect(seedBlock).toContain('pnpm prisma db push --skip-generate --accept-data-loss')
     expect(seedBlock).toContain('node scripts/test/seed-playwright-discover.mjs')
+    expect(seedBlock).not.toContain('DATABASE_URL:')
+    expect(collectBlock).not.toContain('DATABASE_URL:')
+    expect(workflow).not.toContain('DATABASE_URL: file:${{ runner.temp }}/lighthouse.db')
   })
 
   it('starts Browser Smoke with the same direct standalone launcher contract used by E2E and production', () => {
@@ -82,11 +90,22 @@ describe('Playwright Discover fixture isolation', () => {
     expect(workflow).not.toContain('PORT=3100 pnpm run start &')
   })
 
-  it('uses Persian fixture copy for the Persian Discover evidence capture', () => {
+  it('uses locale-neutral fixture copy independently in both create and update branches', () => {
     const seed = readFileSync(resolve(process.cwd(), 'scripts/test/seed-playwright-discover.mjs'), 'utf8')
+    const createIndex = seed.indexOf('    create: {')
+    const updateIndex = seed.indexOf('    update: {')
+    const createBlock = seed.slice(createIndex, updateIndex)
+    const updateBlock = seed.slice(updateIndex)
 
-    expect(seed).toContain("title: 'منبع آزمایشی Playwright'")
-    expect(seed).toContain("category: 'آزمایش'")
-    expect(seed).not.toContain("title: 'Playwright Discover Resource'")
+    expect(createIndex).toBeGreaterThan(-1)
+    expect(updateIndex).toBeGreaterThan(createIndex)
+    for (const block of [createBlock, updateBlock]) {
+      expect(block).toContain("title: 'Playwright Fixture 01'")
+      expect(block).toContain("description: 'fixture-description-01'")
+      expect(block).toContain("content: 'fixture-content-01'")
+      expect(block).toContain("category: 'test-fixture'")
+      expect(block).not.toContain("title: 'منبع آزمایشی Playwright'")
+      expect(block).not.toContain("category: 'آزمایش'")
+    }
   })
 })
