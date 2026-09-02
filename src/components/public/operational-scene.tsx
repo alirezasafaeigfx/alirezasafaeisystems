@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { transitionScene, SYSTEM_SCENE_STATES, type SystemSceneState } from '@/lib/system-scene'
 import { SystemCore3dLauncher } from './system-core-3d-launcher'
 
@@ -14,9 +14,15 @@ const sceneData: Record<SystemSceneState, { path: string; activeNodes: number[] 
   evidence: { path: 'M48 56 H500 M516 56 l14 14 30 -32', activeNodes: [0, 1, 2, 3] },
 }
 
+const escapeHtml = (value: string) => value
+  .replaceAll('&', '&amp;')
+  .replaceAll('<', '&lt;')
+  .replaceAll('>', '&gt;')
+  .replaceAll('"', '&quot;')
+  .replaceAll("'", '&#39;')
+
 export function OperationalScene({ isFa }: OperationalSceneProps) {
   const [state, setState] = useState<SystemSceneState>('pressure')
-  const interactive = useSyncExternalStore(() => () => undefined, () => true, () => false)
   const copy = isFa
     ? {
         label: 'نمونهٔ آموزشی مسیر تحویل',
@@ -47,6 +53,7 @@ export function OperationalScene({ isFa }: OperationalSceneProps) {
     hasInteractedRef.current = true
     setState((current) => transitionScene(current, event))
   }
+  const fallbackMarkup = `<div data-testid="operational-scene-fallback" class="mt-4 rounded-xl border border-border/70 bg-background/70 p-4"><p class="text-sm font-semibold">${escapeHtml(copy.noScript)}</p><ol class="mt-3 grid gap-2 text-sm text-muted-foreground sm:grid-cols-2">${copy.states.map((label, index) => `<li><span class="font-bold text-primary">0${index + 1}.</span> ${escapeHtml(label)} — ${escapeHtml(copy.descriptions[index])}</li>`).join('')}</ol></div>`
 
   useEffect(() => {
     const motionPath = motionPathRef.current
@@ -80,7 +87,7 @@ export function OperationalScene({ isFa }: OperationalSceneProps) {
         <p className="mt-2 text-sm leading-7 text-muted-foreground">{copy.descriptions[currentIndex]}</p>
       </figcaption>
 
-      <div hidden={!interactive} className="mt-4 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap" role="group" aria-label={isFa ? 'انتخاب مرحلهٔ مسیر' : 'Choose a delivery-path state'}>
+      <div className="mt-4 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap" role="group" aria-label={isFa ? 'انتخاب مرحلهٔ مسیر' : 'Choose a delivery-path state'}>
         {SYSTEM_SCENE_STATES.map((sceneState, index) => (
           <button
             key={sceneState}
@@ -95,14 +102,9 @@ export function OperationalScene({ isFa }: OperationalSceneProps) {
         ))}
       </div>
 
-      <div hidden={interactive} data-testid="operational-scene-fallback" className="mt-4 rounded-xl border border-border/70 bg-background/70 p-4">
-          <p className="text-sm font-semibold">{copy.noScript}</p>
-          <ol className="mt-3 grid gap-2 text-sm text-muted-foreground sm:grid-cols-2">
-            {copy.states.map((label, index) => <li key={label}><span className="font-bold text-primary">0{index + 1}.</span> {label} — {copy.descriptions[index]}</li>)}
-          </ol>
-      </div>
+      <noscript dangerouslySetInnerHTML={{ __html: fallbackMarkup }} />
 
-      <svg className={`${interactive ? '' : 'hidden '}mt-5 h-auto w-full overflow-visible`} viewBox="0 0 640 112" role="img" aria-labelledby="operational-scene-title operational-scene-description">
+      <svg className="mt-5 h-auto w-full overflow-visible" viewBox="0 0 640 112" role="img" aria-labelledby="operational-scene-title operational-scene-description">
         <desc id="operational-scene-description">{copy.topology.join(' → ')} · {copy.states[currentIndex]}</desc>
         <path data-testid="operational-scene-path" className="operational-scene__path opacity-0" d={data.path} pathLength="1" />
         <path ref={motionPathRef} aria-hidden="true" className="operational-scene__path" d={data.path} pathLength="1" />
@@ -118,14 +120,14 @@ export function OperationalScene({ isFa }: OperationalSceneProps) {
         })}
       </svg>
 
-      <div hidden={!interactive} className="mt-3 flex items-center justify-between gap-3">
+      <div className="mt-3 flex items-center justify-between gap-3">
         <p className="text-xs font-semibold text-muted-foreground" aria-live="polite">{copy.states[currentIndex]}</p>
         <div className="flex gap-2">
           <button type="button" className="min-h-11 rounded-lg border border-border/70 px-3 text-xs font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" onClick={() => move({ type: 'previous' })} disabled={currentIndex === 0}>{copy.previous}</button>
           <button type="button" className="min-h-11 rounded-lg bg-primary px-3 text-xs font-bold text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" onClick={() => move({ type: 'next' })} disabled={currentIndex === SYSTEM_SCENE_STATES.length - 1}>{copy.next}</button>
         </div>
       </div>
-      {interactive && <SystemCore3dLauncher state={state} isFa={isFa} />}
+      <SystemCore3dLauncher state={state} isFa={isFa} />
     </figure>
   )
 }
