@@ -18,11 +18,11 @@ const publicActionFiles = [
 ]
 
 describe('public assessment copy', () => {
-  it('uses one truthful action and does not promise a free audit', () => {
-    const copy = publicActionFiles.map((path) => readFileSync(resolve(process.cwd(), path), 'utf8')).join('\n')
-    expect(copy).not.toMatch(/Start Free Audit|Audit رایگان|Request an ASDEV Audit|درخواست ارزیابی Audit/)
-    expect(copy).toContain('Request a website review')
-    expect(copy).toContain('درخواست بررسی سایت')
+  it.each(publicActionFiles)('%s uses a truthful review action without legacy audit promises', (path) => {
+    const copy = readFileSync(resolve(process.cwd(), path), 'utf8')
+
+    expect(copy).not.toMatch(/Start Free Audit|Audit رایگان|Request an ASDEV Audit|درخواست ارزیابی Audit|Request Audit assessment/)
+    expect(copy).toMatch(/Request a website review|درخواست بررسی سایت/)
   })
 
   it('keeps Persian case-study claims plain and marks unaccepted outcomes as pending', () => {
@@ -34,7 +34,7 @@ describe('public assessment copy', () => {
     const copy = publicCaseStudyFiles.map((path) => readFileSync(resolve(process.cwd(), path), 'utf8')).join('\n')
 
     expect(copy).toContain('تا پایان بازبینی مستقل، نتیجه‌ای به‌عنوان دستاورد منتشر نمی‌شود.')
-    expect(copy).toContain('برای همهٔ موارد، شواهد پذیرفته‌شده در دسترس نیست')
+    expect(copy).toContain('پذیرش مستقل برای برخی موارد هنوز در انتظار است')
     expect(copy).not.toMatch(/صفر rollback اضطراری|کاهش میانگین lead-time انتشار به میزان ۳۴٪/)
     expect(copy).not.toMatch(/تصمیم‌های استقرار ad-hoc|بررسی blast radius|معماری localization-first|fallback کنترل‌شده|rollout چک‌لیست/)
   })
