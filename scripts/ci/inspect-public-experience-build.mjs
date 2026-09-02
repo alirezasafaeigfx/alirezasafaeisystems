@@ -1,5 +1,6 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { basename, dirname, join, relative } from 'node:path'
+import { classifyModules } from './public-experience-attribution.mjs'
 
 const values = (name) => process.argv.flatMap((value, index) => value === name ? [process.argv[index + 1]] : []).filter(Boolean)
 const value = (name) => values(name).at(-1)
@@ -26,22 +27,17 @@ const witnesses = [...new Set([...explicitWitnesses, ...reportWitnesses, ...diag
 
 const manifestPath = join(buildDir, 'server', 'app', 'page', 'build-manifest.json')
 const manifest = JSON.parse(await readFile(manifestPath, 'utf8'))
-
-const classifyModules = (body) => {
-  const modules = []
-  if (body.includes('hydrateRoot')) modules.push('next-app-hydration')
-  if (body.includes('rendererPackageName:"react-dom"') || body.includes("rendererPackageName:'react-dom'")) modules.push('react-dom')
-  if (body.includes('String.prototype.trimStart') && body.includes('Promise.prototype.finally')) modules.push('browser-polyfills')
-  if (body.includes('var(--next-error-title)')) modules.push('next-error-boundary')
-  if (body.includes('animejs')) modules.push('animejs')
-  if (body.includes('WebGLRenderer')) modules.push('three')
-  return modules
-}
+const candidates = [...new Set(Object.values(manifest).flatMap((files) => Array.isArray(files) ? files : []))]
 
 const chunks = []
+const unresolvedChunks = []
 for (const witness of witnesses) {
-  const candidates = Object.values(manifest).flatMap((files) => Array.isArray(files) ? files : [])
-  const file = candidates.find((candidate) => basename(candidate) === basename(witness)) ?? `static/chunks/${basename(witness)}`
+  const witnessName = basename(witness)
+  const file = candidates.find((candidate) => basename(candidate) === witnessName)
+  if (!file) {
+    unresolvedChunks.push(witnessName)
+    continue
+  }
   const body = await readFile(join(buildDir, file), 'utf8')
   const manifestRoles = Object.entries(manifest)
     .filter(([, files]) => Array.isArray(files) && files.includes(file))
@@ -55,4 +51,9 @@ for (const witness of witnesses) {
 }
 
 await mkdir(dirname(output), { recursive: true })
-await writeFile(output, `${JSON.stringify({ schemaVersion: 1, manifest: relative(buildDir, manifestPath).replaceAll('\\', '/'), chunks }, null, 2)}\n`)
+await writeFile(output, `${JSON.stringify({
+  schemaVersion: 1,
+  manifest: relative(buildDir, manifestPath).replaceAll('\\', '/'),
+  chunks,
+  unresolvedChunks: [...new Set(unresolvedChunks)],
+}, null, 2)}\n`)
