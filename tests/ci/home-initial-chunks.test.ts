@@ -46,6 +46,18 @@ describe('Home initial chunk boundary', () => {
     }))).toThrow('deferred motion runtime')
   })
 
+  it('rejects the hydration-heavy OperationalScene shell from the initial Home entry', () => {
+    expect(() => verifyHomeInitialChunks(fixture({
+      'static/chunks/page.js': '"[project]/src/components/public/operational-scene.tsx"',
+    }))).toThrow('hydration-heavy scene shell')
+  })
+
+  it('accepts a bounded client enhancer for the server-rendered scene', () => {
+    expect(verifyHomeInitialChunks(fixture({
+      'static/chunks/page.js': '"[project]/src/components/public/operational-scene-enhancer.tsx"',
+    }))).toContain('static/chunks/page.js')
+  })
+
   it('accepts benign prose that mentions Three without module attribution', () => {
     expect(verifyHomeInitialChunks(fixture({ 'static/chunks/page.js': 'const note = "THREE.js is optional"' }))).toContain('static/chunks/page.js')
   })
