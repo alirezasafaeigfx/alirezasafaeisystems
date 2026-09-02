@@ -6,6 +6,8 @@ import { execFileSync } from 'node:child_process'
 
 const SHA = /^[0-9a-f]{40}$/i
 const HASH = /^[0-9a-f]{64}$/i
+const REMOTE_ARTIFACT_MAX_BYTES = 16 * 1024 * 1024
+const REMOTE_ARTIFACT_TIMEOUT_MS = 10_000
 const REQUIRED_CRITERIA = {
   'S1-01': ['S1-01-evidence-gating'],
   'S1-08': ['S1-08-plain-language-fa', 'S1-08-plain-language-en'],
@@ -162,12 +164,43 @@ export async function validateRemoteArtifacts(manifest) {
   for (const artifact of manifest?.artifacts ?? []) {
     if (!/^https:\/\/[^\s]+$/i.test(artifact?.durableUrl ?? '') || !HASH.test(artifact?.sha256 ?? '')) continue
     try {
-      const response = await fetch(artifact.durableUrl, { redirect: 'follow' })
+      const response = await fetch(artifact.durableUrl, {
+        redirect: 'follow',
+        signal: AbortSignal.timeout(REMOTE_ARTIFACT_TIMEOUT_MS),
+      })
       if (!response.ok) {
         errors.push(`artifact ${artifact.id} remote retrieval returned HTTP ${response.status}`)
         continue
       }
-      const actual = createHash('sha256').update(Buffer.from(await response.arrayBuffer())).digest('hex')
+      const declaredLength = Number(response.headers.get('content-length'))
+      if (Number.isFinite(declaredLength) && declaredLength > REMOTE_ARTIFACT_MAX_BYTES) {
+        errors.push(`artifact ${artifact.id} exceeds remote artifact byte limit`)
+        continue
+      }
+      if (!response.body) {
+        errors.push(`artifact ${artifact.id} remote retrieval returned no body`)
+        continue
+      }
+      const reader = response.body.getReader()
+      const hash = createHash('sha256')
+      let receivedBytes = 0
+      let exceeded = false
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+        receivedBytes += value.byteLength
+        if (receivedBytes > REMOTE_ARTIFACT_MAX_BYTES) {
+          exceeded = true
+          await reader.cancel().catch(() => {})
+          break
+        }
+        hash.update(value)
+      }
+      if (exceeded) {
+        errors.push(`artifact ${artifact.id} exceeds remote artifact byte limit`)
+        continue
+      }
+      const actual = hash.digest('hex')
       if (actual !== artifact.sha256.toLowerCase()) errors.push(`artifact ${artifact.id} remote SHA-256 does not match its file`)
     } catch {
       errors.push(`artifact ${artifact?.id ?? 'unknown'} remote retrieval failed`)
