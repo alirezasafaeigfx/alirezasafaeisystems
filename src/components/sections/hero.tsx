@@ -123,7 +123,7 @@ export function Hero() {
         detail: 'Get a practical report from Audit Systems and fix the highest-impact issues in a fixed 5-7 day sprint (with real before/after).',
         href: withLocale('/qualification?source=portfolio&placement=hero_intent&offer=request_assessment', language),
         external: false,
-        cta: 'Request Audit assessment',
+        cta: 'Request a website review',
       },
       toolbox: {
         key: 'toolbox',
@@ -139,7 +139,7 @@ export function Hero() {
         detail: 'Start qualification or request the fixed-scope Quick Fix Sprint directly (PDF available) for a clear, fast path.',
         href: withLocale('/qualification?source=portfolio&placement=hero_execution&offer=request_assessment', language),
         external: false,
-        cta: 'Request Assessment',
+        cta: 'Request a website review',
       },
     }
 
