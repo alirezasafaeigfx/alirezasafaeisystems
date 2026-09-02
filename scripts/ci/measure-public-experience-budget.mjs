@@ -45,6 +45,7 @@ async function measure(browser, url, { profileCpu = false } = {}) {
     await cdp.send('Profiler.start')
   }
   const scripts = []
+  const pendingScriptBodies = new Set()
   await page.addInitScript(() => {
     window.__budgetLongTasks = []
     window.__budgetLongAnimationFrames = []
@@ -115,16 +116,20 @@ async function measure(browser, url, { profileCpu = false } = {}) {
       requestAnimationFrame(sample)
     })
   })
-  page.on('response', async (response) => {
+  page.on('response', (response) => {
     if (response.request().resourceType() !== 'script') return
-    try {
-      const body = await response.body()
-      scripts.push({ url: response.url(), bytes: body.byteLength, gzipBytes: gzipSync(body).byteLength })
-    } catch {
-      scripts.push({ url: response.url(), bytes: null, gzipBytes: null })
-    }
+    const pending = (async () => {
+      try {
+        const body = await response.body()
+        scripts.push({ url: response.url(), bytes: body.byteLength, gzipBytes: gzipSync(body).byteLength })
+      } catch {
+        scripts.push({ url: response.url(), bytes: null, gzipBytes: null })
+      }
+    })()
+    pendingScriptBodies.add(pending)
   })
   await page.goto(url, { waitUntil: 'networkidle' })
+  await Promise.allSettled([...pendingScriptBodies])
   await page.locator('main').waitFor()
   const scene = page.locator('[data-testid="operational-scene"]')
   await scene.waitFor({ state: 'visible' })
@@ -173,6 +178,7 @@ async function measure(browser, url, { profileCpu = false } = {}) {
     }
     await page.evaluate(() => { window.__budgetInteractionWindow.end = performance.now() })
   }
+  await Promise.allSettled([...pendingScriptBodies])
   const cpuHotspots = profileCpu
     ? summarizeCpuProfile((await cdp.send('Profiler.stop')).profile)
     : []
