@@ -15,9 +15,12 @@ describe('V3.2 controlled performance contract', () => {
     expect(harness).toContain('uploadKbitPerSecond: 750')
   })
 
-  it('evaluates over-budget work across every candidate run', () => {
+  it('evaluates over-budget work across every candidate run with task-level attribution', () => {
     expect(harness).toContain('allRunOverBudgetLongTasks')
-    expect(harness).toContain('allRunAttributableLongAnimationFrames')
+    expect(harness).toContain('allRunScriptOverBudgetLongAnimationFrames')
+    expect(harness).toContain('candidateAttributableLongAnimationFrames')
+    expect(harness).toContain('frameworkBootstrapLongAnimationFrames')
+    expect(harness).toContain('renderDominatedLongAnimationFrames')
     expect(harness).toContain('candidate.allRunOverBudgetLongTasks')
     expect(harness).not.toContain('candidate.interactionLongTasks.some')
   })
@@ -48,10 +51,11 @@ describe('V3.2 controlled performance contract', () => {
     )
   })
 
-  it('builds both immutable revisions in isolated worktrees and uses three-run profiling', () => {
+  it('builds both immutable revisions in isolated worktrees and supplies candidate build ownership', () => {
     expect(runner).toContain("['worktree', 'add', '--detach'")
     expect(runner).toContain("'--baseline-url'")
     expect(runner).toContain("'--candidate-url'")
+    expect(runner).toContain("'--candidate-build-dir'")
     expect(harness).toContain('for (let index = 0; index < 3; index += 1)')
   })
 
@@ -77,9 +81,9 @@ describe('V3.2 controlled performance contract', () => {
     expect(runner).not.toContain('3102')
   })
 
-  it('persists an explicit PASS, FAIL, or UNVERIFIED verdict', () => {
+  it('persists an explicit PASS, FAIL, or UNVERIFIED verdict and attribution policy', () => {
     expect(harness).toContain("const verdict = unsupportedReasons.length ? 'UNVERIFIED' : failedBudgets.length ? 'FAIL' : 'PASS'")
-    expect(harness).toContain("requiredControlsAvailable")
+    expect(harness).toContain('requiredControlsAvailable')
     expect(harness).toContain("runs.every((run) => run.requiredControlsAvailable)")
     expect(harness).toContain("runs.every((run) => run.lcp > 0 && run.frameTimes.length > 0 && run.loafSupported)")
     expect(harness).toContain("required-run-metrics-unavailable")
@@ -87,6 +91,8 @@ describe('V3.2 controlled performance contract', () => {
     expect(harness).toContain('unsupportedReasons')
     expect(harness).toContain('failedBudgets')
     expect(harness).toContain('cacheProfile')
+    expect(harness).toContain('attributionPolicy')
+    expect(harness).toContain("unknownOverBudgetScriptSource: 'candidate-attributable-fail-closed'")
   })
 
   it('requires interaction instrumentation from the candidate without inventing it for the frozen baseline', () => {
@@ -94,7 +100,7 @@ describe('V3.2 controlled performance contract', () => {
     expect(harness).toContain("baseline.runs.every((run) => run.lcp > 0 && run.loafSupported)")
     expect(harness).toContain("candidate.runs.every((run) => run.lcp > 0 && run.frameTimes.length > 0 && run.loafSupported)")
     expect(harness).toContain("if (!candidateControlsAvailable) unsupportedReasons.push('required-scene-controls-missing')")
-    expect(harness).toContain('candidate.allRunAttributableLongAnimationFrames.length) failedBudgets')
+    expect(harness).toContain('candidate.candidateAttributableLongAnimationFrames.length) failedBudgets')
   })
 
   it('records standards-based script attribution instead of a nonexistent functionName field', () => {
