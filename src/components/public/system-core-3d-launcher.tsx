@@ -57,21 +57,15 @@ export function SystemCore3dLauncher({ state, isFa }: SystemCore3dLauncherProps)
         note: 'Optional; loaded only after you choose it.',
       }
 
-  useEffect(() => setSceneState(state), [state])
-
   useEffect(() => {
     const root = containerRef.current?.closest<HTMLElement>('[data-testid="operational-scene"]')
     if (!root) return
 
-    const syncState = (value: unknown) => {
+    const onState = (event: Event) => {
+      const value = (event as CustomEvent<{ state?: string }>).detail?.state
       if (typeof value !== 'string') return
       if (!SYSTEM_SCENE_STATES.includes(value as SystemSceneState)) return
       setSceneState(value as SystemSceneState)
-    }
-    syncState(root.dataset.state)
-
-    const onState = (event: Event) => {
-      syncState((event as CustomEvent<{ state?: string }>).detail?.state)
     }
     root.addEventListener('asdev:scene-state', onState)
     return () => root.removeEventListener('asdev:scene-state', onState)
