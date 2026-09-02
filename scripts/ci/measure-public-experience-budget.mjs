@@ -2,6 +2,7 @@ import { mkdir, writeFile } from 'node:fs/promises'
 import { dirname } from 'node:path'
 import { gzipSync } from 'node:zlib'
 import { chromium } from '@playwright/test'
+import { classifyLongAnimationFrames, loadChunkOwnership } from './public-experience-attribution.mjs'
 
 const REQUIRED_SCENE_STATES = ['pressure', 'diagnosis', 'intervention', 'stable', 'evidence']
 const REQUIRED_SCENE_TRANSITION_TARGETS = ['diagnosis', 'intervention', 'stable', 'evidence', 'pressure']
@@ -226,7 +227,7 @@ const percentile = (values, fraction) => {
   return sorted[Math.min(sorted.length - 1, Math.ceil(sorted.length * fraction) - 1)]
 }
 
-async function measureProfile(browser, url) {
+async function measureProfile(browser, url, chunkOwnership = {}) {
   const runs = []
   for (let index = 0; index < 3; index += 1) runs.push(await measure(browser, url))
   const diagnosticRun = await measure(browser, url, { profileCpu: true })
@@ -239,6 +240,7 @@ async function measureProfile(browser, url) {
     const sceneReady = run.phaseTimeline.find((item) => item.name === 'scene-ready')?.at ?? Number.POSITIVE_INFINITY
     return { run: runIndex + 1, phase: transition ? `transition:${transition.state}` : frame.startTime <= sceneReady ? 'before-scene-ready' : 'post-scene-ready', ...frame }
   }))
+  const taskAttribution = classifyLongAnimationFrames(longAnimationFrames, chunkOwnership)
   return {
     url,
     runs,
@@ -258,7 +260,11 @@ async function measureProfile(browser, url) {
     diagnosticPhaseTimeline: diagnosticRun.phaseTimeline,
     diagnosticLongAnimationFrames: diagnosticRun.longAnimationFrames,
     allRunOverBudgetLongTasks: longTasks.filter((task) => task.duration > 50),
-    allRunAttributableLongAnimationFrames: longAnimationFrames.filter((frame) => frame.blockingDuration > 50 && frame.scripts.some((script) => script.sourceURL)),
+    allRunScriptOverBudgetLongAnimationFrames: taskAttribution.scriptOverBudgetFrames,
+    candidateAttributableLongAnimationFrames: taskAttribution.candidateAttributableFrames,
+    frameworkBootstrapLongAnimationFrames: taskAttribution.frameworkBootstrapFrames,
+    renderDominatedLongAnimationFrames: taskAttribution.renderDominatedFrames,
+    allRunAttributableLongAnimationFrames: taskAttribution.candidateAttributableFrames,
     interactionLongAnimationFrames: runs.flatMap((run, runIndex) => run.longAnimationFrames.filter((frame) => run.interactionWindow && frame.startTime + frame.duration >= run.interactionWindow.start && frame.startTime <= run.interactionWindow.end).map((frame) => ({ run: runIndex + 1, ...frame }))),
     interactionLongTasks: runs.flatMap((run, runIndex) => run.longTasks.filter((task) => run.interactionWindow && task.startTime + task.duration >= run.interactionWindow.start && task.startTime <= run.interactionWindow.end).map((task) => ({ run: runIndex + 1, ...task }))),
     frameTimeMedianMs: runs.flatMap((run) => run.frameTimes).length ? median(runs.flatMap((run) => run.frameTimes)) : null,
@@ -271,15 +277,17 @@ const baselineUrl = readArgument('--baseline-url')
 const candidateUrl = readArgument('--candidate-url')
 const baselineSha = readArgument('--baseline-sha')
 const candidateSha = readArgument('--candidate-sha')
+const candidateBuildDir = readArgument('--candidate-build-dir')
 const output = readArgument('--output')
-if (!baselineUrl || !candidateUrl || !/^[0-9a-f]{40}$/i.test(baselineSha ?? '') || !/^[0-9a-f]{40}$/i.test(candidateSha ?? '') || !output) {
-  throw new Error('Usage: --baseline-url URL --candidate-url URL --baseline-sha SHA --candidate-sha SHA --output FILE')
+if (!baselineUrl || !candidateUrl || !/^[0-9a-f]{40}$/i.test(baselineSha ?? '') || !/^[0-9a-f]{40}$/i.test(candidateSha ?? '') || !candidateBuildDir || !output) {
+  throw new Error('Usage: --baseline-url URL --candidate-url URL --baseline-sha SHA --candidate-sha SHA --candidate-build-dir DIR --output FILE')
 }
 
+const candidateChunkOwnership = await loadChunkOwnership(candidateBuildDir)
 const browser = await chromium.launch({ headless: true })
 try {
   const baseline = await measureProfile(browser, baselineUrl)
-  const candidate = await measureProfile(browser, candidateUrl)
+  const candidate = await measureProfile(browser, candidateUrl, candidateChunkOwnership)
   const candidateControlsAvailable = candidate.runs.every((run) => run.requiredControlsAvailable)
   const candidateTransitionMatrixAvailable = candidate.runs.every((run) => run.transitionSamples.length === REQUIRED_SCENE_STATES.length)
   const baselineMetricsAvailable = baseline.runs.every((run) => run.lcp > 0 && run.loafSupported)
@@ -289,13 +297,13 @@ try {
   if (!candidateControlsAvailable) unsupportedReasons.push('required-scene-controls-missing')
   if (!candidateTransitionMatrixAvailable || !candidate.requiredTransitionMatrixAvailable) unsupportedReasons.push('required-transition-matrix-unavailable')
   if (!baselineMetricsAvailable || !candidateMetricsAvailable) unsupportedReasons.push('required-run-metrics-unavailable')
-  if (candidate.allRunOverBudgetLongTasks.length && candidate.allRunAttributableLongAnimationFrames.length === 0) unsupportedReasons.push('long-task-attribution-unavailable')
+  if (candidate.allRunOverBudgetLongTasks.length && candidate.allRunScriptOverBudgetLongAnimationFrames.length === 0) unsupportedReasons.push('long-task-attribution-unavailable')
   const failedBudgets = []
   if (candidate.gzipBytes - baseline.gzipBytes > 30 * 1024) failedBudgets.push('initial-javascript-delta')
   if (candidate.medianLcp > 2500) failedBudgets.push('lcp')
   if (candidate.maxCls > 0.1) failedBudgets.push('cls')
   if (candidate.maxInteractionMs === null || candidate.maxInteractionMs > 200) failedBudgets.push('interaction')
-  if (candidate.allRunAttributableLongAnimationFrames.length) failedBudgets.push('long-animation-frame')
+  if (candidate.candidateAttributableLongAnimationFrames.length) failedBudgets.push('long-animation-frame')
   if (candidate.frameTimeP95Ms !== null && candidate.frameTimeP95Ms > 50) failedBudgets.push('frame-time-p95')
   const verdict = unsupportedReasons.length ? 'UNVERIFIED' : failedBudgets.length ? 'FAIL' : 'PASS'
   const report = {
@@ -306,6 +314,12 @@ try {
     candidate,
     initialJavaScriptDeltaGzipBytes: candidate.gzipBytes - baseline.gzipBytes,
     budgetGzipBytes: 30 * 1024,
+    attributionPolicy: {
+      taskBudgetMs: 50,
+      frameworkBootstrap: 'reported-separately-when-proven-root-runtime-only',
+      renderDominatedFrames: 'diagnostic-not-task-budget',
+      unknownOverBudgetScriptSource: 'candidate-attributable-fail-closed',
+    },
     capturedAt: new Date().toISOString(),
     browser: { name: 'chromium', version: browser.version() },
     runner: { platform: process.platform, arch: process.arch, cpus: await import('node:os').then(({ cpus }) => cpus().length), memoryBytes: (await import('node:os')).totalmem() },
