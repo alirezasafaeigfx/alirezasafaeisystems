@@ -21,8 +21,8 @@ export async function generateMetadata(): Promise<Metadata> {
     title: lang === 'fa' ? 'مطالعات موردی' : 'Case Studies',
     description:
       lang === 'fa'
-        ? 'مطالعات موردی اجرایی با خروجی‌های قابل اندازه‌گیری، محدودیت‌ها و شواهد عملیاتی.'
-        : 'Selected delivery case studies with measurable outcomes, constraints, and operational evidence.',
+        ? 'مطالعات موردی اجرایی با وضعیت شواهد شفاف؛ پذیرش مستقل برای برخی موارد هنوز در انتظار است.'
+        : 'Selected delivery case studies with transparent evidence status; independent acceptance is pending for some cases.',
     alternates: { canonical: `${siteUrl}/${lang}/case-studies` },
   }
 }
@@ -136,14 +136,14 @@ export default async function CaseStudiesPage() {
     schemaName: lang === 'en' ? 'Case Studies' : 'مطالعات موردی',
     schemaDesc:
       lang === 'en'
-        ? 'Selected delivery case studies with their stated evidence status.'
-        : 'مطالعات موردی منتخب با وضعیت شواهد اعلام‌شده برای هر مورد.',
+        ? 'Selected delivery case studies; independent acceptance is pending for some cases.'
+        : 'مطالعات موردی منتخب؛ پذیرش مستقل برای برخی موارد هنوز در انتظار است.',
     eyebrow: lang === 'en' ? 'Proof-Backed Delivery' : 'تحویل مبتنی بر شواهد',
     title: lang === 'en' ? 'Case Studies' : 'مطالعات موردی',
     desc:
       lang === 'en'
-        ? 'Each case states its context, constraints, actions, and current evidence status; accepted evidence is not available for every case.'
-        : 'هر مورد زمینه، محدودیت‌ها، اقدام‌ها و وضعیت فعلی شواهد را اعلام می‌کند؛ برای همهٔ موارد، شواهد پذیرفته‌شده در دسترس نیست.',
+        ? 'Each case states its context, constraints, actions, and current evidence status; independent acceptance is pending for some cases.'
+        : 'هر مورد زمینه، محدودیت‌ها، اقدام‌ها و وضعیت فعلی شواهد را اعلام می‌کند؛ پذیرش مستقل برای برخی موارد هنوز در انتظار است.',
     open: lang === 'en' ? 'Open Full Case' : 'مشاهده کامل',
   }
 
