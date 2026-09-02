@@ -72,7 +72,15 @@ try {
   const candidateUrl = `http://127.0.0.1:${candidatePort}/`
   await waitFor(baselineUrl, baselineServer)
   await waitFor(candidateUrl, candidateServer)
-  await run(process.execPath, [resolve(root, 'scripts/ci/measure-public-experience-budget.mjs'), '--baseline-url', baselineUrl, '--candidate-url', candidateUrl, '--baseline-sha', baseSha, '--candidate-sha', candidateSha, '--output', resolve(root, output)], root)
+  await run(process.execPath, [
+    resolve(root, 'scripts/ci/measure-public-experience-budget.mjs'),
+    '--baseline-url', baselineUrl,
+    '--candidate-url', candidateUrl,
+    '--baseline-sha', baseSha,
+    '--candidate-sha', candidateSha,
+    '--candidate-build-dir', resolve(root, '.next'),
+    '--output', resolve(root, output),
+  ], root)
 } finally {
   for (const child of processes) if (child.exitCode === null) {
     if (process.platform === 'win32') await exec('taskkill', ['/pid', String(child.pid), '/t', '/f']).catch(() => {})
