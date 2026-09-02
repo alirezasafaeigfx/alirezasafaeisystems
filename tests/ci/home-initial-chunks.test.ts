@@ -40,6 +40,12 @@ describe('Home initial chunk boundary', () => {
     }
   })
 
+  it('rejects Anime.js runtime from the initial Home entry', () => {
+    expect(() => verifyHomeInitialChunks(fixture({
+      'static/chunks/page.js': '"[project]/node_modules/animejs/dist/modules/animation/index.js"',
+    }))).toThrow('deferred motion runtime')
+  })
+
   it('accepts benign prose that mentions Three without module attribution', () => {
     expect(verifyHomeInitialChunks(fixture({ 'static/chunks/page.js': 'const note = "THREE.js is optional"' }))).toContain('static/chunks/page.js')
   })
