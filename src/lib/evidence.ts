@@ -20,6 +20,8 @@ export type EvidenceRecord = {
 }
 
 const isoDatePattern = /^\d{4}-\d{2}-\d{2}$/
+const sha1Pattern = /^[0-9a-f]{40}$/i
+const sha256Pattern = /^[0-9a-f]{64}$/i
 
 function isValidIsoDate(value: string): boolean {
   if (!isoDatePattern.test(value)) return false
@@ -38,6 +40,15 @@ function isRetrievableSource(sourceUrl: string): boolean {
   }
 }
 
+function hasImmutableApproval(record: EvidenceRecord): boolean {
+  return (
+    isRetrievableSource(record.reviewArtifactUrl?.trim() ?? '') &&
+    sha256Pattern.test(record.reviewArtifactSha256?.trim() ?? '') &&
+    sha1Pattern.test(record.reviewedCandidateSha?.trim() ?? '') &&
+    record.reviewedEvidenceId?.trim() === record.id.trim()
+  )
+}
+
 function hasSupportedPeriod(record: EvidenceRecord): boolean {
   if (/published reference|accepted .*record|رکورد پذیرفته[‌ -]?شده|مرجع منتشر[‌ -]?شده/i.test(`${record.source} ${record.period}`)) return false
   if (!/[0-9۰-۹]/.test(record.value)) return true
@@ -46,6 +57,8 @@ function hasSupportedPeriod(record: EvidenceRecord): boolean {
 
   const before = record.period.match(/before\s*:\s*(\d{4}-\d{2}-\d{2})/i)?.[1]
   const after = record.period.match(/after\s*:\s*(\d{4}-\d{2}-\d{2})/i)?.[1]
+  if (before && !isValidIsoDate(before)) return false
+  if (after && !isValidIsoDate(after)) return false
   return !(before && after && before >= after)
 }
 
@@ -58,6 +71,7 @@ export function isPublishableEvidence(record: EvidenceRecord): boolean {
     !/^(independent .*reviewer|بازبینی مستقل.*)$/i.test(record.reviewedBy?.trim() ?? '') &&
     isValidIsoDate(record.reviewedAt?.trim() ?? '') &&
     isValidIsoDate(record.verificationDate.trim()) &&
+    hasImmutableApproval(record) &&
     hasSupportedPeriod(record) &&
     !/accepted .*evidence .*record|رکورد پذیرفته[‌ -]?شده.*شواهد/i.test(record.source) &&
     [
