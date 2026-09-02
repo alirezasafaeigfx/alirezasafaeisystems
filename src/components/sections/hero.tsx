@@ -286,7 +286,7 @@ export function Hero() {
                   className="mt-3 inline-flex rounded-md border border-primary/40 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary/20 transition-colors"
                   href={withLocale('/qualification', language)}
                 >
-                  {language === 'en' ? 'Request Assessment' : 'شروع بررسی'}
+                  {language === 'en' ? 'Request a website review' : 'شروع بررسی'}
                 </a>
               </article>
               <article className="rounded-lg border border-border/60 bg-background/75 p-4 text-sm">
