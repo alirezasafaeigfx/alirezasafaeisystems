@@ -11,13 +11,16 @@ const acceptedEvidence: EvidenceRecord = {
   verificationDate: '2026-08-30',
   reviewState: 'accepted',
   sourceUrl: 'https://github.com/alirezasafaeigfx/alirezasafaeisystems/actions/runs/33332174608',
-  reviewedBy: 'Review agent Banach',
+  reviewedBy: 'coderabbitai',
   reviewedAt: '2026-08-30',
 }
 
 const approval = {
+  reviewProvider: 'github-pull-request-review' as const,
   reviewArtifactUrl: 'https://github.com/alirezasafaeigfx/alirezasafaeisystems/pull/26#pullrequestreview-1234567890',
   reviewArtifactSha256: 'a'.repeat(64),
+  reviewArtifactReviewer: acceptedEvidence.reviewedBy,
+  reviewerIdentityUrl: `https://github.com/${acceptedEvidence.reviewedBy}`,
   reviewedCandidateSha: 'b'.repeat(40),
   reviewedEvidenceId: acceptedEvidence.id,
 }
@@ -30,6 +33,14 @@ describe('typed public evidence', () => {
     expect(isPublishableEvidence({ ...acceptedEvidence, ...approval, reviewedCandidateSha: 'not-a-sha' })).toBe(false)
     expect(isPublishableEvidence({ ...acceptedEvidence, ...approval, reviewArtifactSha256: 'not-a-hash' })).toBe(false)
     expect(isPublishableEvidence({ ...acceptedEvidence, ...approval, reviewArtifactUrl: '' })).toBe(false)
+  })
+
+  it('binds the approval artifact to a trusted provider and the same reviewer identity', () => {
+    expect(isPublishableEvidence({ ...acceptedEvidence, ...approval, reviewProvider: undefined })).toBe(false)
+    expect(isPublishableEvidence({ ...acceptedEvidence, ...approval, reviewArtifactUrl: 'https://example.com/review.json' })).toBe(false)
+    expect(isPublishableEvidence({ ...acceptedEvidence, ...approval, reviewArtifactReviewer: 'different-reviewer' })).toBe(false)
+    expect(isPublishableEvidence({ ...acceptedEvidence, ...approval, reviewerIdentityUrl: 'https://github.com/different-reviewer' })).toBe(false)
+    expect(isPublishableEvidence({ ...acceptedEvidence, ...approval, reviewedBy: 'Review agent Banach' })).toBe(false)
   })
 
   it('rejects unreviewed or incomplete evidence', () => {
