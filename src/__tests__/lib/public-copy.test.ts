@@ -21,7 +21,7 @@ describe('public assessment copy', () => {
   it.each(publicActionFiles)('%s uses a truthful review action without legacy audit promises', (path) => {
     const copy = readFileSync(resolve(process.cwd(), path), 'utf8')
 
-    expect(copy).not.toMatch(/Start Free Audit|Audit رایگان|Request an ASDEV Audit|درخواست ارزیابی Audit|Request Audit assessment/)
+    expect(copy).not.toMatch(/Start Free Audit|Audit رایگان|Request an ASDEV Audit|درخواست ارزیابی Audit|Request Audit assessment|Request Assessment/)
     expect(copy).toMatch(/Request a website review|درخواست بررسی سایت/)
   })
 
