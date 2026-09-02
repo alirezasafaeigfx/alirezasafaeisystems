@@ -18,7 +18,11 @@ const reportWitnesses = report?.candidate?.allRunAttributableLongAnimationFrames
   .map((script) => script.sourceURL)
   .filter((sourceURL) => sourceURL?.includes('/_next/static/chunks/'))
   .map((sourceURL) => new URL(sourceURL).pathname) ?? []
-const witnesses = [...new Set([...explicitWitnesses, ...reportWitnesses])]
+const diagnosticWitnesses = report?.candidate?.diagnosticCpuHotspots
+  ?.map((hotspot) => hotspot.url)
+  .filter((sourceURL) => sourceURL?.includes('/_next/static/chunks/'))
+  .map((sourceURL) => new URL(sourceURL).pathname) ?? []
+const witnesses = [...new Set([...explicitWitnesses, ...reportWitnesses, ...diagnosticWitnesses])]
 
 const manifestPath = join(buildDir, 'server', 'app', 'page', 'build-manifest.json')
 const manifest = JSON.parse(await readFile(manifestPath, 'utf8'))
