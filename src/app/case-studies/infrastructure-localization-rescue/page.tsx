@@ -14,7 +14,7 @@ export async function generateMetadata(): Promise<Metadata> {
     title: lang === 'fa' ? 'کیس استادی: نجات بومی‌سازی زیرساخت' : 'Case Study: Infrastructure Localization Rescue',
     description:
       lang === 'fa'
-        ? 'چگونه یک استک استقرار پرریسک با معماری بومی و دروازه‌های حکمرانی پایدار شد.'
+        ? 'روایت بومی‌سازی زیرساخت؛ بازبینی مستقل شواهد عمومی هنوز در انتظار است.'
         : 'A documented infrastructure-localization approach with its public evidence review still pending.',
     alternates: {
       canonical: `${siteUrl}/${lang}/case-studies/infrastructure-localization-rescue`,
@@ -82,7 +82,7 @@ export default async function InfrastructureLocalizationRescueCaseStudyPage() {
     pProof:
       lang === 'en'
         ? 'A public release-path record exists for this narrative, but no report or outcome is presented as accepted evidence before independent review.'
-        : 'برای این روایت، یک رکورد عمومی از مسیر انتشار وجود دارد؛ اما پیش از بازبینی مستقل، هیچ گزارش یا نتیجه‌ای به‌عنوان شاهد پذیرفته‌شده عرضه نمی‌شود.',
+        : 'برای این روایت، یک رکورد عمومی از مسیر انتشار وجود دارد؛ بازبینی مستقل شواهد عمومی هنوز در انتظار است و هیچ گزارش یا نتیجه‌ای به‌عنوان شاهد پذیرفته‌شده عرضه نمی‌شود.',
     hLessons: lang === 'en' ? 'Lessons & Tradeoffs' : 'درس‌ها و ملاحظه‌ها',
     pLessons:
       lang === 'en'
