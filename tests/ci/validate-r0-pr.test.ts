@@ -169,10 +169,12 @@ describe('public-experience dependency preflight', () => {
         'scripts/ci/create-public-experience-evidence-draft.mjs',
         'scripts/ci/inspect-public-experience-build.mjs',
         'scripts/ci/measure-public-experience-budget.mjs',
+        'scripts/ci/public-experience-attribution.mjs',
         'scripts/ci/run-public-experience-comparison.mjs',
         'scripts/ci/verify-home-initial-chunks.mjs',
         'scripts/test/seed-playwright-discover.mjs',
         'tests/ci/playwright-discover-fixture.test.ts',
+        'tests/ci/public-experience-long-task-attribution.test.ts',
         'tests/ci/public-experience-performance-contract.test.ts',
         'tests/ci/home-initial-chunks.test.ts',
         'tests/ci/inspect-public-experience-build.test.ts',
@@ -211,7 +213,7 @@ describe('public-experience dependency preflight', () => {
     ]))
   })
 
-  it('rejects auth, database, deployment, and undeclared categories', () => {
+  it('rejects auth, database, deployment, similarly named CI files, and undeclared categories', () => {
     const errors = validateR0PullRequest({
       baseSha: sha('a'),
       headSha: sha('b'),
@@ -223,6 +225,7 @@ describe('public-experience dependency preflight', () => {
         'src/lib/db.ts',
         'prisma/schema.prisma',
         'scripts/deploy/release.sh',
+        'scripts/ci/public-experience-attribution-extra.mjs',
         'docs/engineering/PUBLIC_EXPERIENCE_ENGINEERING.md',
       ],
       ...publicDeclaration,
