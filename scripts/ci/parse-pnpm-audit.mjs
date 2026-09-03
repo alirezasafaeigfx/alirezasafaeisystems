@@ -3,6 +3,7 @@ import { resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 
 const severities = ['info', 'low', 'moderate', 'high', 'critical']
+const blockingSeverities = new Set(['high', 'critical'])
 
 export function summarizeAuditReport(report) {
   if (!report || typeof report !== 'object') throw new Error('unsupported pnpm audit payload')
@@ -27,6 +28,50 @@ export function summarizeAuditReport(report) {
   return counts
 }
 
+function viaDetail(via) {
+  if (!Array.isArray(via)) return null
+  for (const entry of via) {
+    if (typeof entry === 'string' && entry.trim()) return { title: entry.trim(), url: null }
+    if (entry && typeof entry === 'object') {
+      const title = String(entry.title ?? entry.source ?? entry.name ?? '').trim()
+      const url = String(entry.url ?? '').trim()
+      if (title || url) return { title: title || null, url: url || null }
+    }
+  }
+  return null
+}
+
+export function describeBlockingFindings(report) {
+  if (!report || typeof report !== 'object') return []
+  const findings = report.advisories && typeof report.advisories === 'object' && !Array.isArray(report.advisories)
+    ? report.advisories
+    : report.vulnerabilities && typeof report.vulnerabilities === 'object' && !Array.isArray(report.vulnerabilities)
+      ? report.vulnerabilities
+      : null
+  if (!findings) return []
+
+  const lines = []
+  const seen = new Set()
+  for (const [key, finding] of Object.entries(findings)) {
+    const severity = String(finding?.severity ?? '').toLowerCase()
+    if (!blockingSeverities.has(severity)) continue
+    const packageName = String(finding?.module_name ?? finding?.name ?? key).trim() || key
+    const fallback = viaDetail(finding?.via)
+    const title = String(finding?.title ?? fallback?.title ?? '').trim()
+    const url = String(finding?.url ?? fallback?.url ?? '').trim()
+    const line = [
+      `${severity} ${packageName}`,
+      title || null,
+      url || null,
+    ].filter(Boolean).join(' — ')
+    if (!seen.has(line)) {
+      seen.add(line)
+      lines.push(line)
+    }
+  }
+  return lines.sort((a, b) => a.localeCompare(b))
+}
+
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   const filePath = process.argv[2]
   if (!filePath) throw new Error('usage: node parse-pnpm-audit.mjs <audit-json>')
@@ -34,6 +79,12 @@ if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1]
   const counts = summarizeAuditReport(report)
   process.stdout.write(`pnpm audit summary => critical=${counts.critical} high=${counts.high} moderate=${counts.moderate} low=${counts.low} info=${counts.info} unknown=${counts.unknown}\n`)
   if (counts.critical > 0 || counts.high > 0 || counts.unknown > 0) {
+    const findings = describeBlockingFindings(report)
+    if (findings.length) {
+      for (const finding of findings) process.stdout.write(`blocking advisory => ${finding}\n`)
+    } else {
+      process.stdout.write('blocking advisory details unavailable in provider payload\n')
+    }
     process.stderr.write('Blocking due to high/critical vulnerabilities or an unknown audit schema.\n')
     process.exitCode = 1
   }
