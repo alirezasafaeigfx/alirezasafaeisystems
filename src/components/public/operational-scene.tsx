@@ -62,7 +62,7 @@ export function OperationalScene({ isFa }: OperationalSceneProps) {
             data-selected={index === 0}
             aria-pressed={index === 0}
           >
-            <span className="me-1 opacity-60">0{index + 1}</span>{copy.states[index]}
+            <span className="me-1">0{index + 1}</span>{copy.states[index]}
           </button>
         ))}
       </div>
