@@ -82,10 +82,10 @@ export default async function NovaxPriceAlertPage() {
         ? 'Explicit contracts and staged UX + atomic hardening in critical paths delivered trust without over-engineering. Co-deploy discipline (rsync excludes, dedicated PM2/ports) allowed safe addition of new production asset.'
         : 'قراردادهای صریح و UX مرحله‌ای + hardening اتمیک در مسیرهای حیاتی اعتماد ایجاد کرد بدون over-engineering. دیسیپلین co-deploy (rsync excludes، PM2/پورت اختصاصی) امکان افزودن asset production جدید را به صورت ایمن فراهم کرد.',
     back: lang === 'en' ? 'Back to case studies' : 'بازگشت به مطالعات موردی',
-    ctaAudit: lang === 'en' ? 'Start Free Audit' : 'شروع Audit رایگان',
+    ctaAudit: lang === 'en' ? 'Request a website review' : 'درخواست بررسی سایت',
     ctaAuditDesc: lang === 'en'
-      ? 'Want a similar assessment for your site? Start with a free audit.'
-      : 'ارزیابی مشابهی برای سایت خود می‌خواهید؟ با یک Audit رایگان شروع کنید.',
+      ? 'Want a similar assessment for your site? Send its address for review.'
+      : 'برای بررسی مشابه، آدرس سایت خود را بفرستید.',
   }
 
   const pageUrl = `${siteUrl}/${lang}/case-studies/novax-price-alert`

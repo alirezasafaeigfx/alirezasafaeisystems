@@ -55,7 +55,7 @@ export function Footer() {
           <div className="flex flex-col gap-3 sm:flex-row md:justify-end">
             <Button asChild size="lg" className="min-h-12 rounded-xl px-6 font-extrabold">
               <Link href={withLocale('/qualification?source=portfolio&placement=footer&offer=request_assessment', language)}>
-                {isFa ? 'درخواست ارزیابی Audit' : 'Request an ASDEV Audit'}
+                {isFa ? 'درخواست بررسی سایت' : 'Request a website review'}
                 <ArrowUpLeft aria-hidden="true" className={isFa ? 'size-4' : 'size-4 rotate-90'} />
               </Link>
             </Button>

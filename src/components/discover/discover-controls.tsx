@@ -5,6 +5,7 @@ import { Search } from 'lucide-react'
 import { useTransition } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import type { DiscoverPublicQuery } from '@/lib/discover-query'
+import { discoverCategoryLabel, discoverPlatformLabel } from '@/lib/discover-labels'
 
 type DiscoverControlsProps = {
   query: DiscoverPublicQuery
@@ -21,6 +22,7 @@ export function DiscoverControls({
   resourceTypes,
   isEn,
 }: DiscoverControlsProps) {
+  const locale = isEn ? 'en' : 'fa'
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -41,6 +43,7 @@ export function DiscoverControls({
         submit: 'Search',
         filters: 'Resource filters',
       }
+
     : {
         search: 'جستجوی منابع',
         category: 'دسته‌بندی',
@@ -55,6 +58,10 @@ export function DiscoverControls({
         submit: 'جستجو',
         filters: 'فیلترهای منابع',
       }
+
+  const resourceTypeLabels: Record<string, string> = isEn
+    ? { tool: 'Tool', 'ai-tool': 'AI tool', app: 'App', 'web-service': 'Web service', 'developer-tool': 'Developer tool', productivity: 'Productivity', guide: 'Guide', resource: 'Resource', other: 'Other' }
+    : { tool: 'ابزار', 'ai-tool': 'ابزار هوش مصنوعی', app: 'اپلیکیشن', 'web-service': 'سرویس وب', 'developer-tool': 'ابزار توسعه', productivity: 'بهره‌وری', guide: 'راهنما', resource: 'منبع', other: 'سایر' }
 
   function setParams(updates: Record<string, string | null>) {
     const next = new URLSearchParams(searchParams.toString())
@@ -131,7 +138,7 @@ export function DiscoverControls({
           >
             <option value="">{copy.allCategories}</option>
             {categories.map((category) => (
-              <option key={category} value={category}>{category}</option>
+              <option key={category} value={category}>{discoverCategoryLabel(category, locale)}</option>
             ))}
           </select>
         </label>
@@ -146,7 +153,7 @@ export function DiscoverControls({
           >
             <option value="">{copy.allTypes}</option>
             {resourceTypes.map((type) => (
-              <option key={type} value={type}>{type}</option>
+              <option key={type} value={type}>{resourceTypeLabels[type] ?? (isEn ? 'Type not specified' : 'نوع منبع اعلام نشده')}</option>
             ))}
           </select>
         </label>
@@ -161,7 +168,7 @@ export function DiscoverControls({
           >
             <option value="">{copy.allPlatforms}</option>
             {platforms.map((platform) => (
-              <option key={platform} value={platform}>{platform}</option>
+              <option key={platform} value={platform}>{discoverPlatformLabel(platform, locale)}</option>
             ))}
           </select>
         </label>

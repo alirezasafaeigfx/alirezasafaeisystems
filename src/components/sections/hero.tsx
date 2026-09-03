@@ -97,7 +97,7 @@ export function Hero() {
         detail: 'از Audit Systems گزارش عملی بگیرید و مهم‌ترین ایرادها را در اسپرینت ثابت ۵-۷ روزه برطرف کنید (با before/after واقعی).',
         href: withLocale('/qualification?source=portfolio&placement=hero_intent&offer=request_assessment', language),
         external: false,
-        cta: 'درخواست ارزیابی Audit',
+        cta: 'درخواست بررسی سایت',
       },
       toolbox: {
         key: 'toolbox',
@@ -123,7 +123,7 @@ export function Hero() {
         detail: 'Get a practical report from Audit Systems and fix the highest-impact issues in a fixed 5-7 day sprint (with real before/after).',
         href: withLocale('/qualification?source=portfolio&placement=hero_intent&offer=request_assessment', language),
         external: false,
-        cta: 'Request Audit assessment',
+        cta: 'Request a website review',
       },
       toolbox: {
         key: 'toolbox',
@@ -139,7 +139,7 @@ export function Hero() {
         detail: 'Start qualification or request the fixed-scope Quick Fix Sprint directly (PDF available) for a clear, fast path.',
         href: withLocale('/qualification?source=portfolio&placement=hero_execution&offer=request_assessment', language),
         external: false,
-        cta: 'Request Assessment',
+        cta: 'Request a website review',
       },
     }
 
@@ -286,7 +286,7 @@ export function Hero() {
                   className="mt-3 inline-flex rounded-md border border-primary/40 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary/20 transition-colors"
                   href={withLocale('/qualification', language)}
                 >
-                  {language === 'en' ? 'Request Assessment' : 'شروع بررسی'}
+                  {language === 'en' ? 'Request a website review' : 'شروع بررسی'}
                 </a>
               </article>
               <article className="rounded-lg border border-border/60 bg-background/75 p-4 text-sm">

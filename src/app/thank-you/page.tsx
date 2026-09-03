@@ -27,7 +27,7 @@ export default async function ThankYouPage() {
       : 'درخواست شما ثبت شد. در مرحله بعد، بررسی اولیه انجام می‌شود و سپس برای هماهنگی Discovery با شما تماس می‌گیریم.'
   const ctaCases = lang === 'en' ? 'View Case Studies' : 'مشاهده مطالعات موردی'
   const ctaHome = lang === 'en' ? 'Back Home' : 'بازگشت به خانه'
-  const ctaAudit = lang === 'en' ? 'Request Audit Assessment' : 'درخواست ارزیابی Audit'
+  const ctaAudit = lang === 'en' ? 'Request a website review' : 'درخواست بررسی سایت'
   const nextStepsTitle = lang === 'en' ? 'What Happens Next' : 'گام‌های بعدی'
   const nextSteps =
     lang === 'en'

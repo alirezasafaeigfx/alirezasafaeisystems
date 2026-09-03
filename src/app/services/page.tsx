@@ -227,8 +227,8 @@ export default async function ServicesPage() {
           </h2>
           <p className="text-sm text-muted-foreground">
             {lang === 'en'
-              ? 'Start with a free technical audit. Submit your URL and get a structured assessment of your platform\'s security, performance, and maturity.'
-              : 'با یک Audit فنی رایگان شروع کنید. آدرس سایت خود را ارسال کنید و یک ارزیابی ساختاریافته از امنیت، عملکرد و بلوغ پلتفرم خود دریافت کنید.'}
+              ? 'Send your site address so we can review its most important performance, security, and technical SEO risks.'
+              : 'آدرس سایت را بفرستید تا مهم‌ترین خطرهای عملکرد، امنیت و سئوی فنی آن بررسی شود.'}
           </p>
           <a
             href="https://audit.alirezasafaeisystems.ir/audit?utm_source=portfolio&utm_medium=services&utm_campaign=asdev_audit"
@@ -236,7 +236,7 @@ export default async function ServicesPage() {
             rel="noopener noreferrer"
             className="inline-flex rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
           >
-            {lang === 'en' ? 'Start Free Audit' : 'شروع Audit رایگان'}
+            {lang === 'en' ? 'Request a website review' : 'درخواست بررسی سایت'}
           </a>
         </div>
       </section>

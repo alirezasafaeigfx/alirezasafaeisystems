@@ -1,6 +1,12 @@
 name: E2E Smoke
 
 on:
+  workflow_dispatch:
+    inputs:
+      evidence_manifest:
+        description: Repository-relative path to a complete, durable public-experience evidence manifest.
+        required: false
+        type: string
   pull_request:
   push:
     branches:
@@ -22,6 +28,10 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
       - uses: pnpm/action-setup@v4
         with:
           dest: ${{ runner.temp }}/setup-pnpm
@@ -35,6 +45,27 @@ jobs:
         env:
           PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/ms-playwright
         run: pnpm exec playwright install chromium
+      - name: Run immutable three-run public experience performance comparison
+        if: ${{ github.event_name == 'pull_request' && !cancelled() }}
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/ms-playwright
+          PUBLIC_EXPERIENCE_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PUBLIC_EXPERIENCE_CANDIDATE_SHA: ${{ github.event.pull_request.head.sha }}
+        run: >-
+          node scripts/ci/run-public-experience-comparison.mjs
+          --base-sha "$PUBLIC_EXPERIENCE_BASE_SHA"
+          --candidate-sha "$PUBLIC_EXPERIENCE_CANDIDATE_SHA"
+          --output test-results/public-experience/performance-comparison.json
+      - name: Skip performance comparison without immutable pull-request base
+        if: ${{ github.event_name != 'pull_request' && !cancelled() }}
+        run: echo "UNVERIFIED performance comparison skipped; event has no immutable pull-request base SHA."
+      - name: Map performance chunk witnesses to build modules
+        if: ${{ github.event_name == 'pull_request' && always() && hashFiles('test-results/public-experience/performance-comparison.json') != '' }}
+        run: >-
+          node scripts/ci/inspect-public-experience-build.mjs
+          --build-dir .next
+          --report test-results/public-experience/performance-comparison.json
+          --output test-results/public-experience/build-attribution.json
       - name: Run smoke tests
         env:
           PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/ms-playwright
@@ -43,6 +74,34 @@ jobs:
         env:
           PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/ms-playwright
         run: pnpm exec playwright test e2e/a11y.spec.ts
+      - name: Run V3.2 public experience acceptance
+        if: ${{ !cancelled() }}
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/ms-playwright
+          PUBLIC_EXPERIENCE_CANDIDATE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: pnpm exec playwright test e2e/public-experience.spec.mjs
+      - name: Create incomplete V3.2 evidence manifest draft
+        if: ${{ !cancelled() }}
+        env:
+          PUBLIC_EXPERIENCE_CANDIDATE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          PUBLIC_EXPERIENCE_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: >-
+          node scripts/ci/create-public-experience-evidence-draft.mjs
+          S2-01 S2-02 S2-05 S2-06 S3-01 S3-03 S3-04 S3-05 S3-06
+          S4-01 S4-02 S4-03 S4-05 S4-06 S4-07 S4-10 S4-11 S4-12
+      - name: Validate supplied complete V3.2 evidence manifest
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.evidence_manifest != '' && !cancelled() }}
+        env:
+          EVIDENCE_MANIFEST: ${{ inputs.evidence_manifest }}
+        run: node scripts/ci/validate-public-experience-evidence.mjs --manifest "$EVIDENCE_MANIFEST" --root "$GITHUB_WORKSPACE"
+      - name: Upload V3.2 public experience evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v32-public-experience-${{ github.event.pull_request.head.sha || github.sha }}
+          path: test-results/public-experience
+          if-no-files-found: error
+          retention-days: 14
       - name: Run V3.1 visual contract
         if: ${{ !cancelled() }}
         env:

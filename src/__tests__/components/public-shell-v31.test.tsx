@@ -73,7 +73,7 @@ describe('V3.1 global public shell', () => {
     expect(within(primaryNav).getByRole('link', { name: 'Case Studies' })).toBeInTheDocument()
     expect(within(primaryNav).getByRole('link', { name: 'Discover' })).toBeInTheDocument()
     expect(within(primaryNav).queryByRole('link', { name: 'Blog' })).not.toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Request an ASDEV Audit' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Request a website review' })).toHaveAttribute(
       'href',
       '/en/qualification?source=portfolio&placement=header&offer=request_assessment',
     )
