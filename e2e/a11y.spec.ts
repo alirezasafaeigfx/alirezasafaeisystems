@@ -19,30 +19,29 @@ const PAGES = [
 ]
 
 for (const { name, path } of PAGES) {
-  test(`${name} (${path}) has no critical accessibility violations`, async ({ page }) => {
+  test(`${name} (${path}) has no serious or critical accessibility violations`, async ({ page }) => {
     await page.goto(path)
     await page.waitForLoadState('networkidle')
     const results = await new AxeBuilder({ page }).analyze()
-    const criticalViolations = results.violations.filter((v) => v.impact === 'critical')
-    const seriousViolations = results.violations.filter((v) => v.impact === 'serious')
+    const blockingViolations = results.violations.filter((violation) =>
+      violation.impact === 'critical' || violation.impact === 'serious'
+    )
 
-    if (criticalViolations.length > 0) {
-      console.error(`Critical a11y violations on ${name}:`, criticalViolations.map((v) => ({
-        id: v.id,
-        description: v.description,
-        nodes: v.nodes.length,
-        help: v.help,
+    if (blockingViolations.length > 0) {
+      console.error(`Blocking a11y violations on ${name}:`, blockingViolations.map((violation) => ({
+        id: violation.id,
+        impact: violation.impact,
+        description: violation.description,
+        help: violation.help,
+        nodes: violation.nodes.map((node) => ({
+          target: node.target,
+          html: node.html,
+          failureSummary: node.failureSummary,
+        })),
       })))
     }
-    expect(criticalViolations).toEqual([])
 
-    if (seriousViolations.length > 0) {
-      console.warn(`Serious a11y violations on ${name}:`, seriousViolations.map((v) => ({
-        id: v.id,
-        description: v.description,
-        nodes: v.nodes.length,
-      })))
-    }
+    expect(blockingViolations).toEqual([])
   })
 }
 
