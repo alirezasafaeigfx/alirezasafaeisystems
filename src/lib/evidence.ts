@@ -27,6 +27,7 @@ const sha1Pattern = /^[0-9a-f]{40}$/i
 const sha256Pattern = /^[0-9a-f]{64}$/i
 const githubLoginPattern = /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?$/
 const githubPullReviewPattern = /^https:\/\/github\.com\/[^/\s]+\/[^/\s]+\/pull\/\d+#pullrequestreview-\d+$/i
+const providerVerifiedEvidence = new WeakSet<object>()
 
 function isValidIsoDate(value: string): boolean {
   if (!isoDatePattern.test(value)) return false
@@ -78,6 +79,7 @@ function hasSupportedPeriod(record: EvidenceRecord): boolean {
 
 export function isPublishableEvidence(record: EvidenceRecord): boolean {
   return (
+    providerVerifiedEvidence.has(record) &&
     record.reviewState === 'accepted' &&
     isRetrievableSource(record.sourceUrl?.trim() ?? '') &&
     isValidIsoDate(record.reviewedAt?.trim() ?? '') &&
