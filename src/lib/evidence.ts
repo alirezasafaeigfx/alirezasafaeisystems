@@ -203,6 +203,8 @@ function hasSupportedPeriod(record: EvidenceRecord): boolean {
   return !(before && after && before >= after)
 }
 
+export function isPublishableEvidence(record: EvidenceRecord): boolean
+export function isPublishableEvidence(record: EvidenceRecord, approval: VerifiedEvidenceApproval): boolean
 export function isPublishableEvidence(
   record: EvidenceRecord,
   approval?: VerifiedEvidenceApproval,
