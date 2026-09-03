@@ -74,10 +74,10 @@ export default async function LegacyNextjsReplatformPage() {
         ? 'A phased migration took longer than a big-bang rewrite, but preserved uptime and reduced organizational risk.'
         : 'مهاجرت مرحله‌ای از بازنویسی big-bang طولانی‌تر است، اما uptime را حفظ و ریسک سازمانی را کاهش می‌دهد.',
     back: lang === 'en' ? 'Back to case studies' : 'بازگشت به مطالعات موردی',
-    ctaAudit: lang === 'en' ? 'Start Free Audit' : 'شروع Audit رایگان',
+    ctaAudit: lang === 'en' ? 'Request a website review' : 'درخواست بررسی سایت',
     ctaAuditDesc: lang === 'en'
-      ? 'Want a similar assessment for your site? Start with a free audit.'
-      : 'ارزیابی مشابهی برای سایت خود می‌خواهید؟ با یک Audit رایگان شروع کنید.',
+      ? 'Want a similar assessment for your site? Send its address for review.'
+      : 'برای بررسی مشابه، آدرس سایت خود را بفرستید.',
   }
 
   const pageUrl = `${siteUrl}/${lang}/case-studies/legacy-nextjs-replatform`

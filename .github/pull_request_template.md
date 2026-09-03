@@ -2,6 +2,14 @@
 
 <!-- What changed and why (ASDEV goal) -->
 
+ASDEV-SCOPE: r0-infrastructure
+ASDEV-TASK-ID: TASK-ID
+ASDEV-INTENDED-BASE-SHA: FULL-BASE-SHA
+ASDEV-PRIMARY-CONCERN: concise concern
+ASDEV-EXPECTED-PATH-CATEGORIES: application
+
+For the admitted Anime.js/Three.js unit, use `public-experience-dependencies`, include S4-10 or S4-11 in the task IDs, use the exact current `GITHUB_MAIN` base SHA, and list every changed-path category. The validator rejects unrelated auth, database, deployment, and undeclared paths.
+
 ## Type
 
 - [ ] Platform / control plane

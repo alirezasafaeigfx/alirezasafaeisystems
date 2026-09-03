@@ -48,7 +48,7 @@ export function Header() {
     router.refresh()
   }
 
-  const collaborationLabel = language === 'fa' ? 'درخواست ارزیابی Audit' : 'Request an ASDEV Audit'
+  const collaborationLabel = language === 'fa' ? 'درخواست بررسی سایت' : 'Request a website review'
   const primaryNavLabel = language === 'fa' ? 'ناوبری اصلی' : 'Primary navigation'
   const mobileNavLabel = language === 'fa' ? 'ناوبری موبایل' : 'Mobile navigation'
 
@@ -57,7 +57,7 @@ export function Header() {
   }
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 pointer-events-none">
+    <header className="public-header fixed inset-x-0 top-0 z-50 pointer-events-none">
       <div className="public-shell pt-3 md:pt-4">
         <div
           className={`pointer-events-auto flex min-h-16 items-center justify-between gap-3 rounded-2xl border px-3.5 py-2.5 transition-[background-color,border-color,box-shadow] duration-200 md:px-4 ${

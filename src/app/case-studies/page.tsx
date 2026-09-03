@@ -21,8 +21,8 @@ export async function generateMetadata(): Promise<Metadata> {
     title: lang === 'fa' ? 'مطالعات موردی' : 'Case Studies',
     description:
       lang === 'fa'
-        ? 'مطالعات موردی اجرایی با خروجی‌های قابل اندازه‌گیری، محدودیت‌ها و شواهد عملیاتی.'
-        : 'Selected delivery case studies with measurable outcomes, constraints, and operational evidence.',
+        ? 'مطالعات موردی اجرایی با وضعیت شواهد شفاف؛ پذیرش مستقل برای برخی موارد هنوز در انتظار است.'
+        : 'Selected delivery case studies with transparent evidence status; independent acceptance is pending for some cases.',
     alternates: { canonical: `${siteUrl}/${lang}/case-studies` },
   }
 }
@@ -58,7 +58,7 @@ function getCases(lang: 'fa' | 'en'): CaseStudyItem[] {
       {
         title: 'Infrastructure Localization Rescue',
         sector: 'B2B SaaS',
-        outcome: 'Documented release-governance and recovery evidence',
+        outcome: 'Release-governance narrative; independent evidence review pending',
         href: '/case-studies/infrastructure-localization-rescue',
       },
       {
@@ -70,7 +70,7 @@ function getCases(lang: 'fa' | 'en'): CaseStudyItem[] {
       {
         title: 'CI/CD Governance Hardening',
         sector: 'Enterprise B2B',
-        outcome: 'Documented rollback-readiness evidence',
+        outcome: 'Release-governance narrative; independent evidence review pending',
         href: '/case-studies/ci-cd-governance-hardening',
       },
     ]
@@ -105,7 +105,7 @@ function getCases(lang: 'fa' | 'en'): CaseStudyItem[] {
     {
       title: 'نجات بومی‌سازی زیرساخت',
       sector: 'SaaS سازمانی',
-      outcome: 'شواهد مستند حاکمیت انتشار و بازیابی',
+      outcome: 'روایت حاکمیت انتشار؛ بازبینی مستقل شواهد در انتظار است',
       href: '/case-studies/infrastructure-localization-rescue',
     },
     {
@@ -117,7 +117,7 @@ function getCases(lang: 'fa' | 'en'): CaseStudyItem[] {
     {
       title: 'سخت‌سازی حاکمیت CI/CD',
       sector: 'B2B سازمانی',
-      outcome: 'شواهد مستند آمادگی rollback',
+      outcome: 'روایت حاکمیت انتشار؛ بازبینی مستقل شواهد در انتظار است',
       href: '/case-studies/ci-cd-governance-hardening',
     },
   ]
@@ -125,7 +125,9 @@ function getCases(lang: 'fa' | 'en'): CaseStudyItem[] {
 
 export default async function CaseStudiesPage() {
   const lang = await getRequestLanguage()
-  const cases = getCases(lang)
+  const cases = [...getCases(lang)].sort((left, right) =>
+    Number(right.href === '/case-studies/infrastructure-localization-rescue') - Number(left.href === '/case-studies/infrastructure-localization-rescue'),
+  )
   const withLocale = (path: string) => (lang === 'fa' ? path : `/${lang}${path}`)
 
   const copy = {
@@ -134,14 +136,14 @@ export default async function CaseStudiesPage() {
     schemaName: lang === 'en' ? 'Case Studies' : 'مطالعات موردی',
     schemaDesc:
       lang === 'en'
-        ? 'Selected delivery case studies with measurable outcomes and operational evidence.'
-        : 'مطالعات موردی منتخب با خروجی قابل اندازه‌گیری و شواهد اجرایی.',
+        ? 'Selected delivery case studies; independent acceptance is pending for some cases.'
+        : 'مطالعات موردی منتخب؛ پذیرش مستقل برای برخی موارد هنوز در انتظار است.',
     eyebrow: lang === 'en' ? 'Proof-Backed Delivery' : 'تحویل مبتنی بر شواهد',
     title: lang === 'en' ? 'Case Studies' : 'مطالعات موردی',
     desc:
       lang === 'en'
-        ? 'Each case includes context, constraints, actions, outcomes, and accepted evidence.'
-        : 'هر مورد شامل زمینه، محدودیت‌ها، اقدام‌ها، خروجی‌ها و شواهد قابل قبول است.',
+        ? 'Each case states its context, constraints, actions, and current evidence status; independent acceptance is pending for some cases.'
+        : 'هر مورد زمینه، محدودیت‌ها، اقدام‌ها و وضعیت فعلی شواهد را اعلام می‌کند؛ پذیرش مستقل برای برخی موارد هنوز در انتظار است.',
     open: lang === 'en' ? 'Open Full Case' : 'مشاهده کامل',
   }
 

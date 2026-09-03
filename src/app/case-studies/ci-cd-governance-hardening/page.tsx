@@ -13,8 +13,8 @@ export async function generateMetadata(): Promise<Metadata> {
     title: lang === 'fa' ? 'کیس استادی: سخت‌سازی حکمرانی CI/CD' : 'Case Study: CI/CD Governance Hardening',
     description:
       lang === 'fa'
-        ? 'چگونه کیفیت انتشار و مالکیت از طریق دروازه‌های سیاست CI/CD قابل اجرا پایدار شد.'
-        : 'How release quality and ownership were stabilized through enforceable CI/CD policy gates.',
+        ? 'روایت سخت‌سازی حاکمیت CI/CD؛ بازبینی مستقل شواهد عمومی هنوز در انتظار است.'
+        : 'A CI/CD governance hardening narrative; independent evidence review remains pending.',
     alternates: {
       canonical: `${siteUrl}/${lang}/case-studies/ci-cd-governance-hardening`,
     },
@@ -37,7 +37,7 @@ export default async function CiCdGovernanceHardeningPage() {
     pProblem:
       lang === 'en'
         ? 'Releases bypassed test gates, incident handoffs lacked structure, and postmortems were not actionable.'
-        : 'انتشارها از گیت‌های تست عبور می‌کردند، handoff رخداد ساختار نداشت، و postmortemها به اقدام عملی تبدیل نمی‌شدند.',
+        : 'انتشارها از دروازه‌های آزمون عبور می‌کردند، تحویل‌گیری رخداد ساختار نداشت، و بررسی پس از رخداد به اقدام عملی تبدیل نمی‌شد.',
     hSolution: lang === 'en' ? 'Solution' : 'راهکار',
     solutionItems:
       lang === 'en'
@@ -47,50 +47,50 @@ export default async function CiCdGovernanceHardeningPage() {
             'Standardized release report and incident evidence templates',
           ]
         : [
-            'مسدودکننده کردن گیت‌های lint/type-check/integration/smoke/Lighthouse',
-            'تعریف cadence تمرین rollback و مدل مالکیت انتشار',
+            'الزامی کردن بررسی کد، بررسی نوع‌ها، آزمون یکپارچه، آزمون سریع و سنجش عملکرد',
+            'تعریف زمان‌بندی تمرین بازگردانی نسخه و مدل مسئولیت انتشار',
             'استانداردسازی قالب گزارش انتشار و شواهد رخداد',
           ],
     hResult: lang === 'en' ? 'Result' : 'نتیجه',
     pResult:
       lang === 'en'
-        ? 'No emergency rollback over 30 days and mean release lead-time reduced by 34%.'
-        : 'صفر rollback اضطراری در ۳۰ روز و کاهش میانگین lead-time انتشار به میزان ۳۴٪.',
+        ? 'No accepted quantitative outcome is published for this case until independent evidence review remains pending.'
+        : 'تا پایان بازبینی مستقل، هیچ نتیجه کمّی یا ادعای آمادگی بازگردانی نسخه برای این مورد منتشر نمی‌شود.',
     hRole: lang === 'en' ? 'Role' : 'نقش',
     pRole:
       lang === 'en'
         ? 'Pipeline governance design, standards implementation, and release enablement.'
-        : 'طراحی حاکمیت pipeline، پیاده‌سازی استانداردها، و توانمندسازی تیم برای release.',
+        : 'طراحی حاکمیت خط انتشار، پیاده‌سازی استانداردها، و توانمندسازی تیم برای انتشار.',
     hStack: lang === 'en' ? 'Tech Stack' : 'تکنولوژی‌ها',
     pStack: 'GitHub Actions, Playwright, Lighthouse CI, Node.js, Nginx.',
     hProof: lang === 'en' ? 'Proof' : 'شواهد',
     pProof:
       lang === 'en'
-        ? 'Release dashboard snapshots, CI pass/fail history, and drill evidence were shared in weekly governance reviews.'
-        : 'اسنپ‌شات داشبورد انتشار، تاریخچه پاس/فیل CI، و شواهد drill در جلسات هفتگی حاکمیت ارائه شد.',
-    hLessons: lang === 'en' ? 'Lessons & Tradeoffs' : 'درس‌ها و tradeoffها',
+        ? 'Public workflow records exist, but independent evidence review remains pending; they are not presented as accepted proof.'
+        : 'رکوردهای عمومی گردش‌کار وجود دارند، اما بازبینی مستقل شواهد هنوز در انتظار است و این رکوردها به‌عنوان شاهد پذیرفته‌شده عرضه نمی‌شوند.',
+    hLessons: lang === 'en' ? 'Lessons & Tradeoffs' : 'درس‌ها و ملاحظه‌ها',
     pLessons:
       lang === 'en'
-        ? 'Stricter gates slightly increased pre-release effort but removed far larger post-release firefighting costs.'
-        : 'گیت‌های سخت‌گیرانه کمی هزینه قبل از انتشار را بالا برد اما هزینه‌های بسیار بزرگ‌تر بعد از انتشار را حذف کرد.',
+        ? 'Stricter gates require more pre-release discipline; the effect and cost tradeoff in this case have not been independently accepted.'
+        : 'دروازه‌های سخت‌گیرانه، کار پیش از انتشار را بیشتر می‌کنند؛ نسبت اثر و هزینه در این مورد هنوز به‌طور مستقل تأیید نشده است.',
     back: lang === 'en' ? 'Back to case studies' : 'بازگشت به مطالعات موردی',
-    ctaAudit: lang === 'en' ? 'Start Free Audit' : 'شروع Audit رایگان',
+    ctaAudit: lang === 'en' ? 'Request a website review' : 'درخواست بررسی سایت',
     ctaAuditDesc: lang === 'en'
-      ? 'Want a similar assessment for your site? Start with a free audit.'
-      : 'ارزیابی مشابهی برای سایت خود می‌خواهید؟ با یک Audit رایگان شروع کنید.',
+      ? 'Want a similar assessment for your site? Send its address for review.'
+      : 'برای بررسی مشابه، آدرس سایت خود را بفرستید.',
   }
 
   const pageUrl = `${siteUrl}/${lang}/case-studies/ci-cd-governance-hardening`
   const projectSchema = generateProjectSchema({
     name: 'CI/CD Governance Hardening',
-    description: 'Operational and governance hardening for high-stakes release pipelines.',
+    description: 'A CI/CD governance hardening narrative; independent evidence review remains pending.',
     url: lang === 'fa' ? '/case-studies/ci-cd-governance-hardening' : `/${lang}/case-studies/ci-cd-governance-hardening`,
     technologies: ['GitHub Actions', 'Playwright', 'Lighthouse CI', 'Nginx', 'Node.js'],
   })
 
   const articleSchema = generateArticleSchema({
     title: 'Case Study: CI/CD Governance Hardening',
-    description: 'How release quality and ownership were stabilized through enforceable CI/CD policy gates.',
+    description: 'A CI/CD governance hardening narrative; independent evidence review remains pending.',
     publishDate: '2026-02-10',
     modifiedDate: '2026-02-16',
     author: 'Alireza Safaei',

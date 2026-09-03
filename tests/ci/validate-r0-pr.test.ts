@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { validateR0PullRequest } from '../../scripts/ci/validate-r0-pr.mjs'
+import { isGitAncestor, validateR0PullRequest } from '../../scripts/ci/validate-r0-pr.mjs'
 
 const sha = (character: string) => character.repeat(40)
 const declaration = {
@@ -10,6 +10,10 @@ const declaration = {
 }
 
 describe('R0 bounded PR preflight', () => {
+  it('evaluates real git ancestry as text in the CLI path', () => {
+    expect(isGitAncestor('HEAD', 'HEAD')).toBe(true)
+  })
+
   it('requires a canonical task declaration and expected path categories', () => {
     const errors = validateR0PullRequest({
       baseSha: sha('a'),
@@ -105,7 +109,7 @@ describe('R0 bounded PR preflight', () => {
     expect(errors[1]).toContain('path is outside the bounded R0 infrastructure allowlist')
   })
 
-  it('does not apply the bounded guard to non-R0 scopes', () => {
+  it('does not apply the bounded guard to unrelated non-sensitive scopes', () => {
     expect(validateR0PullRequest({
       baseSha: sha('a'),
       headSha: sha('b'),
@@ -113,5 +117,126 @@ describe('R0 bounded PR preflight', () => {
       scope: 'product',
       changedFiles: ['src/app/page.tsx'],
     })).toEqual([])
+  })
+})
+
+describe('public-experience dependency preflight', () => {
+  const publicDeclaration = {
+    taskId: 'S4-10,S4-11',
+    intendedBaseSha: sha('a'),
+    primaryConcern: 'public experience advanced motion and GPU prototype',
+    expectedCategories: ['workflow', 'ci', 'governance', 'release', 'application', 'guide'],
+  }
+
+  it('accepts the declared bounded dependency and UI unit', () => {
+    expect(validateR0PullRequest({
+      baseSha: sha('a'),
+      headSha: sha('b'),
+      mainSha: sha('a'),
+      scope: 'public-experience-dependencies',
+      changedFiles: [
+        '.github/workflows/ci-router.yml',
+        '.github/pull_request_template.md',
+        'scripts/ci/validate-r0-pr.mjs',
+        'tests/ci/validate-r0-pr.test.ts',
+        'package.json',
+        'pnpm-lock.yaml',
+        'src/components/public/system-core-3d.tsx',
+        'src/components/public/operational-scene.tsx',
+        'src/lib/system-scene.ts',
+        'src/generated/sitemap-manifest.json',
+        'src/app/loading.tsx',
+        'src/app/case-studies/page.tsx',
+        'e2e/a11y.spec.ts',
+        'e2e/public-experience.spec.mjs',
+        'e2e/system-core-3d-lifecycle.spec.mjs',
+        'docs/engineering/PUBLIC_EXPERIENCE_ENGINEERING.md',
+      ],
+      mergeBaseSha: sha('a'),
+      headIsDescendant: true,
+      ...publicDeclaration,
+    })).toEqual([])
+  })
+
+  it('accepts the bounded V3.2 evidence workflow and measurement harness', () => {
+    expect(validateR0PullRequest({
+      baseSha: sha('a'),
+      headSha: sha('b'),
+      mainSha: sha('a'),
+      scope: 'public-experience-dependencies',
+      changedFiles: [
+        '.github/workflows/e2e-smoke.yml',
+        '.github/workflows/lighthouse.yml',
+        'scripts/ci/create-public-experience-evidence-draft.mjs',
+        'scripts/ci/inspect-public-experience-build.mjs',
+        'scripts/ci/measure-public-experience-budget.mjs',
+        'scripts/ci/public-experience-attribution.mjs',
+        'scripts/ci/run-public-experience-comparison.mjs',
+        'scripts/ci/verify-home-initial-chunks.mjs',
+        'scripts/test/seed-playwright-discover.mjs',
+        'tests/ci/playwright-discover-fixture.test.ts',
+        'tests/ci/public-experience-long-task-attribution.test.ts',
+        'tests/ci/public-experience-performance-contract.test.ts',
+        'tests/ci/home-initial-chunks.test.ts',
+        'tests/ci/inspect-public-experience-build.test.ts',
+        'src/lib/system-route-geometry.ts',
+        'src/components/analytics/tracked-link.tsx',
+        'e2e/homepage-hydration.spec.mjs',
+      ],
+      mergeBaseSha: sha('a'),
+      headIsDescendant: true,
+      ...publicDeclaration,
+      taskId: 'S4-10,S4-11,S4-12,S5-01',
+      expectedCategories: ['workflow', 'ci', 'application'],
+    })).toEqual([])
+  })
+
+  it('rejects missing or forged declarations and ancestry', () => {
+    const errors = validateR0PullRequest({
+      baseSha: sha('a'),
+      headSha: sha('b'),
+      mainSha: sha('d'),
+      scope: 'public-experience-dependencies',
+      changedFiles: ['package.json'],
+      taskId: 'S4-99',
+      intendedBaseSha: sha('c'),
+      primaryConcern: 'dependency update',
+      expectedCategories: ['release'],
+      mergeBaseSha: sha('c'),
+      headIsDescendant: false,
+    })
+    expect(errors).toEqual(expect.arrayContaining([
+      expect.stringContaining('S4-10, S4-11, or S4-12'),
+      expect.stringContaining('declared intended base SHA'),
+      expect.stringContaining('current main'),
+      expect.stringContaining('merge-base'),
+      expect.stringContaining('must descend'),
+    ]))
+  })
+
+  it('rejects auth, database, deployment, similarly named CI files, and undeclared categories', () => {
+    const errors = validateR0PullRequest({
+      baseSha: sha('a'),
+      headSha: sha('b'),
+      mainSha: sha('a'),
+      scope: 'public-experience-dependencies',
+      changedFiles: [
+        'package.json',
+        'src/app/api/admin/auth/login/route.ts',
+        'src/lib/db.ts',
+        'prisma/schema.prisma',
+        'scripts/deploy/release.sh',
+        'scripts/ci/public-experience-attribution-extra.mjs',
+        'e2e/a11y-extra.spec.ts',
+        'docs/engineering/PUBLIC_EXPERIENCE_ENGINEERING.md',
+      ],
+      ...publicDeclaration,
+      expectedCategories: ['release'],
+    })
+    expect(errors).toEqual(expect.arrayContaining([
+      expect.stringContaining('outside the bounded public-experience allowlist'),
+      expect.stringContaining('deployment path category is forbidden'),
+      expect.stringContaining('not declared in expected categories'),
+    ]))
   })
 })

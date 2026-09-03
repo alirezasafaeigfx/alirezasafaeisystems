@@ -16,7 +16,7 @@ describe('Homepage V3.2 positioning and proof', () => {
     trackEventMock.mockResolvedValue(undefined)
   })
 
-  it('renders the personal Persian hero with exactly two actions and a real owner portrait', () => {
+  it('keeps the first mobile viewport focused on the problem, action, and interactive scene', () => {
     render(<HomePageV3 language="fa" />)
 
     const hero = screen.getByRole('region', { name: 'معرفی علیرضا صفایی' })
@@ -24,18 +24,46 @@ describe('Homepage V3.2 positioning and proof', () => {
 
     const actions = within(hero).getByRole('group', { name: 'اقدام‌های اصلی' })
     expect(within(actions).getAllByRole('link')).toHaveLength(2)
-    expect(within(actions).getByRole('link', { name: 'درخواست ارزیابی Audit' })).toHaveAttribute(
+    expect(within(actions).getByRole('link', { name: 'درخواست بررسی سایت' })).toHaveAttribute(
       'href',
       '/qualification?source=portfolio&placement=hero&offer=request_assessment',
     )
     expect(within(actions).getByRole('link', { name: 'مشاهده پروژه‌ها' })).toHaveAttribute('href', '/case-studies')
 
-    const portraitFrame = within(hero).getByTestId('owner-portrait-frame')
+    expect(within(hero).getByTestId('operational-scene')).toBeInTheDocument()
+    expect(within(hero).queryByTestId('owner-portrait-frame')).not.toBeInTheDocument()
+
+    const founder = screen.getByLabelText('درباره علیرضا صفایی')
+    const portraitFrame = within(founder).getByTestId('owner-portrait-frame')
     expect(portraitFrame).toBeInTheDocument()
     expect(portraitFrame).not.toHaveAttribute('aria-hidden', 'true')
     expect(portraitFrame).not.toHaveAttribute('data-asset-status', 'pending-owner-portrait')
     expect(within(portraitFrame).getByRole('img', { name: 'پرتره حرفه‌ای علیرضا صفایی' })).toBeInTheDocument()
     expect(within(portraitFrame).queryByText('AS')).not.toBeInTheDocument()
+  })
+
+  it('uses the authored roadmap reading order and makes one flagship project dominant', () => {
+    render(<HomePageV3 language="fa" />)
+
+    const hero = screen.getByLabelText('معرفی علیرضا صفایی')
+    const proof = screen.getByLabelText('شواهد واقعی')
+    const projects = screen.getByLabelText('پروژه‌های منتخب')
+    const services = screen.getByLabelText('خدمات اصلی')
+    const founder = screen.getByLabelText('درباره علیرضا صفایی')
+    const finalAssessment = screen.getByLabelText('درخواست نهایی ارزیابی')
+
+    expect(hero.compareDocumentPosition(proof) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    const flagship = screen.getByTestId('flagship-project')
+    expect(proof.compareDocumentPosition(flagship) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(flagship.compareDocumentPosition(services) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(services.compareDocumentPosition(projects) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(projects.compareDocumentPosition(founder) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(founder.compareDocumentPosition(finalAssessment) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(flagship).toContainElement(screen.getByRole('heading', { name: 'نجات بومی‌سازی زیرساخت' }))
+    expect(within(finalAssessment).getByRole('link', { name: 'درخواست بررسی سایت' })).toHaveAttribute(
+      'href',
+      '/qualification?source=portfolio&placement=final&offer=request_assessment',
+    )
   })
 
   it('renders three differentiated services and three visual project showcases', () => {
@@ -49,25 +77,27 @@ describe('Homepage V3.2 positioning and proof', () => {
 
     const projects = screen.getByLabelText('پروژه‌های منتخب')
     expect(within(projects).getAllByRole('article')).toHaveLength(3)
-    expect(within(projects).getAllByRole('img')).toHaveLength(3)
+    expect(within(projects).getAllByRole('img')).toHaveLength(2)
+    expect(within(projects).getByTestId('discover-preview')).toContainElement(
+      within(projects).getByRole('link', { name: 'مشاهده Discover' }),
+    )
     expect(
       within(projects).getByRole('img', { name: 'اسکرین‌شات صفحه اصلی PersianToolbox' }),
     ).toBeInTheDocument()
-    expect(
-      within(projects).getByRole('img', { name: 'اسکرین‌شات مطالعه موردی نجات بومی‌سازی زیرساخت' }),
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('flagship-project')).toContainElement(
+      screen.getByRole('img', { name: 'اسکرین‌شات مطالعه موردی نجات بومی‌سازی زیرساخت' }),
+    )
     expect(
       within(projects).getByRole('img', { name: 'اسکرین‌شات صفحه اصلی Audit Systems' }),
     ).toBeInTheDocument()
   })
 
-  it('renders evidence and personal-trust surfaces instead of generic filler sections', () => {
+  it('does not publish evidence records while independent review remains pending', () => {
     render(<HomePageV3 language="fa" />)
 
     const proof = screen.getByLabelText('شواهد واقعی')
-    expect(within(proof).getByText('PersianToolbox')).toBeInTheDocument()
-    expect(within(proof).getByText('Infrastructure Localization Rescue')).toBeInTheDocument()
-    expect(within(proof).getByText('Audit Systems')).toBeInTheDocument()
+    expect(within(proof).getByText('این شواهد هنوز تأیید مستقل نشده‌اند.')).toBeInTheDocument()
+    expect(within(proof).queryByText('PersianToolbox')).not.toBeInTheDocument()
 
     const about = screen.getByLabelText('درباره علیرضا صفایی')
     expect(within(about).getByRole('heading', { level: 2, name: 'درباره من' })).toBeInTheDocument()
@@ -77,7 +107,7 @@ describe('Homepage V3.2 positioning and proof', () => {
     render(<HomePageV3 language="fa" />)
 
     const hero = screen.getByRole('region', { name: 'معرفی علیرضا صفایی' })
-    fireEvent.click(within(hero).getByRole('link', { name: 'درخواست ارزیابی Audit' }))
+    fireEvent.click(within(hero).getByRole('link', { name: 'درخواست بررسی سایت' }))
     fireEvent.click(within(hero).getByRole('link', { name: 'مشاهده پروژه‌ها' }))
 
     expect(trackEventMock).toHaveBeenCalledWith({

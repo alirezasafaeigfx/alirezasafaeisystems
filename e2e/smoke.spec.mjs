@@ -38,7 +38,7 @@ test.describe('smoke', () => {
     const hero = page.getByLabel('معرفی علیرضا صفایی')
     await expect(hero.getByRole('heading', { level: 1 })).toContainText('سیستم‌های عملیاتی را قابل دیدن می‌کنم')
     await expect(hero.getByRole('link')).toHaveCount(2)
-    await expect(hero.getByRole('link', { name: 'درخواست ارزیابی Audit' })).toBeVisible()
+    await expect(hero.getByRole('link', { name: 'درخواست بررسی سایت' })).toBeVisible()
     await expect(page.getByLabel('خدمات اصلی').getByRole('article')).toHaveCount(3)
     expect(pageErrors).toEqual([])
     expect(failedRequests).toEqual([])
@@ -68,8 +68,8 @@ test.describe('smoke', () => {
     await page.setViewportSize({ width: 390, height: 844 })
     await page.goto('/discover/playwright-discover-resource?utm_source=instagram&utm_medium=social&utm_campaign=playwright&utm_content=reel-test')
 
-    await expect(page.locator('h1')).toContainText('Playwright Discover Resource')
-    await expect(page.getByText('This quick guide is seeded only for disposable browser testing.')).toBeVisible()
+    await expect(page.locator('h1')).toContainText('Playwright Fixture 01')
+    await expect(page.getByText('fixture-description-01')).toBeVisible()
 
     const official = page.locator('a[href="https://example.com/tool"]')
     const telegramGuide = page.locator('a[href="https://t.me/asdev_test/123"]')
