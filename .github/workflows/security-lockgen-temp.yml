@@ -16,16 +16,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
 
-      - name: Setup pnpm 11 for modern audit endpoint
-        uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1
-        with:
-          version: 11.25.0
-          run_install: false
-
       - name: Setup Node
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: 22
+
+      - name: Install pnpm 11 for modern audit endpoint
+        run: npm install --global pnpm@11.25.0
+
+      - name: Report temporary toolchain
+        run: |
+          node --version
+          pnpm --version
 
       - name: Generate lockfile from fixed constraints
         run: pnpm install --lockfile-only --ignore-scripts
