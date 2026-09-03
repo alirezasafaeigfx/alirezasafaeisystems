@@ -10,6 +10,22 @@ describe('pnpm audit parser', () => {
     })).toEqual({ info: 0, low: 4, moderate: 21, high: 44, critical: 1, unknown: 0 })
   })
 
+  it('accepts supported pnpm metadata advisory totals when vulnerability totals are absent', () => {
+    expect(summarizeAuditReport({
+      metadata: {
+        advisories: { info: 0, low: 2, moderate: 3, high: 4, critical: 1 },
+      },
+    })).toEqual({ info: 0, low: 2, moderate: 3, high: 4, critical: 1, unknown: 0 })
+  })
+
+  it('fails closed on unknown metadata severity keys by counting them as unknown', () => {
+    expect(summarizeAuditReport({
+      metadata: {
+        vulnerabilities: { info: 0, low: 0, moderate: 0, high: 0, critical: 0, emergency: 2 },
+      },
+    })).toEqual({ info: 0, low: 0, moderate: 0, high: 0, critical: 0, unknown: 2 })
+  })
+
   it('falls back to npm-style vulnerability objects', () => {
     expect(summarizeAuditReport({
       vulnerabilities: {
