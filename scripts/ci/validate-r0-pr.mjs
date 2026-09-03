@@ -26,7 +26,7 @@ const ALLOWED_PUBLIC_EXPERIENCE_PATHS = [
   /^src\/generated\/sitemap-manifest\.json$/,
   /^src\/app\/(globals\.css|loading\.tsx|audit-readiness\/page\.tsx|services\/page\.tsx|thank-you\/page\.tsx|discover\/\[slug\]\/page\.tsx|case-studies\/page\.tsx|case-studies\/[^/]+\/page\.tsx)$/,
   /^src\/__tests__\/(components|discover|lib)\//,
-  /^e2e\/(public-experience|system-core-3d-lifecycle|homepage-hydration|smoke)\.spec\.mjs$/,
+  /^e2e\/(a11y|public-experience|system-core-3d-lifecycle|homepage-hydration|smoke)\.spec\.(?:ts|mjs)$/,
   /^docs\/(engineering|execution|governance|roadmaps)\//,
 ]
 
