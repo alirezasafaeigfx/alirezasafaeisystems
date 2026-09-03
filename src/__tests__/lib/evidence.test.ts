@@ -26,8 +26,8 @@ const approval = {
 }
 
 describe('typed public evidence', () => {
-  it('publishes accepted evidence only when every provenance and immutable approval field is present', () => {
-    expect(isPublishableEvidence({ ...acceptedEvidence, ...approval })).toBe(true)
+  it('does not publish accepted evidence from manifest-controlled approval fields alone', () => {
+    expect(isPublishableEvidence({ ...acceptedEvidence, ...approval })).toBe(false)
     expect(isPublishableEvidence(acceptedEvidence)).toBe(false)
     expect(isPublishableEvidence({ ...acceptedEvidence, ...approval, reviewedEvidenceId: 'different-evidence' })).toBe(false)
     expect(isPublishableEvidence({ ...acceptedEvidence, ...approval, reviewedCandidateSha: 'not-a-sha' })).toBe(false)
