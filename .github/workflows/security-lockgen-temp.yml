@@ -1,0 +1,57 @@
+name: Temporary security lock generator
+
+on:
+  push:
+    branches:
+      - chore/security-lockgen-20260904
+
+permissions:
+  contents: read
+
+jobs:
+  lockgen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+
+      - name: Setup pnpm 11 for modern audit endpoint
+        uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1
+        with:
+          version: 11.25.0
+          run_install: false
+
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 22
+
+      - name: Generate lockfile from fixed constraints
+        run: pnpm install --lockfile-only --ignore-scripts
+
+      - name: Verify generated lockfile installs
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: Capture modern audit result without hiding findings
+        shell: bash
+        run: |
+          set +e
+          pnpm audit --json > audit.json
+          status=$?
+          set -e
+          printf '%s\n' "$status" > audit-exit.txt
+          node -e 'const fs=require("fs"); const p="audit.json"; try { const x=JSON.parse(fs.readFileSync(p,"utf8")); const meta=x?.metadata?.vulnerabilities; console.log(JSON.stringify({auditExit:Number(fs.readFileSync("audit-exit.txt","utf8")), metadata:meta ?? null, topLevelKeys:Object.keys(x ?? {})}, null, 2)); } catch(e) { console.error("audit-json-invalid", e.message); process.exitCode=1; }'
+
+      - name: Upload generated dependency evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: security-lockgen
+          path: |
+            package.json
+            pnpm-lock.yaml
+            audit.json
+            audit-exit.txt
+          if-no-files-found: error
+          retention-days: 1
