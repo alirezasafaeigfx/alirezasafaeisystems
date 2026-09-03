@@ -1,4 +1,5 @@
-import { describe, expect, it } from 'vitest'
+import { createHash } from 'node:crypto'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { isPublishableEvidence, type EvidenceRecord } from '@/lib/evidence'
 
 const acceptedEvidence: EvidenceRecord = {
@@ -25,6 +26,26 @@ const approval = {
   reviewedEvidenceId: acceptedEvidence.id,
 }
 
+function canonicalEvidencePayload(record: EvidenceRecord) {
+  return JSON.stringify({
+    id: record.id,
+    label: record.label,
+    value: record.value,
+    source: record.source,
+    period: record.period,
+    method: record.method,
+    verificationDate: record.verificationDate,
+    sourceUrl: record.sourceUrl ?? null,
+    quantitativeSourceUrl: record.quantitativeSourceUrl ?? null,
+  })
+}
+
+function evidenceDigest(record: EvidenceRecord) {
+  return createHash('sha256').update(canonicalEvidencePayload(record)).digest('hex')
+}
+
+afterEach(() => vi.unstubAllGlobals())
+
 describe('typed public evidence', () => {
   it('does not publish accepted evidence from manifest-controlled approval fields alone', () => {
     expect(isPublishableEvidence({ ...acceptedEvidence, ...approval })).toBe(false)
@@ -33,6 +54,45 @@ describe('typed public evidence', () => {
     expect(isPublishableEvidence({ ...acceptedEvidence, ...approval, reviewedCandidateSha: 'not-a-sha' })).toBe(false)
     expect(isPublishableEvidence({ ...acceptedEvidence, ...approval, reviewArtifactSha256: 'not-a-hash' })).toBe(false)
     expect(isPublishableEvidence({ ...acceptedEvidence, ...approval, reviewArtifactUrl: '' })).toBe(false)
+  })
+
+  it('publishes only after GitHub binds an independent approval to the exact candidate and evidence digest', async () => {
+    const record = { ...acceptedEvidence }
+    const candidateSha = 'b'.repeat(40)
+    const reviewUrl = 'https://github.com/alirezasafaeigfx/alirezasafaeisystems/pull/26#pullrequestreview-1234567890'
+    const review = {
+      id: 1234567890,
+      html_url: reviewUrl,
+      user: { login: 'trusted-reviewer', html_url: 'https://github.com/trusted-reviewer' },
+      body: `ASDEV-EVIDENCE-ID: ${record.id}\nASDEV-EVIDENCE-SHA256: ${evidenceDigest(record)}`,
+      state: 'APPROVED',
+      commit_id: candidateSha,
+      submitted_at: '2026-09-03T10:00:00Z',
+    }
+    const pullRequest = {
+      number: 26,
+      user: { login: 'implementation-author' },
+      head: { sha: candidateSha },
+    }
+
+    vi.stubGlobal('fetch', vi.fn(async (input: string | URL | Request) => {
+      const url = String(input)
+      if (url.endsWith('/pulls/26/reviews/1234567890')) return new Response(JSON.stringify(review), { status: 200 })
+      if (url.endsWith('/pulls/26')) return new Response(JSON.stringify(pullRequest), { status: 200 })
+      return new Response('not found', { status: 404 })
+    }))
+
+    const evidenceModule = await import('@/lib/evidence')
+    const verifyEvidenceApproval = (evidenceModule as unknown as {
+      verifyEvidenceApproval?: (evidence: EvidenceRecord, locator: { reviewUrl: string; candidateSha: string }) => Promise<unknown>
+    }).verifyEvidenceApproval
+    const verifiedApproval = await verifyEvidenceApproval?.(record, { reviewUrl, candidateSha })
+    const publishable = (evidenceModule as unknown as {
+      isPublishableEvidence: (evidence: EvidenceRecord, approval?: unknown) => boolean
+    }).isPublishableEvidence
+
+    expect(verifiedApproval).toBeTruthy()
+    expect(publishable(record, verifiedApproval)).toBe(true)
   })
 
   it('binds the approval artifact to a trusted provider and the same reviewer identity', () => {
