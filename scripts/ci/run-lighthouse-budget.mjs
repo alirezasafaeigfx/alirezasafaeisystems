@@ -133,7 +133,7 @@ function runCommand(command, args, options = {}) {
   })
 }
 
-async function waitForServer(url, timeoutMs, serverProcess) {
+export async function waitForServer(url, timeoutMs, serverProcess) {
   const deadline = Date.now() + timeoutMs
   let lastError = 'server not ready'
   while (Date.now() < deadline) {
