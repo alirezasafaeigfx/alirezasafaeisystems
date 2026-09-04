@@ -1,6 +1,6 @@
 import { spawn } from 'node:child_process'
 import { EventEmitter } from 'node:events'
-import { chmodSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { createServer } from 'node:http'
 import { tmpdir } from 'node:os'
 import { delimiter, join, resolve } from 'node:path'
@@ -196,6 +196,7 @@ describe('Lighthouse budget runner contract', () => {
       const outDir = join(tempRoot, 'artifacts')
       const binDir = join(tempRoot, 'bin')
       const fakePnpmJs = join(tempRoot, 'fake-pnpm.cjs')
+      mkdirSync(binDir, { recursive: true })
       writeFileSync(serverScript, `const http = require('node:http')\nconst server = http.createServer((_req, res) => { res.statusCode = 204; res.end() })\nserver.listen(${port}, '127.0.0.1')\n`)
       writeFileSync(fakePnpmJs, `process.stderr.write('intentional fake Lighthouse failure\\n')\nprocess.exit(42)\n`)
       writeFileSync(configPath, `${JSON.stringify({
