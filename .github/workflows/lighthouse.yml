@@ -26,7 +26,7 @@ jobs:
           dest: ${{ runner.temp }}/setup-pnpm
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22.23.2
           cache: 'pnpm'
           cache-dependency-path: pnpm-lock.yaml
       - run: pnpm install --frozen-lockfile
@@ -39,10 +39,18 @@ jobs:
         env:
           PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/ms-playwright
         run: pnpm exec playwright install chromium
-      - name: Run Lighthouse CI
+      - name: Run Lighthouse budget
         env:
           PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/ms-playwright
         run: |
           export CHROME_PATH="$(find "$PLAYWRIGHT_BROWSERS_PATH" -type f -name chrome -perm -111 -print -quit)"
           test -x "$CHROME_PATH"
-          pnpm exec lhci autorun --config=./lighthouserc.json
+          pnpm run lighthouse:ci
+      - name: Upload Lighthouse evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-budget-${{ github.sha }}
+          path: artifacts/lighthouse
+          if-no-files-found: error
+          retention-days: 7
