@@ -3,31 +3,58 @@ import { resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 
 const severities = ['info', 'low', 'moderate', 'high', 'critical']
+const severitySet = new Set(severities)
 const blockingSeverities = new Set(['high', 'critical'])
 
-export function summarizeAuditReport(report) {
-  if (!report || typeof report !== 'object') throw new Error('unsupported pnpm audit payload')
-  const counts = { info: 0, low: 0, moderate: 0, high: 0, critical: 0, unknown: 0 }
-  const metadataCounts = report.metadata?.vulnerabilities
-  if (metadataCounts && typeof metadataCounts === 'object') {
-    for (const severity of severities) {
-      const count = metadataCounts[severity]
-      if (!Number.isInteger(count) || count < 0) throw new Error('unsupported pnpm audit payload')
-      counts[severity] = count
-    }
-    return counts
+/**
+ * Normalize metadata severity totals while rejecting incomplete or malformed
+ * provider payloads. Unknown severity keys are accumulated into `unknown` so
+ * the caller can fail closed without discarding provider-reported findings.
+ */
+function summarizeMetadataCounts(metadataCounts) {
+  if (!metadataCounts || typeof metadataCounts !== 'object' || Array.isArray(metadataCounts)) {
+    throw new Error('unsupported pnpm audit payload')
   }
 
+  const counts = { info: 0, low: 0, moderate: 0, high: 0, critical: 0, unknown: 0 }
+  for (const severity of severities) {
+    const count = metadataCounts[severity]
+    if (!Number.isInteger(count) || count < 0) throw new Error('unsupported pnpm audit payload')
+    counts[severity] = count
+  }
+
+  for (const [severity, count] of Object.entries(metadataCounts)) {
+    if (severitySet.has(severity)) continue
+    if (!Number.isInteger(count) || count < 0) throw new Error('unsupported pnpm audit payload')
+    counts.unknown += count
+  }
+
+  return counts
+}
+
+/**
+ * Summarize supported pnpm/npm audit payloads into severity totals.
+ */
+export function summarizeAuditReport(report) {
+  if (!report || typeof report !== 'object') throw new Error('unsupported pnpm audit payload')
+
+  const metadataCounts = report.metadata?.vulnerabilities ?? report.metadata?.advisories
+  if (metadataCounts !== undefined) return summarizeMetadataCounts(metadataCounts)
+
+  const counts = { info: 0, low: 0, moderate: 0, high: 0, critical: 0, unknown: 0 }
   const findings = report.vulnerabilities ?? report.advisories
   if (!findings || typeof findings !== 'object' || Array.isArray(findings)) throw new Error('unsupported pnpm audit payload')
   for (const finding of Object.values(findings)) {
     const severity = String(finding?.severity ?? '').toLowerCase()
-    if (severity in counts && severity !== 'unknown') counts[severity] += 1
+    if (severitySet.has(severity)) counts[severity] += 1
     else counts.unknown += 1
   }
   return counts
 }
 
+/**
+ * Extract the first useful advisory description from an npm-style `via` list.
+ */
 function viaDetail(via) {
   if (!Array.isArray(via)) return null
   for (const entry of via) {
@@ -41,6 +68,10 @@ function viaDetail(via) {
   return null
 }
 
+/**
+ * Return concise high/critical advisory descriptions without dumping raw audit
+ * payloads into CI logs.
+ */
 export function describeBlockingFindings(report) {
   if (!report || typeof report !== 'object') return []
   const findings = report.advisories && typeof report.advisories === 'object' && !Array.isArray(report.advisories)
