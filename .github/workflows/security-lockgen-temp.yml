@@ -6,7 +6,7 @@ on:
       - chore/security-lockgen-20260904
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   lockgen:
@@ -43,13 +43,29 @@ jobs:
       - name: Capture modern audit result without hiding findings
         shell: bash
         run: |
-          pnpm --version
           set +e
           pnpm audit --json > audit.json
           status=$?
           set -e
           printf '%s\n' "$status" > audit-exit.txt
-          node -e 'const fs=require("fs"); const p="audit.json"; try { const x=JSON.parse(fs.readFileSync(p,"utf8")); const meta=x?.metadata?.vulnerabilities ?? x?.metadata?.advisories; console.log(JSON.stringify({auditExit:Number(fs.readFileSync("audit-exit.txt","utf8")), metadata:meta ?? null, topLevelKeys:Object.keys(x ?? {}), error:x?.error ?? null}, null, 2)); } catch(e) { console.error("audit-json-invalid", e.message); process.exitCode=1; }'
+          node -e 'const fs=require("fs"); const x=JSON.parse(fs.readFileSync("audit.json","utf8")); const meta=x?.metadata?.vulnerabilities ?? x?.metadata?.advisories; console.log(JSON.stringify({auditExit:Number(fs.readFileSync("audit-exit.txt","utf8")), metadata:meta ?? null, topLevelKeys:Object.keys(x ?? {}), error:x?.error ?? null}, null, 2)); if (!meta || Number(meta.critical)!==0 || Number(meta.high)>1) process.exit(1)'
+
+      - name: Publish clean remediation branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp package.json /tmp/security-package.json
+          cp pnpm-lock.yaml /tmp/security-pnpm-lock.yaml
+          git fetch origin chore/security-dependency-remediation-20260904
+          git switch -C chore/security-dependency-remediation-20260904 FETCH_HEAD
+          cp /tmp/security-package.json package.json
+          cp /tmp/security-pnpm-lock.yaml pnpm-lock.yaml
+          test "$(git diff --name-only | sort | tr '\n' ' ')" = "package.json pnpm-lock.yaml "
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add package.json pnpm-lock.yaml
+          git commit -m 'chore(security): remediate dependency advisories'
+          git push origin HEAD:chore/security-dependency-remediation-20260904
 
       - name: Upload generated dependency evidence
         if: always()
