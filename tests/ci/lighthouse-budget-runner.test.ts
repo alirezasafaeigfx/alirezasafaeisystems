@@ -1,10 +1,16 @@
-import { readFileSync } from 'node:fs'
+import { spawn } from 'node:child_process'
+import { EventEmitter } from 'node:events'
+import { chmodSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { createServer } from 'node:http'
+import { tmpdir } from 'node:os'
+import { delimiter, join, resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import {
   ensureHeadlessChromeFlags,
   evaluateLighthouseAssertions,
   metricValueFromReport,
   selectOptimisticValue,
+  waitForServer,
 } from '../../scripts/ci/run-lighthouse-budget.mjs'
 
 type Report = {
@@ -32,6 +38,51 @@ function report({ performance = 0.8, accessibility = 0.95, lcp = 3200 }: {
       'speed-index': { numericValue: 3000 },
     },
   }
+}
+
+function fakeServerProcess() {
+  const processEmitter = new EventEmitter() as EventEmitter & { exitCode: number | null }
+  processEmitter.exitCode = null
+  return processEmitter
+}
+
+async function closeServer(server: ReturnType<typeof createServer>) {
+  await new Promise<void>((resolvePromise, rejectPromise) => {
+    server.close((error) => error ? rejectPromise(error) : resolvePromise())
+  })
+}
+
+async function reservePort() {
+  const server = createServer()
+  await new Promise<void>((resolvePromise, rejectPromise) => {
+    server.once('error', rejectPromise)
+    server.listen(0, '127.0.0.1', resolvePromise)
+  })
+  const address = server.address()
+  if (!address || typeof address === 'string') {
+    await closeServer(server)
+    throw new Error('failed to reserve an ephemeral TCP port')
+  }
+  const port = address.port
+  await closeServer(server)
+  return port
+}
+
+async function runNodeScript(args: string[], env: NodeJS.ProcessEnv) {
+  return await new Promise<{ code: number | null, stderr: string }>((resolvePromise, rejectPromise) => {
+    const child = spawn(process.execPath, args, {
+      cwd: process.cwd(),
+      env,
+      stdio: ['ignore', 'ignore', 'pipe'],
+    })
+    let stderr = ''
+    child.stderr?.setEncoding('utf8')
+    child.stderr?.on('data', (chunk: string) => {
+      stderr += chunk
+    })
+    child.once('error', rejectPromise)
+    child.once('exit', (code) => resolvePromise({ code, stderr }))
+  })
 }
 
 describe('Lighthouse budget runner contract', () => {
@@ -100,5 +151,93 @@ describe('Lighthouse budget runner contract', () => {
     expect(result.failures).toEqual([
       expect.stringContaining('total-blocking-time'),
     ])
+  })
+
+  it('requires a successful 2xx response before declaring the start server ready', async () => {
+    let requests = 0
+    const server = createServer((_request, response) => {
+      requests += 1
+      response.statusCode = requests === 1 ? 404 : 204
+      response.end()
+    })
+    await new Promise<void>((resolvePromise, rejectPromise) => {
+      server.once('error', rejectPromise)
+      server.listen(0, '127.0.0.1', resolvePromise)
+    })
+    const address = server.address()
+    if (!address || typeof address === 'string') {
+      await closeServer(server)
+      throw new Error('test server did not expose a TCP port')
+    }
+
+    try {
+      await waitForServer(`http://127.0.0.1:${address.port}/`, 2500, fakeServerProcess())
+      expect(requests).toBeGreaterThanOrEqual(2)
+    } finally {
+      await closeServer(server)
+    }
+  })
+
+  it('propagates start-server spawn errors through the readiness promise', async () => {
+    const serverProcess = fakeServerProcess()
+    serverProcess.on('error', () => {})
+    const readiness = waitForServer('http://127.0.0.1:9/', 1200, serverProcess)
+    setTimeout(() => serverProcess.emit('error', new Error('intentional spawn failure')), 20)
+
+    await expect(readiness).rejects.toThrow('intentional spawn failure')
+  })
+
+  it('persists budget-summary.json when Lighthouse collection rejects', async () => {
+    const tempRoot = mkdtempSync(join(tmpdir(), 'asdev-lighthouse-runner-'))
+    try {
+      const port = await reservePort()
+      const serverScript = join(tempRoot, 'server.cjs')
+      const configPath = join(tempRoot, 'lighthouserc.json')
+      const outDir = join(tempRoot, 'artifacts')
+      const binDir = join(tempRoot, 'bin')
+      const fakePnpmJs = join(tempRoot, 'fake-pnpm.cjs')
+      writeFileSync(serverScript, `const http = require('node:http')\nconst server = http.createServer((_req, res) => { res.statusCode = 204; res.end() })\nserver.listen(${port}, '127.0.0.1')\n`)
+      writeFileSync(fakePnpmJs, `process.stderr.write('intentional fake Lighthouse failure\\n')\nprocess.exit(42)\n`)
+      writeFileSync(configPath, `${JSON.stringify({
+        ci: {
+          collect: {
+            url: [`http://127.0.0.1:${port}/`],
+            numberOfRuns: 1,
+            startServerCommand: `"${process.execPath}" "${serverScript}"`,
+            startServerReadyTimeout: 5000,
+            settings: { chromeFlags: '--no-sandbox' },
+          },
+          assert: {
+            assertions: {
+              'categories:accessibility': ['error', { minScore: 0.92 }],
+            },
+          },
+        },
+      }, null, 2)}\n`)
+
+      if (process.platform === 'win32') {
+        writeFileSync(join(binDir, 'pnpm.cmd'), `@echo off\r\n"${process.execPath}" "${fakePnpmJs}" %*\r\n`)
+      } else {
+        const fakePnpm = join(binDir, 'pnpm')
+        writeFileSync(fakePnpm, `#!/usr/bin/env node\nrequire(${JSON.stringify(fakePnpmJs)})\n`)
+        chmodSync(fakePnpm, 0o755)
+      }
+
+      const result = await runNodeScript([
+        resolve('scripts/ci/run-lighthouse-budget.mjs'),
+        '--config', configPath,
+        '--out-dir', outDir,
+      ], {
+        ...process.env,
+        CHROME_PATH: process.execPath,
+        PATH: `${binDir}${delimiter}${process.env.PATH ?? ''}`,
+      })
+
+      expect(result.code).toBe(1)
+      expect(result.stderr).toContain('intentional fake Lighthouse failure')
+      expect(existsSync(join(outDir, 'budget-summary.json'))).toBe(true)
+    } finally {
+      rmSync(tempRoot, { recursive: true, force: true })
+    }
   })
 })
