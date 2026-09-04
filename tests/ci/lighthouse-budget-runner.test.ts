@@ -4,7 +4,7 @@ import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, wr
 import { createServer } from 'node:http'
 import { tmpdir } from 'node:os'
 import { delimiter, join, resolve } from 'node:path'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import {
   ensureHeadlessChromeFlags,
   evaluateLighthouseAssertions,
@@ -154,37 +154,30 @@ describe('Lighthouse budget runner contract', () => {
   })
 
   it('requires a successful 2xx response before declaring the start server ready', async () => {
-    let requests = 0
-    const server = createServer((_request, response) => {
-      requests += 1
-      response.statusCode = requests === 1 ? 404 : 204
-      response.end()
-    })
-    await new Promise<void>((resolvePromise, rejectPromise) => {
-      server.once('error', rejectPromise)
-      server.listen(0, '127.0.0.1', resolvePromise)
-    })
-    const address = server.address()
-    if (!address || typeof address === 'string') {
-      await closeServer(server)
-      throw new Error('test server did not expose a TCP port')
-    }
+    const fetchMock = vi.spyOn(globalThis, 'fetch')
+      .mockResolvedValueOnce(new Response(null, { status: 404 }))
+      .mockResolvedValueOnce(new Response(null, { status: 204 }))
 
     try {
-      await waitForServer(`http://127.0.0.1:${address.port}/`, 2500, fakeServerProcess())
-      expect(requests).toBeGreaterThanOrEqual(2)
+      await waitForServer('http://127.0.0.1:3100/', 2500, fakeServerProcess())
+      expect(fetchMock).toHaveBeenCalledTimes(2)
     } finally {
-      await closeServer(server)
+      fetchMock.mockRestore()
     }
   })
 
   it('propagates start-server spawn errors through the readiness promise', async () => {
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockRejectedValue(new Error('connection refused'))
     const serverProcess = fakeServerProcess()
     serverProcess.on('error', () => {})
     const readiness = waitForServer('http://127.0.0.1:9/', 1200, serverProcess)
     setTimeout(() => serverProcess.emit('error', new Error('intentional spawn failure')), 20)
 
-    await expect(readiness).rejects.toThrow('intentional spawn failure')
+    try {
+      await expect(readiness).rejects.toThrow('intentional spawn failure')
+    } finally {
+      fetchMock.mockRestore()
+    }
   })
 
   it('persists budget-summary.json when Lighthouse collection rejects', async () => {
