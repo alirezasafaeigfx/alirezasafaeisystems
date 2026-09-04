@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import {
+  ensureHeadlessChromeFlags,
   evaluateLighthouseAssertions,
   metricValueFromReport,
   selectOptimisticValue,
@@ -48,6 +49,13 @@ describe('Lighthouse budget runner contract', () => {
       interactive: ['warn', { maxNumericValue: 5000 }],
       'speed-index': ['warn', { maxNumericValue: 4500 }],
     })
+  })
+
+  it('adds headless mode for direct Lighthouse CLI collection without changing the configured Chrome flags', () => {
+    const configured = '--no-sandbox --disable-dev-shm-usage --no-proxy-server --allow-insecure-localhost'
+    expect(ensureHeadlessChromeFlags(configured)).toBe(`${configured} --headless`)
+    expect(ensureHeadlessChromeFlags(`${configured} --headless`)).toBe(`${configured} --headless`)
+    expect(ensureHeadlessChromeFlags(`${configured} --headless=new`)).toBe(`${configured} --headless=new`)
   })
 
   it('uses optimistic aggregation: maximum score for minimum-score gates and minimum duration for maximum-value gates', () => {
