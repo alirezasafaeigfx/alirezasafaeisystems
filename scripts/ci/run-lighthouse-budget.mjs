@@ -22,6 +22,17 @@ export function selectOptimisticValue(values, thresholdType) {
 }
 
 /**
+ * Direct Lighthouse CLI collection does not inherit LHCI's headless launcher
+ * behavior. Preserve every configured Chrome flag while ensuring Hosted CI does
+ * not try to launch a display-backed browser.
+ */
+export function ensureHeadlessChromeFlags(flags = '') {
+  const normalized = typeof flags === 'string' ? flags.trim() : ''
+  if (/(?:^|\s)--headless(?:=[^\s]+)?(?:\s|$)/.test(normalized)) return normalized
+  return normalized ? `${normalized} --headless` : '--headless'
+}
+
+/**
  * Read one configured metric from a Lighthouse Result. Category assertions use
  * `categories:<id>` while audit assertions use the audit's numericValue.
  */
@@ -187,9 +198,8 @@ async function runLighthouseBudgetCli() {
       const reportPaths = []
       for (let runIndex = 0; runIndex < collect.numberOfRuns; runIndex += 1) {
         const outputPath = resolve(outDir, safeReportName(url, runIndex))
-        const chromeFlags = collect.settings?.chromeFlags
-        const args = ['exec', 'lighthouse', url, '--output=json', `--output-path=${outputPath}`, '--quiet']
-        if (typeof chromeFlags === 'string' && chromeFlags.trim()) args.push(`--chrome-flags=${chromeFlags}`)
+        const chromeFlags = ensureHeadlessChromeFlags(collect.settings?.chromeFlags)
+        const args = ['exec', 'lighthouse', url, '--output=json', `--output-path=${outputPath}`, '--quiet', `--chrome-flags=${chromeFlags}`]
         await runCommand('pnpm', args, { env: process.env })
         reports.push(JSON.parse(readFileSync(outputPath, 'utf8')))
         reportPaths.push(outputPath)
