@@ -16,9 +16,9 @@ const ALLOWED_R0_PATHS = [
 const ALLOWED_PUBLIC_EXPERIENCE_PATHS = [
   /^\.github\/workflows\/(ci-router|e2e-smoke|lighthouse)\.yml$/,
   /^\.github\/pull_request_template\.md$/,
-  /^scripts\/ci\/(validate-(r0-pr|public-experience-evidence)|measure-public-experience-budget|public-experience-attribution|run-public-experience-comparison|verify-home-initial-chunks|create-public-experience-evidence-draft|inspect-public-experience-build)\.mjs$/,
+  /^scripts\/ci\/(validate-(r0-pr|public-experience-evidence)|measure-public-experience-budget|public-experience-attribution|run-public-experience-comparison|verify-home-initial-chunks|create-public-experience-evidence-draft|inspect-public-experience-build|run-lighthouse-budget)\.mjs$/,
   /^scripts\/test\/seed-playwright-discover\.mjs$/,
-  /^tests\/ci\/(home-initial-chunks|inspect-public-experience-build|playwright-discover-fixture|public-experience-long-task-attribution|public-experience-performance-contract|public-experience-remote-artifact|public-experience-review-copy-contract|validate-(r0-pr|public-experience-evidence))\.test\.ts$/,
+  /^tests\/ci\/(home-initial-chunks|inspect-public-experience-build|playwright-discover-fixture|public-experience-long-task-attribution|public-experience-performance-contract|public-experience-remote-artifact|public-experience-review-copy-contract|lighthouse-budget-runner|validate-(r0-pr|public-experience-evidence))\.test\.ts$/,
   /^(package\.json|pnpm-lock\.yaml|next\.config\.ts)$/,
   /^src\/components\/(public|sections|discover|layout)\//,
   /^src\/components\/analytics\/tracked-link\.tsx$/,
