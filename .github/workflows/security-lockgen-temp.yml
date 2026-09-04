@@ -13,8 +13,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - name: Checkout
+      - name: Checkout modernization target
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          ref: chore/security-lighthouse-modernization-20260904
+          fetch-depth: 0
 
       - name: Setup project pnpm
         uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1
@@ -24,12 +27,20 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
-          node-version: 22
+          node-version: 22.23.2
 
-      - name: Report project toolchain
+      - name: Replace legacy LHCI dependency
+        shell: bash
         run: |
-          node --version
-          pnpm --version
+          node <<'NODE'
+          const fs = require('node:fs')
+          const path = 'package.json'
+          const pkg = JSON.parse(fs.readFileSync(path, 'utf8'))
+          delete pkg.devDependencies['@lhci/cli']
+          pkg.devDependencies.lighthouse = '13.4.1'
+          pkg.scripts['lighthouse:ci'] = 'node scripts/ci/run-lighthouse-budget.mjs --config=./lighthouserc.json --out-dir artifacts/lighthouse'
+          fs.writeFileSync(path, `${JSON.stringify(pkg, null, 2)}\n`)
+          NODE
 
       - name: Generate lockfile with project pnpm
         run: pnpm install --lockfile-only --ignore-scripts
@@ -37,10 +48,7 @@ jobs:
       - name: Verify generated lockfile with project pnpm
         run: pnpm install --frozen-lockfile --ignore-scripts
 
-      - name: Install pnpm 11 only for modern audit endpoint
-        run: npm install --global pnpm@11.25.0
-
-      - name: Capture modern audit result without hiding findings
+      - name: Capture fail-closed audit evidence
         shell: bash
         run: |
           set +e
@@ -48,30 +56,40 @@ jobs:
           status=$?
           set -e
           printf '%s\n' "$status" > audit-exit.txt
-          node -e 'const fs=require("fs"); const x=JSON.parse(fs.readFileSync("audit.json","utf8")); const meta=x?.metadata?.vulnerabilities ?? x?.metadata?.advisories; console.log(JSON.stringify({auditExit:Number(fs.readFileSync("audit-exit.txt","utf8")), metadata:meta ?? null, topLevelKeys:Object.keys(x ?? {}), error:x?.error ?? null}, null, 2)); if (!meta || Number(meta.critical)!==0 || Number(meta.high)>1) process.exit(1)'
+          node <<'NODE'
+          const fs = require('node:fs')
+          const audit = JSON.parse(fs.readFileSync('audit.json', 'utf8'))
+          const meta = audit?.metadata?.vulnerabilities ?? audit?.metadata?.advisories
+          if (!meta || typeof meta !== 'object') throw new Error('audit metadata missing')
+          const known = ['info', 'low', 'moderate', 'high', 'critical']
+          for (const severity of known) {
+            const value = Number(meta[severity])
+            if (!Number.isInteger(value) || value < 0) throw new Error(`invalid audit count for ${severity}`)
+          }
+          const unknown = Object.entries(meta)
+            .filter(([key]) => !known.includes(key))
+            .reduce((sum, [, value]) => sum + (Number.isInteger(Number(value)) && Number(value) >= 0 ? Number(value) : 1), 0)
+          const result = { auditExit: Number(fs.readFileSync('audit-exit.txt', 'utf8')), metadata: meta, unknown }
+          console.log(JSON.stringify(result, null, 2))
+          if (Number(meta.critical) !== 0 || Number(meta.high) !== 0 || unknown !== 0) process.exit(1)
+          NODE
 
-      - name: Publish clean remediation branch
+      - name: Publish package and lock atomically
         shell: bash
         run: |
           set -euo pipefail
-          cp package.json /tmp/security-package.json
-          cp pnpm-lock.yaml /tmp/security-pnpm-lock.yaml
-          git fetch origin chore/security-dependency-remediation-20260904
-          git switch -C chore/security-dependency-remediation-20260904 FETCH_HEAD
-          cp /tmp/security-package.json package.json
-          cp /tmp/security-pnpm-lock.yaml pnpm-lock.yaml
           test "$(git diff --name-only | sort | tr '\n' ' ')" = "package.json pnpm-lock.yaml "
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add package.json pnpm-lock.yaml
-          git commit -m 'chore(security): remediate dependency advisories'
-          git push origin HEAD:chore/security-dependency-remediation-20260904
+          git commit -m 'chore(security): replace legacy LHCI dependency'
+          git push origin HEAD:chore/security-lighthouse-modernization-20260904
 
       - name: Upload generated dependency evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: security-lockgen
+          name: security-lockgen-final
           path: |
             package.json
             pnpm-lock.yaml
