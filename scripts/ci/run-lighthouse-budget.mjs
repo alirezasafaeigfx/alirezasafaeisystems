@@ -136,18 +136,31 @@ function runCommand(command, args, options = {}) {
 export async function waitForServer(url, timeoutMs, serverProcess) {
   const deadline = Date.now() + timeoutMs
   let lastError = 'server not ready'
-  while (Date.now() < deadline) {
-    if (serverProcess.exitCode !== null) throw new Error(`start server command exited early with ${serverProcess.exitCode}`)
-    try {
-      const response = await fetch(url, { redirect: 'follow', signal: AbortSignal.timeout(5000) })
-      if (response.status < 500) return
-      lastError = `HTTP ${response.status}`
-    } catch (error) {
-      lastError = error instanceof Error ? error.message : String(error)
-    }
-    await new Promise((resolvePromise) => setTimeout(resolvePromise, 1000))
+  let spawnError = null
+  const onSpawnError = (error) => {
+    spawnError = error instanceof Error ? error : new Error(String(error))
   }
-  throw new Error(`start server readiness timed out after ${timeoutMs}ms: ${lastError}`)
+  serverProcess.once('error', onSpawnError)
+
+  try {
+    while (Date.now() < deadline) {
+      if (spawnError) throw spawnError
+      if (serverProcess.exitCode !== null) throw new Error(`start server command exited early with ${serverProcess.exitCode}`)
+      try {
+        const response = await fetch(url, { redirect: 'follow', signal: AbortSignal.timeout(5000) })
+        if (response.ok) return
+        lastError = `HTTP ${response.status}`
+      } catch (error) {
+        if (spawnError) throw spawnError
+        lastError = error instanceof Error ? error.message : String(error)
+      }
+      await new Promise((resolvePromise) => setTimeout(resolvePromise, 1000))
+    }
+    if (spawnError) throw spawnError
+    throw new Error(`start server readiness timed out after ${timeoutMs}ms: ${lastError}`)
+  } finally {
+    serverProcess.off('error', onSpawnError)
+  }
 }
 
 function terminateProcessTree(child) {
@@ -210,11 +223,15 @@ async function runLighthouseBudgetCli() {
       summary.warnings.push(...evaluation.warnings.map((warning) => `${url} — ${warning}`))
       summary.failures.push(...evaluation.failures.map((failure) => `${url} — ${failure}`))
     }
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error)
+    summary.failures.push(`runner — ${message}`)
+    throw error
   } finally {
     terminateProcessTree(serverProcess)
+    writeFileSync(resolve(outDir, 'budget-summary.json'), `${JSON.stringify(summary, null, 2)}\n`)
   }
 
-  writeFileSync(resolve(outDir, 'budget-summary.json'), `${JSON.stringify(summary, null, 2)}\n`)
   for (const warning of summary.warnings) console.warn(`Lighthouse budget warning: ${warning}`)
   for (const failure of summary.failures) console.error(`Lighthouse budget failure: ${failure}`)
   console.log(`Lighthouse budget summary: urls=${summary.urls.length} runs=${collect.numberOfRuns} warnings=${summary.warnings.length} failures=${summary.failures.length}`)
