@@ -69,7 +69,7 @@ function viaDetail(via) {
 }
 
 /**
- * Return concise high/critical advisory descriptions without dumping raw audit
+ * Return concise high/critical/unknown advisory descriptions without dumping raw audit
  * payloads into CI logs.
  */
 export function describeBlockingFindings(report) {
@@ -85,13 +85,15 @@ export function describeBlockingFindings(report) {
   const seen = new Set()
   for (const [key, finding] of Object.entries(findings)) {
     const severity = String(finding?.severity ?? '').toLowerCase()
-    if (!blockingSeverities.has(severity)) continue
+    const isUnknownSeverity = !severitySet.has(severity)
+    if (!blockingSeverities.has(severity) && !isUnknownSeverity) continue
     const packageName = String(finding?.module_name ?? finding?.name ?? key).trim() || key
+    const displaySeverity = isUnknownSeverity ? 'unknown' : severity
     const fallback = viaDetail(finding?.via)
     const title = String(finding?.title ?? fallback?.title ?? '').trim()
     const url = String(finding?.url ?? fallback?.url ?? '').trim()
     const line = [
-      `${severity} ${packageName}`,
+      `${displaySeverity} ${packageName}`,
       title || null,
       url || null,
     ].filter(Boolean).join(' — ')
