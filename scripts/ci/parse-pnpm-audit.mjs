@@ -33,23 +33,43 @@ function summarizeMetadataCounts(metadataCounts) {
 }
 
 /**
- * Summarize supported pnpm/npm audit payloads into severity totals.
+ * Count provider finding records by severity, routing unrecognized severities
+ * to `unknown` so an unfamiliar provider value remains fail-closed.
  */
-export function summarizeAuditReport(report) {
-  if (!report || typeof report !== 'object') throw new Error('unsupported pnpm audit payload')
-
-  const metadataCounts = report.metadata?.vulnerabilities ?? report.metadata?.advisories
-  if (metadataCounts !== undefined) return summarizeMetadataCounts(metadataCounts)
+function summarizeFindingCounts(findings) {
+  if (!findings || typeof findings !== 'object' || Array.isArray(findings)) {
+    throw new Error('unsupported pnpm audit payload')
+  }
 
   const counts = { info: 0, low: 0, moderate: 0, high: 0, critical: 0, unknown: 0 }
-  const findings = report.vulnerabilities ?? report.advisories
-  if (!findings || typeof findings !== 'object' || Array.isArray(findings)) throw new Error('unsupported pnpm audit payload')
   for (const finding of Object.values(findings)) {
     const severity = String(finding?.severity ?? '').toLowerCase()
     if (severitySet.has(severity)) counts[severity] += 1
     else counts.unknown += 1
   }
   return counts
+}
+
+/**
+ * Summarize supported pnpm/npm audit payloads into severity totals.
+ */
+export function summarizeAuditReport(report) {
+  if (!report || typeof report !== 'object') throw new Error('unsupported pnpm audit payload')
+
+  const metadataCounts = report.metadata?.vulnerabilities ?? report.metadata?.advisories
+  const findings = report.vulnerabilities ?? report.advisories
+  if (metadataCounts !== undefined) {
+    const counts = summarizeMetadataCounts(metadataCounts)
+    if (findings !== undefined) {
+      const findingCounts = summarizeFindingCounts(findings)
+      for (const severity of [...severities, 'unknown']) {
+        counts[severity] = Math.max(counts[severity], findingCounts[severity])
+      }
+    }
+    return counts
+  }
+
+  return summarizeFindingCounts(findings)
 }
 
 /**
