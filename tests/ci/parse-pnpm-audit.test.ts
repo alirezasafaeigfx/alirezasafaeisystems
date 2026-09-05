@@ -95,4 +95,19 @@ describe('pnpm audit parser', () => {
       },
     })).toEqual(['high alpha — GHSA-alpha'])
   })
+
+  it('reports available details for unknown-severity findings that fail closed', () => {
+    expect(describeBlockingFindings({
+      vulnerabilities: {
+        omega: {
+          name: 'omega',
+          severity: 'emergency',
+          title: 'Provider introduced an unsupported severity',
+          url: 'https://github.com/advisories/GHSA-unknown-severity',
+        },
+      },
+    })).toEqual([
+      'unknown omega — Provider introduced an unsupported severity — https://github.com/advisories/GHSA-unknown-severity',
+    ])
+  })
 })
