@@ -26,6 +26,19 @@ describe('pnpm audit parser', () => {
     })).toEqual({ info: 0, low: 0, moderate: 0, high: 0, critical: 0, unknown: 2 })
   })
 
+  it('does not let contradictory metadata suppress blocking advisory records', () => {
+    expect(summarizeAuditReport({
+      metadata: {
+        vulnerabilities: { info: 0, low: 0, moderate: 0, high: 0, critical: 0 },
+      },
+      advisories: {
+        high: { severity: 'high' },
+        critical: { severity: 'critical' },
+        unknown: { severity: 'emergency' },
+      },
+    })).toEqual({ info: 0, low: 0, moderate: 0, high: 1, critical: 1, unknown: 1 })
+  })
+
   it('falls back to npm-style vulnerability objects', () => {
     expect(summarizeAuditReport({
       vulnerabilities: {
