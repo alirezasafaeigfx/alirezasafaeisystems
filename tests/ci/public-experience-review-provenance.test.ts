@@ -2,7 +2,7 @@ import { mkdtempSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { validatePublicExperienceEvidence } from '@/../scripts/ci/validate-public-experience-evidence.mjs'
+import { validatePublicExperienceEvidenceTrusted } from '@/../scripts/ci/validate-public-experience-evidence-trusted.mjs'
 
 const baseSha = 'a'.repeat(40)
 const candidateSha = 'b'.repeat(40)
@@ -66,11 +66,11 @@ function forgedReviewManifest() {
 }
 
 describe('public experience review provenance', () => {
-  it('rejects a manifest-authored accepted review that has no provider verification', () => {
+  it('rejects a manifest-authored accepted review that has no provider verification', async () => {
     const rootDir = mkdtempSync(join(tmpdir(), 'asdev-review-provenance-'))
     writeFileSync(join(rootDir, 'evidence.png'), 'hello')
 
-    const errors = validatePublicExperienceEvidence(forgedReviewManifest(), {
+    const errors = await validatePublicExperienceEvidenceTrusted(forgedReviewManifest(), {
       rootDir,
       verifyGitIdentity: false,
     })
