@@ -1,12 +1,14 @@
-# Public experience acceptance checkpoint — 2026-09-05
+# Public experience acceptance checkpoint — updated 2026-09-08
 
 This checkpoint reconciles current GitHub evidence without reopening already merged implementation work. It is a state record, not a release authorization, deployment receipt, owner visual approval, or replacement for the canonical task definitions in `docs/roadmaps/ASDEV_PUBLIC_EXPERIENCE_EXECUTION.md`.
 
 ## Current repository identity
 
-- Current `main` at checkpoint creation: `6c19598a56a651dde07884afdc8da0fcfbac02c5`.
+- Current `main` at the latest reconciliation: `9920f346fd0be09d195672cbea448ad0d5714c34`.
 - PR #26 (`feat(experience): deliver measured V3.2 public interaction`) is merged. Merge commit: `336ab2090cd251ca6108ba4577288b05c915a451`.
 - PR #30 (`chore(security): modernize Lighthouse audit toolchain`) is merged. Merge commit/current main at checkpoint creation: `6c19598a56a651dde07884afdc8da0fcfbac02c5`.
+- PR #33 (`fix(evidence): require trusted public-experience acceptance`) is merged. Final candidate: `3d92f47224cee5f8570463994574319d964093ab`; merge commit: `13224b21949215e7f02d302dfc712f90351a41ea`.
+- PR #31 (`fix(security): integrate fail-closed pnpm audit parser`) is merged. Final candidate: `f0f946f466363c719e25def744b293a74bb96500`; merge commit/current main: `9920f346fd0be09d195672cbea448ad0d5714c34`.
 - No Production deploy, public-edge change, migration, timer activation, DNS/nginx mutation, or customer submission is authorized or performed by this checkpoint.
 
 ## PR #26 implementation/review reconciliation
@@ -28,7 +30,7 @@ Therefore S4 implementation must **not** be restarted. The five-state semantic s
 
 ## Exact candidate evidence retrieved
 
-The E2E Smoke run exposes a still-retrievable V3.2 evidence artifact:
+The E2E Smoke run exposed a V3.2 evidence artifact whose availability and integrity were rechecked on 2026-09-08:
 
 - Artifact ID: `9890025924`
 - Name: `v32-public-experience-08d64742282cb7456ffbbc6077baa29d505a0741`
@@ -65,41 +67,17 @@ No existing durable evidence store/path was found on current `main`. The Actions
 
 An explicit owner visual disposition for the exact candidate was also not found in the PR evidence reviewed for this checkpoint. Until such a disposition is recorded, S5-03 owner acceptance remains `UNVERIFIED` even though code review is clean.
 
-## Security chain currently in flight
+## Acceptance and security chain reconciled
 
-PR #31 (`fix(security): integrate fail-closed pnpm audit parser`) is the clean post-#30 integration successor to stale PR #27.
+PR #33 now secures the actual workflow-dispatch acceptance entry point with provider-backed review verification. Manifest-authored review fields cannot certify acceptance; repository, PR, candidate SHA, review scope, accepted disposition, reviewer independence, and linked author/committer identities are checked against GitHub and fail closed. Its final exact-head independent review was `APPROVED`, explicitly without treating code review as owner visual approval. All six hosted workflows passed; the first Lighthouse attempt failed with provider/runtime `NO_NAVSTART`, and its single diagnostic rerun passed.
 
-Current exact head: `d857c9db02d9259df5ef5e53193f40a9683b3a77`.
+PR #31 now always parses provider JSON, including when `pnpm audit` exits zero. It accepts complete pnpm legacy and npm audit v2 reports, validates npm v2 totals, and rejects unsupported versions, dual containers, incomplete findings, malformed metadata, unknown metadata keys, and contradictory counts. High/critical/unknown findings remain blocking. The exact-head full local gate passed 91 test files / 529 tests, and all six hosted workflows passed. Independent exact-head review found no actionable correctness or security issue.
 
-The latest independent review found that metadata totals could contradict available advisory records and suppress a blocking `high`, `critical`, or unknown finding. That finding was handled with a focused TDD cycle:
-
-- RED commit `15d2a1eca057923c4efad28fb036d2d09bbd24f7`
-- Hosted CI `33989144481`: exactly **1 targeted parser failure / 512 pass**
-- the failing assertion showed metadata zeros suppressing one high, one critical, and one unknown record
-- GREEN commit `d857c9db02d9259df5ef5e53193f40a9683b3a77` conservatively reconciles metadata with available finding records using the maximum per severity, so lower contradictory metadata cannot create a false green
-
-All six workflows for the GREEN exact head are successful:
-
-- CI `33989258946`
-- Lighthouse Budget `33989258939`
-- CI Router `33989258934`
-- Security Audit `33989258968`
-- CodeQL `33989258962`
-- E2E Smoke `33989258935`
-
-No audit threshold, allowlist, suppression, dependency version, runtime behavior, deployment or data path was changed by this correction. All known inline review threads are resolved.
-
-A fresh full CodeRabbit review of `d857c9db02d9259df5ef5e53193f40a9683b3a77` was requested after the fix. CodeRabbit recognized the exact head and selected all three PR files, but the included-review quota is currently exhausted; the latest response reported the next included review in 36 minutes. That external gate must not be bypassed.
-
-After PR #31 merges:
-
-- close PR #27 as superseded by the clean parser integration;
-- close draft PR #29 as superseded by merged PR #30 remediation plus PR #31 verification.
+Stale predecessor PRs #27 and #29 were closed without merging after their successors landed. No threshold, allowlist, suppression, dependency manifest, or lockfile change was introduced by PR #31.
 
 ## Current execution decision
 
 1. Do not restart merged S4 implementation.
-2. Finish the PR #31 fresh-review gate and integrate only if the exact head remains clean.
-3. Preserve S5 as acceptance/provenance work: durable artifact publication/retrieval, accepted manifest, explicit owner visual disposition, then the remaining governed acceptance/release chain.
-4. Public edge, live monitoring timers, migration and Production redeploy remain phrase-gated and are outside this safe reconciliation.
-5. Do not blindly merge stale paired docs PR #28: its branch is materially behind current main and needs a clean current-main reconciliation if/when that paired documentation work resumes.
+2. Preserve S5 as acceptance/provenance work: durable artifact publication/retrieval, accepted manifest, explicit owner visual disposition, then the remaining governed acceptance/release chain.
+3. Public edge, live monitoring timers, migration and Production redeploy remain phrase-gated and are outside this safe reconciliation.
+4. Reconcile only useful paired documentation from PR #28; do not restore stale ancestry, obsolete code, or historical status claims.
