@@ -123,6 +123,7 @@ function stubGithubProvider({
   reviewer = 'TrustedReviewer',
   pullAuthor = 'alirezasafaeigfx',
   commitAuthor: providerCommitAuthor = 'ImplementationAuthor',
+  commitCommitter: providerCommitCommitter = 'TrustedCommitter',
   includeChangesRequested = false,
 } = {}) {
   vi.stubGlobal('fetch', vi.fn(async (input: unknown) => {
@@ -166,7 +167,7 @@ function stubGithubProvider({
       headers: new Headers(),
       json: async () => [{
         author: providerCommitAuthor ? { login: providerCommitAuthor } : null,
-        committer: { login: 'TrustedCommitter' },
+        committer: providerCommitCommitter ? { login: providerCommitCommitter } : null,
       }],
     }
     if (url.endsWith('/pulls/123')) {
@@ -235,6 +236,13 @@ describe('public experience review provenance', () => {
   it('fails closed when a commit author identity is unavailable', async () => {
     const manifest = providerBackedManifest()
     stubGithubProvider({ commitAuthor: '', reviewBody: attestationBody(manifest) })
+
+    expect(await validateIndependentReviewProvenance(manifest)).not.toEqual([])
+  })
+
+  it('fails closed when a commit committer identity is unavailable', async () => {
+    const manifest = providerBackedManifest()
+    stubGithubProvider({ commitCommitter: '', reviewBody: attestationBody(manifest) })
 
     expect(await validateIndependentReviewProvenance(manifest)).not.toEqual([])
   })

@@ -124,7 +124,9 @@ async function verifyGithubReview(review, manifest) {
   const pullAuthor = pullRequest.user?.login?.trim() ?? ''
   const declaredReviewer = String(review.author ?? '').trim()
   const commitIdentitiesComplete = pullCommits.length > 0
-    && pullCommits.every((commit) => nonEmpty(commit?.author?.login))
+    && pullCommits.every((commit) =>
+      nonEmpty(commit?.author?.login) && nonEmpty(commit?.committer?.login),
+    )
   const commitIdentities = new Set(pullCommits.flatMap((commit) =>
     [commit?.author?.login, commit?.committer?.login]
       .filter(nonEmpty)
