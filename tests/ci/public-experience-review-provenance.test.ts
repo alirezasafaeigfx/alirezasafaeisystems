@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
@@ -10,6 +11,7 @@ const baseSha = 'a'.repeat(40)
 const candidateSha = 'b'.repeat(40)
 const artifactHash = '2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824'
 const providerUrl = 'https://github.com/alirezasafaeigfx/alirezasafaeisystems/pull/123#pullrequestreview-456'
+const evidenceMarker = 'ASDEV-PUBLIC-EXPERIENCE-EVIDENCE-SHA256'
 
 function forgedReviewManifest() {
   const states = ['pressure', 'diagnosis', 'intervention', 'stable', 'evidence']
@@ -81,7 +83,38 @@ function providerBackedManifest() {
   }
 }
 
-function stubGithubProvider({ headSha = candidateSha, available = true } = {}) {
+function stableJson(value: unknown): string {
+  if (Array.isArray(value)) return `[${value.map(stableJson).join(',')}]`
+  if (value && typeof value === 'object') {
+    const record = value as Record<string, unknown>
+    return `{${Object.keys(record).sort().map((key) => `${JSON.stringify(key)}:${stableJson(record[key])}`).join(',')}}`
+  }
+  return JSON.stringify(value)
+}
+
+function expectedReviewScopeSha256(manifest: ReturnType<typeof providerBackedManifest>): string {
+  const scope = {
+    schemaVersion: manifest.schemaVersion,
+    taskIds: manifest.taskIds,
+    repository: manifest.repository,
+    baseSha: manifest.baseSha,
+    candidateSha: manifest.candidateSha,
+    environment: manifest.environment,
+    capturedAt: manifest.capturedAt,
+    sourceDirty: manifest.sourceDirty,
+    commands: manifest.commands,
+    criteria: manifest.criteria,
+    artifacts: manifest.artifacts,
+    limitations: manifest.limitations,
+  }
+  return createHash('sha256').update(stableJson(scope)).digest('hex')
+}
+
+function attestationBody(manifest: ReturnType<typeof providerBackedManifest>): string {
+  return `${evidenceMarker}: ${expectedReviewScopeSha256(manifest)}`
+}
+
+function stubGithubProvider({ headSha = candidateSha, available = true, reviewBody = '' } = {}) {
   vi.stubGlobal('fetch', vi.fn(async (input: unknown) => {
     if (!available) return { ok: false }
     const url = String(input)
@@ -93,6 +126,7 @@ function stubGithubProvider({ headSha = candidateSha, available = true } = {}) {
           html_url: providerUrl,
           state: 'APPROVED',
           commit_id: candidateSha,
+          body: reviewBody,
           user: { login: 'TrustedReviewer' },
         }),
       }
@@ -124,17 +158,28 @@ describe('public experience review provenance', () => {
     ]))
   })
 
-  it('accepts an approved provider review bound to the exact candidate and an independent reviewer', async () => {
-    stubGithubProvider()
+  it('accepts an approved provider review bound to the exact candidate, evidence scope, and an independent reviewer', async () => {
+    const manifest = providerBackedManifest()
+    stubGithubProvider({ reviewBody: attestationBody(manifest) })
 
-    expect(await validateIndependentReviewProvenance(providerBackedManifest())).toEqual([])
+    expect(await validateIndependentReviewProvenance(manifest)).toEqual([])
+  })
+
+  it('rejects an otherwise valid approved provider review when evidence-scope attestation is missing', async () => {
+    const manifest = providerBackedManifest()
+    stubGithubProvider({ reviewBody: '' })
+
+    expect(await validateIndependentReviewProvenance(manifest)).toEqual([
+      'manifest requires a provider-verified independent review for candidateSha and evidence scope',
+    ])
   })
 
   it('rejects a provider review when the pull-request head no longer matches candidateSha', async () => {
-    stubGithubProvider({ headSha: 'c'.repeat(40) })
+    const manifest = providerBackedManifest()
+    stubGithubProvider({ headSha: 'c'.repeat(40), reviewBody: attestationBody(manifest) })
 
-    expect(await validateIndependentReviewProvenance(providerBackedManifest())).toEqual([
-      'manifest requires a provider-verified independent review for candidateSha',
+    expect(await validateIndependentReviewProvenance(manifest)).toEqual([
+      'manifest requires a provider-verified independent review for candidateSha and evidence scope',
     ])
   })
 
