@@ -25,8 +25,16 @@ function summarizeMetadataCounts(metadataCounts) {
 
   for (const [severity, count] of Object.entries(metadataCounts)) {
     if (severitySet.has(severity)) continue
-    if (!Number.isInteger(count) || count < 0) throw new Error('unsupported pnpm audit payload')
-    counts.unknown += count
+    if (severity === 'total') {
+      if (!Number.isInteger(count) || count < 0) throw new Error('unsupported pnpm audit payload')
+      continue
+    }
+    throw new Error('unsupported pnpm audit payload')
+  }
+
+  const total = severities.reduce((sum, severity) => sum + counts[severity], 0)
+  if (metadataCounts.total !== undefined && metadataCounts.total !== total) {
+    throw new Error('contradictory pnpm audit payload')
   }
 
   return counts
@@ -36,13 +44,27 @@ function summarizeMetadataCounts(metadataCounts) {
  * Count provider finding records by severity, routing unrecognized severities
  * to `unknown` so an unfamiliar provider value remains fail-closed.
  */
-function summarizeFindingCounts(findings) {
+function summarizeFindingCounts(findings, format) {
   if (!findings || typeof findings !== 'object' || Array.isArray(findings)) {
     throw new Error('unsupported pnpm audit payload')
   }
 
   const counts = { info: 0, low: 0, moderate: 0, high: 0, critical: 0, unknown: 0 }
-  for (const finding of Object.values(findings)) {
+  for (const [key, finding] of Object.entries(findings)) {
+    if (!finding || typeof finding !== 'object' || Array.isArray(finding)) {
+      throw new Error('unsupported pnpm audit payload')
+    }
+    if (format === 'npm-v2') {
+      if (!String(finding.name ?? key).trim() || !Array.isArray(finding.via)
+        || !Array.isArray(finding.effects) || !String(finding.range ?? '').trim()
+        || !Array.isArray(finding.nodes) || !Object.hasOwn(finding, 'fixAvailable')) {
+        throw new Error('unsupported pnpm audit payload')
+      }
+    } else if (!Number.isInteger(finding.id) || !String(finding.module_name ?? '').trim()
+      || !String(finding.title ?? '').trim() || !String(finding.url ?? '').trim()
+      || !Array.isArray(finding.findings)) {
+      throw new Error('unsupported pnpm audit payload')
+    }
     const severity = String(finding?.severity ?? '').toLowerCase()
     if (severitySet.has(severity)) counts[severity] += 1
     else counts.unknown += 1
@@ -54,22 +76,30 @@ function summarizeFindingCounts(findings) {
  * Summarize supported pnpm/npm audit payloads into severity totals.
  */
 export function summarizeAuditReport(report) {
-  if (!report || typeof report !== 'object') throw new Error('unsupported pnpm audit payload')
-
-  const metadataCounts = report.metadata?.vulnerabilities ?? report.metadata?.advisories
-  const findings = report.vulnerabilities ?? report.advisories
-  if (metadataCounts !== undefined) {
-    const counts = summarizeMetadataCounts(metadataCounts)
-    if (findings !== undefined) {
-      const findingCounts = summarizeFindingCounts(findings)
-      for (const severity of [...severities, 'unknown']) {
-        counts[severity] = Math.max(counts[severity], findingCounts[severity])
-      }
-    }
-    return counts
+  if (!report || typeof report !== 'object' || Array.isArray(report)
+    || !report.metadata || typeof report.metadata !== 'object' || Array.isArray(report.metadata)) {
+    throw new Error('unsupported pnpm audit payload')
   }
 
-  return summarizeFindingCounts(findings)
+  const hasVulnerabilities = Object.hasOwn(report, 'vulnerabilities')
+  const hasAdvisories = Object.hasOwn(report, 'advisories')
+  if (hasVulnerabilities === hasAdvisories) throw new Error('unsupported pnpm audit payload')
+
+  const format = hasVulnerabilities ? 'npm-v2' : 'pnpm-legacy'
+  if ((format === 'npm-v2' && report.auditReportVersion !== 2)
+    || (format === 'pnpm-legacy' && report.auditReportVersion !== undefined)) {
+    throw new Error('unsupported pnpm audit payload')
+  }
+
+  const metadataKeys = ['vulnerabilities', 'advisories'].filter((key) => Object.hasOwn(report.metadata, key))
+  if (metadataKeys.length !== 1) throw new Error('unsupported pnpm audit payload')
+  const counts = summarizeMetadataCounts(report.metadata[metadataKeys[0]])
+  const findingCounts = summarizeFindingCounts(report[hasVulnerabilities ? 'vulnerabilities' : 'advisories'], format)
+  for (const severity of severities) {
+    if (counts[severity] !== findingCounts[severity]) throw new Error('contradictory pnpm audit payload')
+  }
+  if (findingCounts.unknown > 0) counts.unknown = findingCounts.unknown
+  return counts
 }
 
 /**
