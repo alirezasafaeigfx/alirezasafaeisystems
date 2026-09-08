@@ -75,6 +75,18 @@ PR #31 now always parses provider JSON, including when `pnpm audit` exits zero. 
 
 Stale predecessor PRs #27 and #29 were closed without merging after their successors landed. No threshold, allowlist, suppression, dependency manifest, or lockfile change was introduced by PR #31.
 
+## Useful paired contract retained from PR #28
+
+PR #28 remains a stale documentation branch and must not be merged wholesale. Its durable coordination content is retained here without its obsolete baselines or open-status claims:
+
+- `EC-01`: reconcile exact candidates and demonstrated blockers; the ASDEV security/evidence portion is now represented by merged #33/#31, while Audit correctness remains owned by the paired repository.
+- `EC-02`: keep one visual family without copying incompatible components or forcing the ASDEV scene into Audit forms/reports.
+- `EC-03`: preserve one owner per intent—automated check and specialist assessment belong to Audit; implementation help belongs to ASDEV. Locale and bounded `source`/`placement`/`offer` attribution may cross the bridge, but URLs must not carry customer targets, report tokens, contact data, or PII.
+- `EC-04`: measured, unknown, partial, and failed Audit results must remain distinct and equivalent across report/API/PDF/comparison; ASDEV must not invent score semantics.
+- `EC-05`: candidates, releases, deployed identities, rollback evidence, and observed growth remain separate per repository. Neither product's green CI or health response closes the other product.
+
+These IDs remain historical coordination references, not a competing task selector. Any future paired implementation must re-read the current code and the Audit repository contract before changing routes or attribution.
+
 ## Current execution decision
 
 1. Do not restart merged S4 implementation.
