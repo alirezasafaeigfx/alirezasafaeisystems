@@ -210,7 +210,10 @@ export async function validatePublicExperienceEvidenceTrusted(manifest, options 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   const manifestIndex = process.argv.indexOf('--manifest')
   const rootIndex = process.argv.indexOf('--root')
-  const printReviewScopeSha256 = process.argv.includes('--print-review-scope-sha256')
+  const optionValueIndexes = new Set([manifestIndex + 1, rootIndex + 1])
+  const printReviewScopeSha256 = process.argv.some((argument, index) =>
+    argument === '--print-review-scope-sha256' && !optionValueIndexes.has(index),
+  )
   if (manifestIndex < 0 || !process.argv[manifestIndex + 1]) {
     console.error('::error::usage: node validate-public-experience-evidence-trusted.mjs --manifest <path> [--root <dir>] [--print-review-scope-sha256]')
     process.exitCode = 1

@@ -70,4 +70,20 @@ describe('public experience review-scope CLI', () => {
     expect(result.stderr).toBe('')
     expect(result.stdout).toBe(`${marker}: ${expectedScopeSha256(manifest)}\n`)
   })
+
+  it('does not interpret an option value as the print flag', () => {
+    const result = spawnSync(process.execPath, [
+      'scripts/ci/validate-public-experience-evidence-trusted.mjs',
+      '--manifest',
+      'package.json',
+      '--root',
+      '--print-review-scope-sha256',
+    ], {
+      cwd: process.cwd(),
+      encoding: 'utf8',
+    })
+
+    expect(result.status).toBe(1)
+    expect(result.stdout).not.toContain(marker)
+  })
 })

@@ -181,6 +181,7 @@ describe('public-experience dependency preflight', () => {
         'tests/ci/public-experience-long-task-attribution.test.ts',
         'tests/ci/public-experience-performance-contract.test.ts',
         'tests/ci/public-experience-review-provenance.test.ts',
+        'tests/ci/public-experience-review-scope-cli.test.ts',
         'tests/ci/home-initial-chunks.test.ts',
         'tests/ci/inspect-public-experience-build.test.ts',
         'src/lib/system-route-geometry.ts',
