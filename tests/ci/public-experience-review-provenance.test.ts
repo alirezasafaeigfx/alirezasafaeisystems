@@ -179,7 +179,7 @@ describe('public experience review provenance', () => {
     stubGithubProvider({ headSha: 'c'.repeat(40), reviewBody: attestationBody(manifest) })
 
     expect(await validateIndependentReviewProvenance(manifest)).toEqual([
-      'manifest requires a provider-verified independent review for candidateSha and evidence scope',
+      'manifest requires a provider-verified independent review for candidateSha',
     ])
   })
 
