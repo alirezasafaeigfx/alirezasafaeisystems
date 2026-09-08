@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
@@ -7,11 +8,51 @@ import {
 } from './validate-public-experience-evidence.mjs'
 
 const SHA = /^[0-9a-f]{40}$/i
+const HASH = /^[0-9a-f]{64}$/i
 const GITHUB_PR_REVIEW_URL = /^https:\/\/github\.com\/([^/\s]+)\/([^/\s]+)\/pull\/(\d+)#pullrequestreview-(\d+)$/i
 const PROVIDER_TIMEOUT_MS = 5_000
 const TRUSTED_REPOSITORY = 'alirezasafaeigfx/alirezasafaeisystems'
+const EVIDENCE_SCOPE_MARKER = 'ASDEV-PUBLIC-EXPERIENCE-EVIDENCE-SHA256'
 
 const nonEmpty = (value) => typeof value === 'string' && value.trim().length > 0
+
+function stableJson(value) {
+  if (Array.isArray(value)) return `[${value.map(stableJson).join(',')}]`
+  if (value && typeof value === 'object') {
+    return `{${Object.keys(value).sort().map((key) => `${JSON.stringify(key)}:${stableJson(value[key])}`).join(',')}}`
+  }
+  return JSON.stringify(value) ?? 'null'
+}
+
+function evidenceReviewScope(manifest) {
+  return {
+    schemaVersion: manifest?.schemaVersion,
+    taskIds: manifest?.taskIds,
+    repository: manifest?.repository,
+    baseSha: manifest?.baseSha,
+    candidateSha: manifest?.candidateSha,
+    environment: manifest?.environment,
+    capturedAt: manifest?.capturedAt,
+    sourceDirty: manifest?.sourceDirty,
+    commands: manifest?.commands,
+    criteria: manifest?.criteria,
+    artifacts: manifest?.artifacts,
+    limitations: manifest?.limitations,
+  }
+}
+
+function evidenceReviewScopeSha256(manifest) {
+  return createHash('sha256').update(stableJson(evidenceReviewScope(manifest))).digest('hex')
+}
+
+function markerValue(body, marker) {
+  if (typeof body !== 'string') return null
+  const prefix = `${marker}:`
+  const line = body.split(/\r?\n/).find((candidate) => candidate.trimStart().startsWith(prefix))
+  if (!line) return null
+  const value = line.trimStart().slice(prefix.length).trim()
+  return HASH.test(value) ? value.toLowerCase() : null
+}
 
 async function fetchGithubJson(url) {
   const controller = new AbortController()
@@ -63,7 +104,7 @@ async function verifyGithubReview(review, manifest) {
   const pullAuthor = pullRequest.user?.login?.trim() ?? ''
   const declaredReviewer = String(review.author ?? '').trim()
 
-  const verified = providerReview.id === reviewId
+  const identityVerified = providerReview.id === reviewId
     && providerReview.html_url === review.providerUrl
     && providerReview.state === 'APPROVED'
     && providerReview.commit_id === manifest.candidateSha
@@ -75,7 +116,12 @@ async function verifyGithubReview(review, manifest) {
     && nonEmpty(pullAuthor)
     && providerReviewer.toLowerCase() !== pullAuthor.toLowerCase()
 
-  return verified ? 'verified' : 'invalid'
+  if (!identityVerified) return 'invalid'
+
+  const attestedScope = markerValue(providerReview.body ?? '', EVIDENCE_SCOPE_MARKER)
+  if (attestedScope !== evidenceReviewScopeSha256(manifest)) return 'unattested'
+
+  return 'verified'
 }
 
 /**
@@ -94,15 +140,21 @@ export async function validateIndependentReviewProvenance(manifest) {
   }
 
   let providerUnavailable = false
+  let evidenceScopeUnattested = false
   for (const review of acceptedReviews) {
     const result = await verifyGithubReview(review, manifest)
     if (result === 'verified') return []
     if (result === 'unavailable') providerUnavailable = true
+    if (result === 'unattested') evidenceScopeUnattested = true
   }
 
-  return [providerUnavailable
-    ? 'independent review provider unavailable; provider-verified independent review required'
-    : 'manifest requires a provider-verified independent review for candidateSha']
+  if (providerUnavailable) {
+    return ['independent review provider unavailable; provider-verified independent review required']
+  }
+  if (evidenceScopeUnattested) {
+    return ['manifest requires a provider-verified independent review for candidateSha and evidence scope']
+  }
+  return ['manifest requires a provider-verified independent review for candidateSha']
 }
 
 /** Final fail-closed S5 validation path used by the acceptance workflow. */
