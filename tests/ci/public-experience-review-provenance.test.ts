@@ -114,22 +114,60 @@ function attestationBody(manifest: ReturnType<typeof providerBackedManifest>): s
   return `${evidenceMarker}: ${expectedReviewScopeSha256(manifest)}`
 }
 
-function stubGithubProvider({ headSha = candidateSha, available = true, reviewBody = '' } = {}) {
+function stubGithubProvider({
+  headSha = candidateSha,
+  baseSha: providerBaseSha = baseSha,
+  baseRepository = 'alirezasafaeigfx/alirezasafaeisystems',
+  available = true,
+  reviewBody = '',
+  reviewer = 'TrustedReviewer',
+  pullAuthor = 'alirezasafaeigfx',
+  commitAuthor: providerCommitAuthor = 'ImplementationAuthor',
+  includeChangesRequested = false,
+} = {}) {
   vi.stubGlobal('fetch', vi.fn(async (input: unknown) => {
     if (!available) return { ok: false }
     const url = String(input)
-    if (url.endsWith('/pulls/123/reviews/456')) {
+    if (url.endsWith('/pulls/123/reviews/456')) return {
+      ok: true,
+      json: async () => ({
+        id: 456,
+        html_url: providerUrl,
+        state: 'APPROVED',
+        commit_id: candidateSha,
+        body: reviewBody,
+        submitted_at: '2026-09-08T14:00:00Z',
+        user: { login: reviewer },
+      }),
+    }
+    if (url.includes('/pulls/123/reviews?')) {
       return {
         ok: true,
-        json: async () => ({
+        headers: new Headers(),
+        json: async () => [{
           id: 456,
           html_url: providerUrl,
           state: 'APPROVED',
           commit_id: candidateSha,
           body: reviewBody,
-          user: { login: 'TrustedReviewer' },
-        }),
+          submitted_at: '2026-09-08T14:00:00Z',
+          user: { login: reviewer },
+        }, ...(includeChangesRequested ? [{
+          id: 457,
+          state: 'CHANGES_REQUESTED',
+          commit_id: candidateSha,
+          submitted_at: '2026-09-08T14:01:00Z',
+          user: { login: 'BlockingReviewer' },
+        }] : [])],
       }
+    }
+    if (url.includes('/pulls/123/commits?')) return {
+      ok: true,
+      headers: new Headers(),
+      json: async () => [{
+        author: providerCommitAuthor ? { login: providerCommitAuthor } : null,
+        committer: { login: 'TrustedCommitter' },
+      }],
     }
     if (url.endsWith('/pulls/123')) {
       return {
@@ -137,7 +175,8 @@ function stubGithubProvider({ headSha = candidateSha, available = true, reviewBo
         json: async () => ({
           number: 123,
           head: { sha: headSha },
-          user: { login: 'alirezasafaeigfx' },
+          base: { sha: providerBaseSha, repo: { full_name: baseRepository } },
+          user: { login: pullAuthor },
         }),
       }
     }
@@ -183,6 +222,38 @@ describe('public experience review provenance', () => {
     ])
   })
 
+  it.each([
+    ['base SHA', { baseSha: 'c'.repeat(40) }],
+    ['base repository', { baseRepository: 'attacker/fork' }],
+  ])('rejects a provider review with mismatched %s', async (_name, options) => {
+    const manifest = providerBackedManifest()
+    stubGithubProvider({ ...options, reviewBody: attestationBody(manifest) })
+
+    expect(await validateIndependentReviewProvenance(manifest)).not.toEqual([])
+  })
+
+  it('fails closed when a commit author identity is unavailable', async () => {
+    const manifest = providerBackedManifest()
+    stubGithubProvider({ commitAuthor: '', reviewBody: attestationBody(manifest) })
+
+    expect(await validateIndependentReviewProvenance(manifest)).not.toEqual([])
+  })
+
+  it('rejects an approval from an implementation author', async () => {
+    const manifest = providerBackedManifest()
+    manifest.reviews[0].author = 'ImplementationAuthor'
+    stubGithubProvider({ reviewer: 'ImplementationAuthor', reviewBody: attestationBody(manifest) })
+
+    expect(await validateIndependentReviewProvenance(manifest)).not.toEqual([])
+  })
+
+  it('rejects an outstanding provider changes-requested disposition omitted from the manifest', async () => {
+    const manifest = providerBackedManifest()
+    stubGithubProvider({ includeChangesRequested: true, reviewBody: attestationBody(manifest) })
+
+    expect(await validateIndependentReviewProvenance(manifest)).not.toEqual([])
+  })
+
   it('fails closed when the review provider is unavailable', async () => {
     stubGithubProvider({ available: false })
 
@@ -197,6 +268,8 @@ describe('public experience review provenance', () => {
     expect(workflow).toContain('pull-requests: read')
     expect(workflow).toContain('GITHUB_TOKEN: ${{ github.token }}')
     expect(workflow).toContain('node scripts/ci/validate-public-experience-evidence-trusted.mjs')
+    expect(workflow).toMatch(/evidence_manifest:\s*[\s\S]*?required: true/)
+    expect(workflow).not.toContain("inputs.evidence_manifest != ''")
   })
 
   it('keeps the trusted wrapper fail-closed for structural and remote evidence checks', async () => {

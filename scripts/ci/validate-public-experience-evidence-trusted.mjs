@@ -69,12 +69,28 @@ async function fetchGithubJson(url) {
       signal: controller.signal,
     })
     if (!response.ok) return { status: 'unavailable' }
-    return { status: 'ok', value: await response.json() }
+    return {
+      status: 'ok',
+      value: await response.json(),
+      hasNext: /<[^>]+>;\s*rel="next"/i.test(response.headers?.get?.('link') ?? ''),
+    }
   } catch {
     return { status: 'unavailable' }
   } finally {
     clearTimeout(timeout)
   }
+}
+
+async function fetchGithubCollection(url) {
+  const values = []
+  for (let page = 1; page <= 100; page += 1) {
+    const separator = url.includes('?') ? '&' : '?'
+    const result = await fetchGithubJson(`${url}${separator}per_page=100&page=${page}`)
+    if (result.status !== 'ok' || !Array.isArray(result.value)) return { status: 'unavailable' }
+    values.push(...result.value)
+    if (!result.hasNext) return { status: 'ok', value: values }
+  }
+  return { status: 'unavailable' }
 }
 
 async function verifyGithubReview(review, manifest) {
@@ -92,17 +108,38 @@ async function verifyGithubReview(review, manifest) {
   if (!Number.isSafeInteger(pullNumber) || !Number.isSafeInteger(reviewId)) return 'invalid'
 
   const apiBase = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/pulls/${pullNumber}`
-  const [reviewResult, pullResult] = await Promise.all([
-    fetchGithubJson(`${apiBase}/reviews/${reviewId}`),
+  const [reviewsResult, pullResult, commitsResult] = await Promise.all([
+    fetchGithubCollection(`${apiBase}/reviews`),
     fetchGithubJson(apiBase),
+    fetchGithubCollection(`${apiBase}/commits`),
   ])
-  if (reviewResult.status !== 'ok' || pullResult.status !== 'ok') return 'unavailable'
+  if (reviewsResult.status !== 'ok' || pullResult.status !== 'ok' || commitsResult.status !== 'ok') return 'unavailable'
 
-  const providerReview = reviewResult.value
+  const providerReviews = reviewsResult.value
+  const providerReview = providerReviews.find((candidate) => candidate?.id === reviewId)
+  if (!providerReview) return 'invalid'
   const pullRequest = pullResult.value
+  const pullCommits = commitsResult.value
   const providerReviewer = providerReview.user?.login?.trim() ?? ''
   const pullAuthor = pullRequest.user?.login?.trim() ?? ''
   const declaredReviewer = String(review.author ?? '').trim()
+  const commitIdentitiesComplete = pullCommits.length > 0
+    && pullCommits.every((commit) => nonEmpty(commit?.author?.login))
+  const commitIdentities = new Set(pullCommits.flatMap((commit) =>
+    [commit?.author?.login, commit?.committer?.login]
+      .filter(nonEmpty)
+      .map((login) => login.toLowerCase()),
+  ))
+  const effectiveReviewByAuthor = new Map()
+  for (const candidate of [...providerReviews].sort((left, right) =>
+    String(left?.submitted_at ?? '').localeCompare(String(right?.submitted_at ?? '')) || Number(left?.id ?? 0) - Number(right?.id ?? 0),
+  )) {
+    const login = candidate?.user?.login?.trim?.().toLowerCase()
+    if (nonEmpty(login) && ['APPROVED', 'CHANGES_REQUESTED', 'DISMISSED'].includes(candidate?.state)) {
+      effectiveReviewByAuthor.set(login, candidate.state)
+    }
+  }
+  const hasOutstandingChangesRequest = [...effectiveReviewByAuthor.values()].includes('CHANGES_REQUESTED')
 
   const identityVerified = providerReview.id === reviewId
     && providerReview.html_url === review.providerUrl
@@ -110,11 +147,16 @@ async function verifyGithubReview(review, manifest) {
     && providerReview.commit_id === manifest.candidateSha
     && pullRequest.number === pullNumber
     && pullRequest.head?.sha === manifest.candidateSha
+    && pullRequest.base?.sha === manifest.baseSha
+    && String(pullRequest.base?.repo?.full_name ?? '').toLowerCase() === TRUSTED_REPOSITORY.toLowerCase()
     && nonEmpty(providerReviewer)
     && nonEmpty(declaredReviewer)
     && providerReviewer.toLowerCase() === declaredReviewer.toLowerCase()
     && nonEmpty(pullAuthor)
     && providerReviewer.toLowerCase() !== pullAuthor.toLowerCase()
+    && commitIdentitiesComplete
+    && !commitIdentities.has(providerReviewer.toLowerCase())
+    && !hasOutstandingChangesRequest
 
   if (!identityVerified) return 'invalid'
 
@@ -168,21 +210,26 @@ export async function validatePublicExperienceEvidenceTrusted(manifest, options 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   const manifestIndex = process.argv.indexOf('--manifest')
   const rootIndex = process.argv.indexOf('--root')
+  const printReviewScopeSha256 = process.argv.includes('--print-review-scope-sha256')
   if (manifestIndex < 0 || !process.argv[manifestIndex + 1]) {
-    console.error('::error::usage: node validate-public-experience-evidence-trusted.mjs --manifest <path> [--root <dir>]')
+    console.error('::error::usage: node validate-public-experience-evidence-trusted.mjs --manifest <path> [--root <dir>] [--print-review-scope-sha256]')
     process.exitCode = 1
   } else {
     const manifestPath = resolve(process.argv[manifestIndex + 1])
     try {
       const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'))
-      const errors = await validatePublicExperienceEvidenceTrusted(manifest, {
-        rootDir: rootIndex >= 0 ? process.argv[rootIndex + 1] : undefined,
-      })
-      if (errors.length) {
-        for (const error of errors) console.error(`::error::${error}`)
-        process.exitCode = 1
+      if (printReviewScopeSha256) {
+        process.stdout.write(`${EVIDENCE_SCOPE_MARKER}: ${evidenceReviewScopeSha256(manifest)}\n`)
       } else {
-        process.stdout.write(`trusted public experience evidence manifest valid: ${manifestPath}\n`)
+        const errors = await validatePublicExperienceEvidenceTrusted(manifest, {
+          rootDir: rootIndex >= 0 ? process.argv[rootIndex + 1] : undefined,
+        })
+        if (errors.length) {
+          for (const error of errors) console.error(`::error::${error}`)
+          process.exitCode = 1
+        } else {
+          process.stdout.write(`trusted public experience evidence manifest valid: ${manifestPath}\n`)
+        }
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error)
