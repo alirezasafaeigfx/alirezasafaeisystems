@@ -17,6 +17,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: read
 
 concurrency:
   group: mother-e2e-smoke-${{ github.head_ref || github.ref }}
@@ -93,7 +94,8 @@ jobs:
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.evidence_manifest != '' && !cancelled() }}
         env:
           EVIDENCE_MANIFEST: ${{ inputs.evidence_manifest }}
-        run: node scripts/ci/validate-public-experience-evidence.mjs --manifest "$EVIDENCE_MANIFEST" --root "$GITHUB_WORKSPACE"
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/ci/validate-public-experience-evidence-trusted.mjs --manifest "$EVIDENCE_MANIFEST" --root "$GITHUB_WORKSPACE"
       - name: Upload V3.2 public experience evidence
         if: always()
         uses: actions/upload-artifact@v4
