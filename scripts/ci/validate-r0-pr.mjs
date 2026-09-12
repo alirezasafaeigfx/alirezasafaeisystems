@@ -188,13 +188,17 @@ if (invokedPath && import.meta.url === invokedPath) {
   const mainSha = readOption('--main')
   const scope = readOption('--scope')
   const declaredScope = ['r0-infrastructure', 'public-experience-dependencies', 'security-dependency-remediation'].includes(declaration.scope) ? declaration.scope : undefined
+  if (declaration.scope && !declaredScope) {
+    console.error(`::error::unsupported ASDEV-SCOPE: ${declaration.scope}`)
+    process.exit(1)
+  }
   const errors = validateR0PullRequest({
     baseSha,
     headSha,
     mainSha,
     changedFiles: changedFilesFromGit(baseSha, headSha),
-    scope: declaredScope ?? scope,
     ...declaration,
+    scope: declaredScope ?? scope,
     taskId: declaration.taskId ?? readOption('--task-id'),
     intendedBaseSha: declaration.intendedBaseSha ?? readOption('--intended-base-sha'),
     primaryConcern: declaration.primaryConcern ?? readOption('--primary-concern'),

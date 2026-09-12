@@ -1,4 +1,8 @@
 import { describe, expect, it } from 'vitest'
+import { execFileSync, spawnSync } from 'node:child_process'
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join, resolve } from 'node:path'
 import { isGitAncestor, validateR0PullRequest } from '../../scripts/ci/validate-r0-pr.mjs'
 
 const sha = (character: string) => character.repeat(40)
@@ -293,5 +297,52 @@ describe('security dependency remediation preflight', () => {
       expect.stringContaining('application path category is forbidden'),
       expect.stringContaining('deployment path category is forbidden'),
     ]))
+  })
+
+  it('fails the sensitive CLI preflight when the PR omits its scope', () => {
+    const head = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim()
+    const temp = mkdtempSync(join(tmpdir(), 'asdev-scope-preflight-'))
+    try {
+      const eventPath = join(temp, 'event.json')
+      writeFileSync(eventPath, JSON.stringify({ pull_request: { body: [
+        'ASDEV-TASK-ID: SEC-DEPENDENCY-20260912',
+        `ASDEV-INTENDED-BASE-SHA: ${head}`,
+        'ASDEV-PRIMARY-CONCERN: security dependency remediation',
+        'ASDEV-EXPECTED-PATH-CATEGORIES: release',
+      ].join('\n') } }))
+      const result = spawnSync(process.execPath, [
+        resolve('scripts/ci/validate-r0-pr.mjs'),
+        '--base', head, '--head', head, '--main', head,
+        '--scope', 'r0-infrastructure', '--event', eventPath,
+      ], { encoding: 'utf8' })
+      expect(result.status).toBe(1)
+      expect(result.stderr).toContain('must contain at least one changed file')
+    } finally {
+      rmSync(temp, { recursive: true, force: true })
+    }
+  })
+
+  it('rejects an unknown declared scope instead of silently treating it as R0', () => {
+    const head = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim()
+    const temp = mkdtempSync(join(tmpdir(), 'asdev-scope-preflight-'))
+    try {
+      const eventPath = join(temp, 'event.json')
+      writeFileSync(eventPath, JSON.stringify({ pull_request: { body: [
+        'ASDEV-SCOPE: product',
+        'ASDEV-TASK-ID: SEC-DEPENDENCY-20260912',
+        `ASDEV-INTENDED-BASE-SHA: ${head}`,
+        'ASDEV-PRIMARY-CONCERN: security dependency remediation',
+        'ASDEV-EXPECTED-PATH-CATEGORIES: release',
+      ].join('\n') } }))
+      const result = spawnSync(process.execPath, [
+        resolve('scripts/ci/validate-r0-pr.mjs'),
+        '--base', head, '--head', head, '--main', head,
+        '--scope', 'r0-infrastructure', '--event', eventPath,
+      ], { encoding: 'utf8' })
+      expect(result.status).toBe(1)
+      expect(result.stderr).toContain('unsupported ASDEV-SCOPE: product')
+    } finally {
+      rmSync(temp, { recursive: true, force: true })
+    }
   })
 })
