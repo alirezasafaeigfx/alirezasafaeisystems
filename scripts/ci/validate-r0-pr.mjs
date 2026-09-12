@@ -30,6 +30,13 @@ const ALLOWED_PUBLIC_EXPERIENCE_PATHS = [
   /^docs\/(engineering|execution|governance|roadmaps)\//,
 ]
 
+const ALLOWED_SECURITY_DEPENDENCY_PATHS = [
+  /^(package\.json|pnpm-lock\.yaml)$/,
+  /^scripts\/ci\/validate-r0-pr\.mjs$/,
+  /^tests\/ci\/validate-r0-pr\.test\.ts$/,
+  /^\.github\/pull_request_template\.md$/,
+]
+
 const PATH_CATEGORIES = [
   ['workflow', /^\.github\/workflows\//],
   ['ci', /^(?:(scripts|tests)\/ci\/|scripts\/test\/seed-playwright-discover\.mjs$)/],
@@ -64,7 +71,7 @@ export function validateR0PullRequest({
   if (!/^[0-9a-f]{40}$/.test(baseSha) || !/^[0-9a-f]{40}$/.test(headSha) || !/^[0-9a-f]{40}$/.test(mainSha)) {
     errors.push('base, head, and main SHAs must be full 40-character hexadecimal commit IDs')
   }
-  if (!['r0-infrastructure', 'public-experience-dependencies'].includes(scope)) return errors
+  if (!['r0-infrastructure', 'public-experience-dependencies', 'security-dependency-remediation'].includes(scope)) return errors
 
   if (!taskId?.trim()) errors.push('canonical task ID is required')
   if (!intendedBaseSha?.trim()) errors.push('intended base SHA is required')
@@ -74,7 +81,11 @@ export function validateR0PullRequest({
     errors.push(`declared intended base SHA must match PR base ${baseSha}; received ${intendedBaseSha}`)
   }
 
-  const scopeLabel = scope === 'r0-infrastructure' ? 'R0 infrastructure' : 'public-experience dependency'
+  const scopeLabel = scope === 'r0-infrastructure'
+    ? 'R0 infrastructure'
+    : scope === 'public-experience-dependencies'
+      ? 'public-experience dependency'
+      : 'security dependency remediation'
   if (baseSha !== mainSha) {
     errors.push(`${scopeLabel} PR must be based on current main ${mainSha}; received ${baseSha}`)
   }
@@ -94,6 +105,20 @@ export function validateR0PullRequest({
       const category = pathCategory(file)
       if (!ALLOWED_PUBLIC_EXPERIENCE_PATHS.some((pattern) => pattern.test(file))) errors.push(`path is outside the bounded public-experience allowlist: ${file}`)
       if (['deployment', 'content', 'other'].includes(category)) errors.push(`${category} path category is forbidden in public-experience dependency PR: ${file}`)
+      if (!declared.has(category)) errors.push(`changed path category "${category}" is not declared in expected categories`)
+    }
+    return errors
+  }
+
+  if (scope === 'security-dependency-remediation') {
+    if (!/^SEC-[A-Z0-9][A-Z0-9-]*$/.test(taskId)) errors.push('security dependency task ID must start with SEC- and contain only uppercase letters, numbers, and hyphens')
+    if (!/security dependency/i.test(primaryConcern)) errors.push('security dependency primary concern must identify security dependency remediation')
+    if (changedFiles.length > 8) errors.push(`security dependency remediation PR changes ${changedFiles.length} files; maximum is 8`)
+    const declared = new Set(expectedCategories ?? [])
+    for (const file of changedFiles) {
+      const category = pathCategory(file)
+      if (!ALLOWED_SECURITY_DEPENDENCY_PATHS.some((pattern) => pattern.test(file))) errors.push(`path is outside the bounded security dependency allowlist: ${file}`)
+      if (['application', 'content', 'deployment', 'other'].includes(category)) errors.push(`${category} path category is forbidden in security dependency remediation PR: ${file}`)
       if (!declared.has(category)) errors.push(`changed path category "${category}" is not declared in expected categories`)
     }
     return errors
@@ -162,14 +187,18 @@ if (invokedPath && import.meta.url === invokedPath) {
   const headSha = readOption('--head')
   const mainSha = readOption('--main')
   const scope = readOption('--scope')
-  const declaredScope = ['r0-infrastructure', 'public-experience-dependencies'].includes(declaration.scope) ? declaration.scope : undefined
+  const declaredScope = ['r0-infrastructure', 'public-experience-dependencies', 'security-dependency-remediation'].includes(declaration.scope) ? declaration.scope : undefined
+  if (declaration.scope && !declaredScope) {
+    console.error(`::error::unsupported ASDEV-SCOPE: ${declaration.scope}`)
+    process.exit(1)
+  }
   const errors = validateR0PullRequest({
     baseSha,
     headSha,
     mainSha,
     changedFiles: changedFilesFromGit(baseSha, headSha),
-    scope: declaredScope ?? scope,
     ...declaration,
+    scope: declaredScope ?? scope,
     taskId: declaration.taskId ?? readOption('--task-id'),
     intendedBaseSha: declaration.intendedBaseSha ?? readOption('--intended-base-sha'),
     primaryConcern: declaration.primaryConcern ?? readOption('--primary-concern'),
