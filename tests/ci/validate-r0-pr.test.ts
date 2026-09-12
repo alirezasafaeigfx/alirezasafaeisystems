@@ -246,3 +246,52 @@ describe('public-experience dependency preflight', () => {
     ]))
   })
 })
+
+describe('security dependency remediation preflight', () => {
+  const securityDeclaration = {
+    taskId: 'SEC-DEPENDENCY-20260912',
+    intendedBaseSha: sha('a'),
+    primaryConcern: 'security dependency remediation for a high advisory',
+    expectedCategories: ['release', 'ci', 'governance'],
+  }
+
+  it('accepts a bounded dependency remediation with its guard and declaration', () => {
+    expect(validateR0PullRequest({
+      baseSha: sha('a'),
+      headSha: sha('b'),
+      mainSha: sha('a'),
+      scope: 'security-dependency-remediation',
+      changedFiles: [
+        'package.json',
+        'pnpm-lock.yaml',
+        'scripts/ci/validate-r0-pr.mjs',
+        'tests/ci/validate-r0-pr.test.ts',
+        '.github/pull_request_template.md',
+      ],
+      mergeBaseSha: sha('a'),
+      headIsDescendant: true,
+      ...securityDeclaration,
+    })).toEqual([])
+  })
+
+  it('rejects forged security declarations and unrelated paths', () => {
+    const errors = validateR0PullRequest({
+      baseSha: sha('a'),
+      headSha: sha('b'),
+      mainSha: sha('a'),
+      scope: 'security-dependency-remediation',
+      changedFiles: ['package.json', 'src/app/page.tsx', 'scripts/deploy/release.sh'],
+      ...securityDeclaration,
+      taskId: 'S4-10',
+      primaryConcern: 'public experience dependency update',
+      expectedCategories: ['release', 'application', 'deployment'],
+    })
+    expect(errors).toEqual(expect.arrayContaining([
+      expect.stringContaining('SEC-'),
+      expect.stringContaining('security dependency'),
+      expect.stringContaining('outside the bounded security dependency allowlist'),
+      expect.stringContaining('application path category is forbidden'),
+      expect.stringContaining('deployment path category is forbidden'),
+    ]))
+  })
+})

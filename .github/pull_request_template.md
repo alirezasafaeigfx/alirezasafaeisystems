@@ -10,6 +10,8 @@ ASDEV-EXPECTED-PATH-CATEGORIES: application
 
 For the admitted Anime.js/Three.js unit, use `public-experience-dependencies`, include S4-10 or S4-11 in the task IDs, use the exact current `GITHUB_MAIN` base SHA, and list every changed-path category. The validator rejects unrelated auth, database, deployment, and undeclared paths.
 
+For a high/critical dependency advisory remediation, use `security-dependency-remediation`, a canonical `SEC-...` task ID, a primary concern containing `security dependency`, the exact current `GITHUB_MAIN` base SHA, and only the bounded manifest, lockfile, validator, validator test, and declaration-template paths.
+
 ## Type
 
 - [ ] Platform / control plane
