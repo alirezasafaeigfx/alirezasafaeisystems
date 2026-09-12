@@ -4,7 +4,8 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { chromium, firefox } from "playwright";
+import { networkSmokeBrowserEngines } from "./lib/network-smoke-browser-engines.mjs";
+import { summarizeNetworkSmokeResults } from "./lib/network-smoke-summary.mjs";
 
 const TARGETS = [
   "https://persiantoolbox.ir/",
@@ -115,7 +116,7 @@ async function runScenario(scenario, outDir) {
   const scenarioOutDir = path.join(outDir, scenario.id);
   await fs.mkdir(scenarioOutDir, { recursive: true });
 
-  const engine = scenario.browser === "firefox" ? firefox : chromium;
+  const engine = networkSmokeBrowserEngines[scenario.browser];
   const launchOptions = { headless: true };
   if (scenario.browser === "chromium" && (await fileExists("/usr/bin/google-chrome"))) {
     launchOptions.executablePath = "/usr/bin/google-chrome";
@@ -282,10 +283,11 @@ async function main() {
     lines.push(rowForMarkdown(item));
   }
 
-  const fails = allResults.filter((r) => r.target && !r.ok).length;
+  const summary = summarizeNetworkSmokeResults(allResults);
   lines.push("");
-  lines.push(`Total checks: ${allResults.filter((r) => r.target).length}`);
-  lines.push(`Failed checks: ${fails}`);
+  lines.push(`Total checks: ${summary.total}`);
+  lines.push(`Failed checks: ${summary.failed}`);
+  lines.push(`Scenario launch failures: ${summary.scenarioFailures}`);
   lines.push(`JSON: ${resultJsonPath}`);
 
   const reportMdPath = path.join(outDir, "report.md");
@@ -294,9 +296,11 @@ async function main() {
   console.log(`REPORT_DIR=${outDir}`);
   console.log(`REPORT_MD=${reportMdPath}`);
   console.log(`REPORT_JSON=${resultJsonPath}`);
-  console.log(`TOTAL=${allResults.filter((r) => r.target).length} FAIL=${fails}`);
+  console.log(
+    `TOTAL=${summary.total} FAIL=${summary.failed} SCENARIO_FAILURES=${summary.scenarioFailures}`,
+  );
 
-  if (fails > 0) process.exitCode = 1;
+  if (summary.failed > 0) process.exitCode = 1;
 }
 
 main().catch(async (err) => {
