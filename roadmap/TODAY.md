@@ -21,6 +21,7 @@ S5 publication decision: [`docs/execution/S5_DURABLE_EVIDENCE_DECISION.md`](../d
 
 ## Not 10/10 yet
 - Evidence publication path: selected, not yet published or verified; accepted durable S5 manifest: pending
+- Trusted S5 review/hosted-validation path for the historical candidate: blocked by missing exact-scope `APPROVED` review and candidate-checkout/workflow mismatch; see the decision document
 - Explicit owner visual disposition for the exact accepted candidate: unverified in retrieved evidence
 - Public edge OFF · IRAN app-layer only
 
