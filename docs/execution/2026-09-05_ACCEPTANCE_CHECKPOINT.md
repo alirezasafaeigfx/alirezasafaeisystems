@@ -63,9 +63,13 @@ The generated `manifest.json` is explicitly a draft. It has empty `commands`, `c
 
 The current validator requires each accepted artifact to have a retrievable durable HTTPS URL, rejects expiring GitHub Actions URLs, verifies SHA-256 locally/remotely, requires the complete visual/state criteria, and requires accepted independent review for the candidate SHA.
 
-No existing durable evidence store/path was found on current `main`. The Actions package must therefore not be mislabeled as durable evidence. Creating a new durable publication/storage mechanism is a separate admitted decision; this checkpoint does not invent or silently publish one.
+At this checkpoint, no durable evidence store/path had been admitted. The later [S5 durable evidence publication decision](S5_DURABLE_EVIDENCE_DECISION.md) selects a dedicated GitHub evidence-only prerelease, subject to file-level sanitation, public retrieval and SHA-256 verification. Selection is not publication or acceptance; the Actions package must not be mislabeled durable evidence.
 
 An explicit owner visual disposition for the exact candidate was also not found in the PR evidence reviewed for this checkpoint. Until such a disposition is recorded, S5-03 owner acceptance remains `UNVERIFIED` even though code review is clean.
+
+## 2026-09-12 decision addendum
+
+`GITHUB_MAIN` was rechecked at `ae2bf59046c518564ca28006026237edfb59deae`. PR #38 (security advisory/preflight) merged at `761ad458f6d318bfd3333b60e03ca108d527b170`; PR #37 (Network Smoke false-green prevention) merged at `ae2bf59046c518564ca28006026237edfb59deae`. Those fixes must not be reimplemented. The evidence-only publication path is now specified in the linked decision, but no asset URL, accepted manifest, owner visual disposition, release identity or deployed SHA is inferred from it. The historical snapshot and candidate figures above retain their original observation dates and must be refreshed before any S5 acceptance claim.
 
 ## Acceptance and security chain reconciled
 

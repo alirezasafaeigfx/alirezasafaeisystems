@@ -106,6 +106,13 @@ Do not overwrite all S1–S5 rows with DONE based on one release. The roadmap de
 
 ## Update protocol
 
+### S5 evidence-publication decision — 2026-09-12
+
+- Repository/environment: `alirezasafaeigfx/alirezasafaeisystems`, `GITHUB_MAIN`; base `ae2bf59046c518564ca28006026237edfb59deae`; documentation branch `docs/s5-durable-evidence-20260912` in an isolated `LOCAL_PC` worktree. Candidate evidence remains bound to `08d64742282cb7456ffbbc6077baa29d505a0741`, not to this docs commit.
+- Proven gap: the exact-candidate Actions artifact expires; no durable non-Actions URL or accepted manifest exists. The owner explicitly delegated selection of a publication path. Allowed paths: this ledger, acceptance checkpoint, `roadmap/TODAY.md`, and the new bounded decision document. No application, workflow, dependency, runtime or server mutation.
+- Outcome: select a GitHub evidence-only prerelease with direct sanitized per-file assets, exact tag SHA, public URL/hash verification and explicit non-deployment semantics. [Decision and publication contract](S5_DURABLE_EVIDENCE_DECISION.md). Evidence upload and owner visual disposition remain `UNVERIFIED`; trusted validator acceptance is `BLOCKED` by absent exact-scope `APPROVED` review and candidate-checkout/workflow mismatch. No invented artifact, approval or validation path.
+- Verification/rollback: docs diff, links, consistency and secret checks plus independent documentation review and actual required hosted checks belong to this documentation PR. Revert the docs PR if the decision is superseded; no runtime rollback applies. Next: inspect/sanitize artifact before its recorded expiry, publish only compliant files, validate remotely, then seek owner visual disposition.
+
 For a meaningful change record: UTC; task IDs; prior/new state; owner; exact base/candidate/merge SHAs; paths; acceptance matrix; real commands/exits/counts; artifact URLs/hashes; reviewer/type; failures/limitations; rollback; next dependency.
 
 `READY` means dependencies are satisfied, `IN_PROGRESS` means implementation started, `REVIEW` means verification/disposition pending, `DONE` requires every applicable criterion, `REUSED-DONE` requires valid existing implementation/evidence, `PARTIAL`/`FAIL`/`UNVERIFIED` state the actual gap, and `BLOCKED` names the precise unavailable prerequisite. Program acceptance and release status remain separate.

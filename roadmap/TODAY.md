@@ -3,6 +3,7 @@
 **Focus:** finish verified acceptance/provenance without restarting merged public-experience work.
 
 Current evidence checkpoint: [`docs/execution/2026-09-05_ACCEPTANCE_CHECKPOINT.md`](../docs/execution/2026-09-05_ACCEPTANCE_CHECKPOINT.md)
+S5 publication decision: [`docs/execution/S5_DURABLE_EVIDENCE_DECISION.md`](../docs/execution/S5_DURABLE_EVIDENCE_DECISION.md)
 
 ## Done
 - OS v2 on main
@@ -15,11 +16,12 @@ Current evidence checkpoint: [`docs/execution/2026-09-05_ACCEPTANCE_CHECKPOINT.m
 
 ## Now
 - Preserve S4-10/S4-11/S4-12 as implemented; continue with S5 acceptance/provenance rather than rebuilding the scene/Three.js work
-- Establish truthful durable non-Actions evidence for the exact accepted candidate and complete the manifest/owner visual disposition
+- Inspect and sanitize the exact-candidate source artifact, then publish and independently retrieve file-level evidence through the admitted evidence-only prerelease path; complete the manifest and obtain explicit owner visual disposition separately
 - Safe product depth / a11y only where a demonstrated acceptance gap remains
 
 ## Not 10/10 yet
-- Accepted durable S5 manifest: pending
+- Evidence publication path: selected, not yet published or verified; accepted durable S5 manifest: pending
+- Trusted S5 review/hosted-validation path for the historical candidate: blocked by missing exact-scope `APPROVED` review and candidate-checkout/workflow mismatch; see the decision document
 - Explicit owner visual disposition for the exact accepted candidate: unverified in retrieved evidence
 - Public edge OFF · IRAN app-layer only
 
