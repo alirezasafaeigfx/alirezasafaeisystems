@@ -172,4 +172,31 @@ describe("network smoke summary", () => {
       );
     }
   });
+
+  it("reports a generic Audit degradation without failing an otherwise measured ASDEV candidate", () => {
+    const summary = summarizeNetworkSmokeResults([
+      {
+        scenario: "enterprise-network-audit",
+        target: "https://alirezasafaeisystems.ir/",
+        ok: true,
+        failureSummary: "none",
+      },
+      {
+        scenario: "enterprise-network-audit",
+        target: "https://audit.alirezasafaeisystems.ir/",
+        ok: false,
+        failureSummary: "ready:http:503",
+      },
+    ]);
+
+    expect(shouldFailNetworkSmoke(summary)).toBe(false);
+    expect(summary.targetVerdicts).toContainEqual(
+      expect.objectContaining({
+        targetName: "Audit",
+        observedStatus: "FAIL",
+        failureCategory: "EXTERNAL_PAIRED_TARGET_FAILURE",
+        blocksAsdevRelease: false,
+      }),
+    );
+  });
 });

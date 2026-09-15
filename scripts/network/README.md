@@ -151,6 +151,6 @@ Env vars:
 
 ## Network Smoke release ownership
 
-The checked-in policy in `scripts/lib/network-smoke-target-policy.mjs` separates an observed target result from the ASDEV release verdict. ASDEV checks are blocking. Browser or runner failures that leave ASDEV unmeasured, malformed results, and targets without an explicit policy remain blocking. An ASDEV-originated cross-site navigation failure is also blocking.
+The checked-in policy in `scripts/lib/network-smoke-target-policy.mjs` separates an observed target result from the ASDEV release verdict for both the browser smoke and the enterprise network audit. ASDEV checks are blocking. Browser or runner failures that leave ASDEV unmeasured, malformed results, and targets without an explicit policy remain blocking. An ASDEV-originated cross-site navigation failure is also blocking.
 
 Audit and PersianToolbox are independently owned paired products, not runtime dependencies of the ASDEV mother site. Their failures remain `FAIL` in the JSON, Markdown report, workflow summary, and artifact. A PersianToolbox-only CSP failure is classified as `EXTERNAL_PAIRED_TARGET_CSP_FAILURE` and does not by itself fail the ASDEV release verdict. This does not weaken the CSP probe or declare the external target healthy.

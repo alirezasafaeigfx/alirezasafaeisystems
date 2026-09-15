@@ -131,6 +131,7 @@ describe('R0 bounded PR preflight', () => {
       scope: 'r0-infrastructure',
       changedFiles: [
         '.github/workflows/network-smoke-nightly.yml',
+        'scripts/enterprise-network-audit.mjs',
         'scripts/network-smoke-matrix.mjs',
         'scripts/lib/network-smoke-summary.mjs',
         'scripts/lib/network-smoke-target-policy.mjs',

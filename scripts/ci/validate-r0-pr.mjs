@@ -7,6 +7,7 @@ const ALLOWED_R0_PATHS = [
   /^\.github\/workflows\//,
   /^scripts\/ci\//,
   /^scripts\/network-smoke-matrix\.mjs$/,
+  /^scripts\/enterprise-network-audit\.mjs$/,
   /^scripts\/lib\/network-smoke-(?:summary|target-policy)\.mjs$/,
   /^scripts\/network\/README\.md$/,
   /^tests\/ci\//,
@@ -42,7 +43,7 @@ const ALLOWED_SECURITY_DEPENDENCY_PATHS = [
 
 const PATH_CATEGORIES = [
   ['workflow', /^\.github\/workflows\//],
-  ['ci', /^scripts\/(?:network-smoke-matrix\.mjs|lib\/network-smoke-(?:summary|target-policy)\.mjs)$/],
+  ['ci', /^scripts\/(?:enterprise-network-audit\.mjs|network-smoke-matrix\.mjs|lib\/network-smoke-(?:summary|target-policy)\.mjs)$/],
   ['ci', /^(?:(scripts|tests)\/ci\/|scripts\/test\/seed-playwright-discover\.mjs$)/],
   ['governance', /^(docs\/(governance|automation)\/|\.github\/pull_request_template\.md$)/],
   ['report', /^docs\/reports\//],

@@ -1,6 +1,10 @@
 /* eslint-disable no-console */
 import fs from 'node:fs/promises'
 import path from 'node:path'
+import {
+  shouldFailNetworkSmoke,
+  summarizeNetworkSmokeResults,
+} from './lib/network-smoke-summary.mjs'
 
 const SITES = [
   {
@@ -239,7 +243,7 @@ function buildPhaseActions(resultSet) {
   return actions
 }
 
-function renderMarkdownReport(resultSet, actions) {
+function renderMarkdownReport(resultSet, actions, releaseSummary) {
   const lines = []
   lines.push('# Enterprise Network Audit Report')
   lines.push('')
@@ -270,6 +274,17 @@ function renderMarkdownReport(resultSet, actions) {
   lines.push('|---|---|---|')
   for (const action of actions) {
     lines.push(`| ${action.priority.toUpperCase()} | ${action.phase} | ${action.action} |`)
+  }
+  lines.push('')
+
+  lines.push('## ASDEV Release Verdict')
+  lines.push('')
+  lines.push(`Aggregate ASDEV verdict: ${releaseSummary.aggregateAsdevVerdict}`)
+  lines.push('')
+  lines.push('| Target | Owner | Observed | Category | Blocks ASDEV release | Evidence |')
+  lines.push('|---|---|---|---|---|---|')
+  for (const verdict of releaseSummary.targetVerdicts) {
+    lines.push(`| ${verdict.targetName} | ${verdict.owningProduct} | ${verdict.observedStatus} | ${verdict.failureCategory} | ${verdict.blocksAsdevRelease ? 'yes' : 'no'} | ${verdict.evidence || 'n/a'} |`)
   }
   lines.push('')
 
@@ -307,12 +322,34 @@ async function main() {
     })
   }
 
+  const releaseSummary = summarizeNetworkSmokeResults(resultSet.map((result) => {
+    const failedChecks = result.checks.filter((check) => check.status === 'fail')
+    const asdevCrossSiteFailure = result.site.key === 'portfolio'
+      && failedChecks.some((check) => check.id.startsWith('cross_link_'))
+    const ok = result.root.status >= 200
+      && result.root.status < 300
+      && result.ready.status >= 200
+      && result.ready.status < 300
+      && failedChecks.length === 0
+    return {
+      scenario: 'enterprise-network-audit',
+      target: `${result.site.baseUrl}/`,
+      status: result.root.status,
+      ok,
+      failureSummary: ok
+        ? 'none'
+        : failedChecks.map((check) => check.id).join(' | ') || `http:${result.root.status}/ready:${result.ready.status}`,
+      failureCategory: asdevCrossSiteFailure ? 'ASDEV_CROSS_SITE_LINK_FAILURE' : undefined,
+      logReference: 'reports/enterprise-network/',
+    }
+  }))
   const actions = buildPhaseActions(resultSet)
-  const reportMd = renderMarkdownReport(resultSet, actions)
+  const reportMd = renderMarkdownReport(resultSet, actions, releaseSummary)
   const reportJson = {
     generatedAt: nowIso(),
     resultSet,
     actions,
+    releaseSummary,
   }
 
   const fileTag = stamp()
@@ -328,8 +365,7 @@ async function main() {
   console.log(`[enterprise-audit] json report: ${jsonPath}`)
   console.log(`[enterprise-audit] latest snapshot: ${latestPath}`)
 
-  const hasFail = resultSet.some((r) => r.summary.fail > 0)
-  if (hasFail) {
+  if (shouldFailNetworkSmoke(releaseSummary)) {
     process.exitCode = 1
   }
 }
