@@ -28,6 +28,17 @@ jobs:
         run: pnpm exec playwright install --with-deps chromium
       - name: Run Chromium network smoke
         run: pnpm run network:smoke:chrome
+      - name: Publish Network Smoke summary
+        if: always()
+        shell: bash
+        run: |
+          report=$(find reports/network-smoke -name report.md -type f -print 2>/dev/null | sort | tail -n 1)
+          if [[ -n "$report" ]]; then
+            cat "$report" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Network Smoke report unavailable; ASDEV measurement is unproven." >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
       - name: Run enterprise network audit
         run: pnpm run enterprise:audit:network
       - name: Upload network artifacts

@@ -5,13 +5,11 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { networkSmokeBrowserEngines } from "./lib/network-smoke-browser-engines.mjs";
-import { summarizeNetworkSmokeResults } from "./lib/network-smoke-summary.mjs";
-
-const TARGETS = [
-  "https://persiantoolbox.ir/",
-  "https://alirezasafaeisystems.ir/",
-  "https://audit.alirezasafaeisystems.ir/",
-];
+import {
+  shouldFailNetworkSmoke,
+  summarizeNetworkSmokeResults,
+} from "./lib/network-smoke-summary.mjs";
+import { NETWORK_SMOKE_TARGETS } from "./lib/network-smoke-target-policy.mjs";
 const SUPPORTED_BROWSERS = new Set(["chromium", "firefox"]);
 
 const CSP_PATTERN = /content security policy|csp|refused to|blocked/i;
@@ -140,7 +138,7 @@ async function runScenario(scenario, outDir) {
 
   const results = [];
 
-  for (const target of TARGETS) {
+  for (const target of NETWORK_SMOKE_TARGETS) {
     const safeTarget = target.replace(/^https?:\/\//, "").replace(/[^\w.-]+/g, "_");
     const harPath = path.join(scenarioOutDir, `${safeTarget}.har`);
     const screenshotPath = path.join(scenarioOutDir, `${safeTarget}.png`);
@@ -269,13 +267,18 @@ async function main() {
   }
 
   const resultJsonPath = path.join(outDir, "result.json");
-  await fs.writeFile(resultJsonPath, JSON.stringify({ runId, scenarios, allResults }, null, 2), "utf8");
+  const summary = summarizeNetworkSmokeResults(allResults);
+  await fs.writeFile(
+    resultJsonPath,
+    JSON.stringify({ runId, scenarios, allResults, summary }, null, 2),
+    "utf8",
+  );
 
   const lines = [];
   lines.push(`# Network Smoke Matrix (${runId})`);
   lines.push("");
   lines.push(`Scenarios: ${scenarios.length}`);
-  lines.push(`Targets per scenario: ${TARGETS.length}`);
+  lines.push(`Targets per scenario: ${NETWORK_SMOKE_TARGETS.length}`);
   lines.push("");
   lines.push("| Scenario | Target | HTTP | BodyLen t0/t1s/t5s | CSP | PageErr | Proxy | Result | Failure |");
   lines.push("|---|---|---:|---:|---:|---:|---|---|---|");
@@ -283,11 +286,19 @@ async function main() {
     lines.push(rowForMarkdown(item));
   }
 
-  const summary = summarizeNetworkSmokeResults(allResults);
   lines.push("");
   lines.push(`Total checks: ${summary.total}`);
   lines.push(`Failed checks: ${summary.failed}`);
   lines.push(`Scenario launch failures: ${summary.scenarioFailures}`);
+  lines.push(`Aggregate ASDEV verdict: ${summary.aggregateAsdevVerdict}`);
+  lines.push("");
+  lines.push("| Target | URL | Owner | Observed | Category | Blocks ASDEV release | Evidence |");
+  lines.push("|---|---|---|---|---|---|---|");
+  for (const verdict of summary.targetVerdicts) {
+    lines.push(
+      `| ${verdict.targetName} | ${verdict.target || "n/a"} | ${verdict.owningProduct} | ${verdict.observedStatus} | ${verdict.failureCategory} | ${verdict.blocksAsdevRelease ? "yes" : "no"} | ${verdict.evidence || "n/a"} |`,
+    );
+  }
   lines.push(`JSON: ${resultJsonPath}`);
 
   const reportMdPath = path.join(outDir, "report.md");
@@ -300,7 +311,7 @@ async function main() {
     `TOTAL=${summary.total} FAIL=${summary.failed} SCENARIO_FAILURES=${summary.scenarioFailures}`,
   );
 
-  if (summary.failed > 0) process.exitCode = 1;
+  if (shouldFailNetworkSmoke(summary)) process.exitCode = 1;
 }
 
 main().catch(async (err) => {
