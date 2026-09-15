@@ -6,6 +6,9 @@ import { pathToFileURL } from 'node:url'
 const ALLOWED_R0_PATHS = [
   /^\.github\/workflows\//,
   /^scripts\/ci\//,
+  /^scripts\/network-smoke-matrix\.mjs$/,
+  /^scripts\/lib\/network-smoke-(?:summary|target-policy)\.mjs$/,
+  /^scripts\/network\/README\.md$/,
   /^tests\/ci\//,
   /^docs\/governance\//,
   /^docs\/automation\//,
@@ -39,11 +42,13 @@ const ALLOWED_SECURITY_DEPENDENCY_PATHS = [
 
 const PATH_CATEGORIES = [
   ['workflow', /^\.github\/workflows\//],
+  ['ci', /^scripts\/(?:network-smoke-matrix\.mjs|lib\/network-smoke-(?:summary|target-policy)\.mjs)$/],
   ['ci', /^(?:(scripts|tests)\/ci\/|scripts\/test\/seed-playwright-discover\.mjs$)/],
   ['governance', /^(docs\/(governance|automation)\/|\.github\/pull_request_template\.md$)/],
   ['report', /^docs\/reports\//],
   ['plan', /^docs\/superpowers\/plans\//],
   ['guide', /^docs\/(engineering|execution|roadmaps)\//],
+  ['guide', /^scripts\/network\/README\.md$/],
   ['content', /^(content|data|copy)\//],
   ['application', /^(src|app|pages|public|prisma|e2e)\//],
   ['deployment', /^(scripts\/(deploy|ops)|ops\/deploy)\//],

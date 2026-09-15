@@ -122,6 +122,29 @@ describe('R0 bounded PR preflight', () => {
       changedFiles: ['src/app/page.tsx'],
     })).toEqual([])
   })
+
+  it('admits the bounded Network Smoke ownership contract', () => {
+    expect(validateR0PullRequest({
+      baseSha: sha('a'),
+      headSha: sha('b'),
+      mainSha: sha('a'),
+      scope: 'r0-infrastructure',
+      changedFiles: [
+        '.github/workflows/network-smoke-nightly.yml',
+        'scripts/network-smoke-matrix.mjs',
+        'scripts/lib/network-smoke-summary.mjs',
+        'scripts/lib/network-smoke-target-policy.mjs',
+        'scripts/network/README.md',
+        'tests/ci/network-smoke-summary.test.ts',
+      ],
+      taskId: 'NET-SMOKE-OWNERSHIP',
+      intendedBaseSha: sha('a'),
+      primaryConcern: 'per-target Network Smoke release ownership',
+      expectedCategories: ['workflow', 'ci', 'guide'],
+      mergeBaseSha: sha('a'),
+      headIsDescendant: true,
+    })).toEqual([])
+  })
 })
 
 describe('public-experience dependency preflight', () => {
