@@ -5,6 +5,7 @@ import { pathToFileURL } from 'node:url'
 
 const ALLOWED_R0_PATHS = [
   /^\.github\/workflows\//,
+  /^\.releaserc\.json$/,
   /^scripts\/ci\//,
   /^scripts\/network-smoke-matrix\.mjs$/,
   /^scripts\/enterprise-network-audit\.mjs$/,
@@ -43,6 +44,7 @@ const ALLOWED_SECURITY_DEPENDENCY_PATHS = [
 
 const PATH_CATEGORIES = [
   ['workflow', /^\.github\/workflows\//],
+  ['ci', /^\.releaserc\.json$/],
   ['ci', /^scripts\/(?:enterprise-network-audit\.mjs|network-smoke-matrix\.mjs|lib\/network-smoke-(?:summary|target-policy)\.mjs)$/],
   ['ci', /^(?:(scripts|tests)\/ci\/|scripts\/test\/seed-playwright-discover\.mjs$)/],
   ['governance', /^(docs\/(governance|automation)\/|\.github\/pull_request_template\.md$)/],
