@@ -3,6 +3,7 @@ import { resolve } from 'node:path'
 import { render, screen, within } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { Header } from '@/components/layout/header'
+import { Footer } from '@/components/layout/footer'
 import { SectionHeading } from '@/components/public/section-heading'
 import { VisualFrame } from '@/components/public/visual-frame'
 
@@ -63,6 +64,15 @@ describe('V3.1 public visual primitives', () => {
 })
 
 describe('V3.1 global public shell', () => {
+  it('links visitors to the maintained public GitHub repository', () => {
+    render(<Footer />)
+
+    expect(screen.getByRole('link', { name: 'GitHub' })).toHaveAttribute(
+      'href',
+      'https://github.com/alirezasafaeigfx/alirezasafaeisystems',
+    )
+  })
+
   it('keeps the primary desktop navigation focused and separates collaboration', () => {
     render(<Header />)
 

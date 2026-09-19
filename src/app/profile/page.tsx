@@ -141,7 +141,7 @@ export default async function ProfilePage() {
   }
 
   const contactLinks = [
-    { label: 'GitHub', href: 'https://github.com/parsairaniiidev/alirezasafaeisystems' },
+    { label: 'GitHub', href: brand.githubUrl },
     { label: 'Telegram', href: TELEGRAM_URL },
     { label: 'Resume PDF', href: RESUME_PDF_URL },
     { label: 'Portfolio & contact', href: PORTFOLIO_URL },
