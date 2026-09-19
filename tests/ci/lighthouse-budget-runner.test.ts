@@ -9,6 +9,7 @@ import {
   ensureHeadlessChromeFlags,
   evaluateLighthouseAssertions,
   metricValueFromReport,
+  runLighthouseCollection,
   selectOptimisticValue,
   waitForServer,
 } from '../../scripts/ci/run-lighthouse-budget.mjs'
@@ -107,6 +108,25 @@ describe('Lighthouse budget runner contract', () => {
     expect(ensureHeadlessChromeFlags(configured)).toBe(`${configured} --headless`)
     expect(ensureHeadlessChromeFlags(`${configured} --headless`)).toBe(`${configured} --headless`)
     expect(ensureHeadlessChromeFlags(`${configured} --headless=new`)).toBe(`${configured} --headless=new`)
+  })
+
+  it('retries NO_NAVSTART once and then succeeds', async () => {
+    const execute = vi.fn()
+      .mockRejectedValueOnce(new Error('trace failed (NO_NAVSTART)'))
+      .mockResolvedValueOnce(undefined)
+
+    await expect(runLighthouseCollection(['exec', 'lighthouse'], execute)).resolves.toBeUndefined()
+    expect(execute).toHaveBeenCalledTimes(2)
+  })
+
+  it('fails after a second NO_NAVSTART and never retries arbitrary failures', async () => {
+    const repeatedNavStart = vi.fn().mockRejectedValue(new Error('trace failed (NO_NAVSTART)'))
+    await expect(runLighthouseCollection([], repeatedNavStart)).rejects.toThrow('NO_NAVSTART')
+    expect(repeatedNavStart).toHaveBeenCalledTimes(2)
+
+    const budgetFailure = vi.fn().mockRejectedValue(new Error('categories:accessibility below budget'))
+    await expect(runLighthouseCollection([], budgetFailure)).rejects.toThrow('below budget')
+    expect(budgetFailure).toHaveBeenCalledTimes(1)
   })
 
   it('uses optimistic aggregation: maximum score for minimum-score gates and minimum duration for maximum-value gates', () => {

@@ -23,8 +23,7 @@ describe('semantic release on protected main', () => {
       path.join(repoRoot, '.github/workflows/release.yml'),
       'utf8',
     );
-    expect(workflow).not.toMatch(/^-?\s*-p @semantic-release\/changelog(?:@|\s|$)/m);
-    expect(workflow).not.toMatch(/^-?\s*-p @semantic-release\/git(?:@|\s|$)/m);
+    expect(workflow).not.toMatch(/@semantic-release\/(?:changelog|git)(?:@|[\s'\"]|$)/m);
     expect(workflow).toMatch(/^-?\s*-p @semantic-release\/github@/m);
     expect(workflow).toMatch(/^-?\s*-p @semantic-release\/release-notes-generator@/m);
   });

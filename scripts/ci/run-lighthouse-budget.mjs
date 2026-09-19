@@ -124,13 +124,40 @@ function safeReportName(url, runIndex) {
 
 function runCommand(command, args, options = {}) {
   return new Promise((resolvePromise, rejectPromise) => {
-    const child = spawn(command, args, { stdio: 'inherit', ...options })
+    const child = spawn(command, args, { stdio: ['inherit', 'pipe', 'pipe'], ...options })
+    let output = ''
+    const capture = (stream, destination) => {
+      stream?.on('data', (chunk) => {
+        const text = String(chunk)
+        output = `${output}${text}`.slice(-64_000)
+        destination.write(chunk)
+      })
+    }
+    capture(child.stdout, process.stdout)
+    capture(child.stderr, process.stderr)
     child.once('error', rejectPromise)
     child.once('exit', (code, signal) => {
       if (code === 0) resolvePromise()
-      else rejectPromise(new Error(`${command} exited with ${code ?? `signal ${signal}`}`))
+      else rejectPromise(new Error(`${command} exited with ${code ?? `signal ${signal}`}\n${output}`))
     })
   })
+}
+
+export function shouldRetryLighthouseCollection(error, attemptIndex) {
+  const message = error instanceof Error ? error.message : String(error)
+  return attemptIndex === 0 && /\bNO_NAVSTART\b/.test(message)
+}
+
+export async function runLighthouseCollection(args, execute = (commandArgs) => runCommand('pnpm', commandArgs, { env: process.env })) {
+  for (let attemptIndex = 0; attemptIndex < 2; attemptIndex += 1) {
+    try {
+      await execute(args)
+      return
+    } catch (error) {
+      if (!shouldRetryLighthouseCollection(error, attemptIndex)) throw error
+      console.warn('Lighthouse collection hit NO_NAVSTART; retrying this report once with a fresh browser process')
+    }
+  }
 }
 
 export async function waitForServer(url, timeoutMs, serverProcess) {
@@ -213,7 +240,7 @@ async function runLighthouseBudgetCli() {
         const outputPath = resolve(outDir, safeReportName(url, runIndex))
         const chromeFlags = ensureHeadlessChromeFlags(collect.settings?.chromeFlags)
         const args = ['exec', 'lighthouse', url, '--output=json', `--output-path=${outputPath}`, '--quiet', `--chrome-flags=${chromeFlags}`]
-        await runCommand('pnpm', args, { env: process.env })
+        await runLighthouseCollection(args)
         reports.push(JSON.parse(readFileSync(outputPath, 'utf8')))
         reportPaths.push(outputPath)
       }
@@ -234,7 +261,7 @@ async function runLighthouseBudgetCli() {
 
   for (const warning of summary.warnings) console.warn(`Lighthouse budget warning: ${warning}`)
   for (const failure of summary.failures) console.error(`Lighthouse budget failure: ${failure}`)
-  console.log(`Lighthouse budget summary: urls=${summary.urls.length} runs=${collect.numberOfRuns} warnings=${summary.warnings.length} failures=${summary.failures.length}`)
+  process.stdout.write(`Lighthouse budget summary: urls=${summary.urls.length} runs=${collect.numberOfRuns} warnings=${summary.warnings.length} failures=${summary.failures.length}\n`)
   if (summary.failures.length) process.exitCode = 1
 }
 
