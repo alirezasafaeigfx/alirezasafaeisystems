@@ -2,7 +2,8 @@ import { env } from '@/lib/env'
 import { PROFILE_SUMMARY_EN, PROFILE_SUMMARY_FA } from '@/lib/profile-copy'
 
 const DEFAULT_HANDLE = 'alirezasafaeisystems'
-const DEFAULT_GITHUB_URL = 'https://github.com/parsairaniiidev/alirezasafaeisystems'
+const DEFAULT_GITHUB_URL = 'https://github.com/alirezasafaeigfx/alirezasafaeisystems'
+const LEGACY_GITHUB_PATH = '/parsairaniiidev/alirezasafaeisystems'
 const DEFAULT_LINKEDIN_URL = `https://linkedin.com/in/${DEFAULT_HANDLE}`
 const DEFAULT_TELEGRAM_URL = `https://t.me/asdevsystems`
 const DEFAULT_INSTAGRAM_URL = `https://www.instagram.com/${DEFAULT_HANDLE}`
@@ -12,11 +13,28 @@ const DEFAULT_CONTACT_PHONE = '09001602030'
 const DEFAULT_POSITIONING_EN = `AliReza Safaei — Web Systems Engineer | ${PROFILE_SUMMARY_EN}`
 const DEFAULT_POSITIONING_FA = `علیرضا صفایی — مهندس سیستم‌های وب | ${PROFILE_SUMMARY_FA}`
 
+export function resolveGitHubUrl(configuredUrl: string | undefined): string {
+  const normalizedUrl = configuredUrl?.trim()
+  if (!normalizedUrl) return DEFAULT_GITHUB_URL
+
+  try {
+    const parsedUrl = new URL(normalizedUrl)
+    const normalizedPath = parsedUrl.pathname.replace(/\/+$/, '').toLowerCase()
+    if (parsedUrl.hostname.toLowerCase() === 'github.com' && normalizedPath === LEGACY_GITHUB_PATH) {
+      return DEFAULT_GITHUB_URL
+    }
+  } catch {
+    // Preserve an explicit non-URL override; validation remains owned by env parsing.
+  }
+
+  return normalizedUrl
+}
+
 export const brand = {
   ownerName: env.NEXT_PUBLIC_OWNER_NAME || 'Alireza Safaei',
   brandName: env.NEXT_PUBLIC_BRAND_NAME || 'AliReza Safaei',
   twitterHandle: env.NEXT_PUBLIC_TWITTER_HANDLE || undefined,
-  githubUrl: env.NEXT_PUBLIC_GITHUB_URL || DEFAULT_GITHUB_URL,
+  githubUrl: resolveGitHubUrl(env.NEXT_PUBLIC_GITHUB_URL),
   linkedinUrl: env.NEXT_PUBLIC_LINKEDIN_URL || DEFAULT_LINKEDIN_URL,
   telegramUrl: env.NEXT_PUBLIC_TELEGRAM_URL || DEFAULT_TELEGRAM_URL,
   instagramUrl: env.NEXT_PUBLIC_INSTAGRAM_URL || DEFAULT_INSTAGRAM_URL,
