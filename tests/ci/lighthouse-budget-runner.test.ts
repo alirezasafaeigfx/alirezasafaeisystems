@@ -10,6 +10,7 @@ import {
   evaluateLighthouseAssertions,
   metricValueFromReport,
   selectOptimisticValue,
+  shouldRetryLighthouseCollection,
   waitForServer,
 } from '../../scripts/ci/run-lighthouse-budget.mjs'
 
@@ -107,6 +108,13 @@ describe('Lighthouse budget runner contract', () => {
     expect(ensureHeadlessChromeFlags(configured)).toBe(`${configured} --headless`)
     expect(ensureHeadlessChromeFlags(`${configured} --headless`)).toBe(`${configured} --headless`)
     expect(ensureHeadlessChromeFlags(`${configured} --headless=new`)).toBe(`${configured} --headless=new`)
+  })
+
+  it('retries NO_NAVSTART once without retrying budget or arbitrary runner failures', () => {
+    expect(shouldRetryLighthouseCollection(new Error('trace failed (NO_NAVSTART)'), 0)).toBe(true)
+    expect(shouldRetryLighthouseCollection(new Error('trace failed (NO_NAVSTART)'), 1)).toBe(false)
+    expect(shouldRetryLighthouseCollection(new Error('categories:accessibility below budget'), 0)).toBe(false)
+    expect(shouldRetryLighthouseCollection(new Error('Chrome exited unexpectedly'), 0)).toBe(false)
   })
 
   it('uses optimistic aggregation: maximum score for minimum-score gates and minimum duration for maximum-value gates', () => {
