@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import { isBenignNextRscAbort } from '../../scripts/deploy/live-verify-classification.mjs'
+import {
+  isBenignNextRscAbort,
+  isRetryableSameOriginAssetAbort,
+} from '../../scripts/deploy/live-verify-classification.mjs'
 
 type RequestLike = {
   method: () => string
@@ -58,5 +61,43 @@ describe('live verifier Next.js RSC abort classification', () => {
 
   it('does not classify successful RSC requests as failures or warnings', () => {
     expect(isBenignNextRscAbort(request({ errorText: '' }), origin)).toBe(false)
+  })
+})
+
+describe('live verifier static asset abort recovery classification', () => {
+  const origin = 'https://example.test'
+
+  it.each([
+    ['Next.js chunk', 'https://example.test/_next/static/chunks/app.js', 'script'],
+    ['site font', 'https://example.test/fonts/Vazirmatn-Variable.woff2', 'font'],
+  ])('defers a same-origin non-navigation %s ERR_ABORTED for an independent probe', (_label, url, resourceType) => {
+    expect(isRetryableSameOriginAssetAbort(request({ url, resourceType }), origin)).toBe(true)
+  })
+
+  it('keeps a document navigation abort fatal', () => {
+    expect(isRetryableSameOriginAssetAbort(request({
+      url: 'https://example.test/_next/static/chunks/app.js',
+      resourceType: 'document',
+      navigation: true,
+    }), origin)).toBe(false)
+  })
+
+  it('does not classify cross-origin or non-static aborts as retryable local assets', () => {
+    expect(isRetryableSameOriginAssetAbort(request({
+      url: 'https://cdn.example.test/_next/static/chunks/app.js',
+      resourceType: 'script',
+    }), origin)).toBe(false)
+    expect(isRetryableSameOriginAssetAbort(request({
+      url: 'https://example.test/api/health',
+      resourceType: 'fetch',
+    }), origin)).toBe(false)
+  })
+
+  it('keeps non-abort static asset failures fatal', () => {
+    expect(isRetryableSameOriginAssetAbort(request({
+      url: 'https://example.test/fonts/Vazirmatn-Variable.woff2',
+      resourceType: 'font',
+      errorText: 'net::ERR_CONNECTION_RESET',
+    }), origin)).toBe(false)
   })
 })

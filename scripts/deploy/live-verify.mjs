@@ -1,7 +1,10 @@
 import { mkdir, writeFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 import { chromium } from '@playwright/test'
-import { isBenignNextRscAbort } from './live-verify-classification.mjs'
+import {
+  isBenignNextRscAbort,
+  isRetryableSameOriginAssetAbort,
+} from './live-verify-classification.mjs'
 
 const baseUrl = process.env.LIVE_VERIFY_BASE_URL
 const releaseSha = process.env.LIVE_VERIFY_RELEASE_SHA
@@ -34,7 +37,7 @@ function recordFailure(scope, message) {
   failures.push({ scope, message })
 }
 
-function attachDiagnostics(page, scope) {
+function attachDiagnostics(page, scope, retryableAssetAborts) {
   page.on('console', (message) => {
     if (message.type() === 'error') {
       recordFailure(scope, `console error: ${message.text()}`)
@@ -44,6 +47,8 @@ function attachDiagnostics(page, scope) {
   page.on('requestfailed', (request) => {
     if (isBenignNextRscAbort(request, baseOrigin)) {
       warnings.push(`${scope}: benign Next.js RSC fetch abort: ${request.url()}`)
+    } else if (isRetryableSameOriginAssetAbort(request, baseOrigin)) {
+      retryableAssetAborts.add(request.url())
     } else if (sameOrigin(request.url())) {
       recordFailure(scope, `request failed: ${request.method()} ${request.url()} (${request.failure()?.errorText ?? 'unknown'})`)
     }
@@ -53,6 +58,24 @@ function attachDiagnostics(page, scope) {
       recordFailure(scope, `server response ${response.status()}: ${response.url()}`)
     }
   })
+}
+
+async function probeRetryableAssetAborts(page, scope, urls) {
+  for (const url of urls) {
+    try {
+      const response = await page.request.get(url, {
+        failOnStatusCode: false,
+        timeout: 15_000,
+      })
+      if (response.ok()) {
+        warnings.push(`${scope}: transient asset abort recovered by HTTP ${response.status()} probe: ${url}`)
+      } else {
+        recordFailure(scope, `aborted asset probe failed: GET ${url} (HTTP ${response.status()})`)
+      }
+    } catch (error) {
+      recordFailure(scope, `aborted asset probe failed: GET ${url} (${error instanceof Error ? error.message : String(error)})`)
+    }
+  }
 }
 
 async function goto(page, pathname, { requireMain = true } = {}) {
@@ -72,7 +95,8 @@ async function goto(page, pathname, { requireMain = true } = {}) {
 async function runCheck(browser, name, viewport, check) {
   const context = await browser.newContext({ viewport, javaScriptEnabled: true })
   const page = await context.newPage()
-  attachDiagnostics(page, name)
+  const retryableAssetAborts = new Set()
+  attachDiagnostics(page, name, retryableAssetAborts)
   const failureCountBefore = failures.length
 
   try {
@@ -80,6 +104,8 @@ async function runCheck(browser, name, viewport, check) {
   } catch (error) {
     recordFailure(name, error instanceof Error ? error.message : String(error))
   }
+
+  await probeRetryableAssetAborts(page, name, retryableAssetAborts)
 
   if (failures.length > failureCountBefore) {
     try {
