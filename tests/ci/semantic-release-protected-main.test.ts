@@ -16,6 +16,8 @@ describe('semantic release on protected main', () => {
 
     expect(pluginNames).not.toContain('@semantic-release/changelog');
     expect(pluginNames).not.toContain('@semantic-release/git');
+    expect(pluginNames).toContain('@semantic-release/github');
+    expect(pluginNames).toContain('@semantic-release/release-notes-generator');
 
     const workflow = fs.readFileSync(
       path.join(repoRoot, '.github/workflows/release.yml'),
@@ -23,5 +25,7 @@ describe('semantic release on protected main', () => {
     );
     expect(workflow).not.toMatch(/^-?\s*-p @semantic-release\/changelog(?:@|\s|$)/m);
     expect(workflow).not.toMatch(/^-?\s*-p @semantic-release\/git(?:@|\s|$)/m);
+    expect(workflow).toMatch(/^-?\s*-p @semantic-release\/github@/m);
+    expect(workflow).toMatch(/^-?\s*-p @semantic-release\/release-notes-generator@/m);
   });
 });
