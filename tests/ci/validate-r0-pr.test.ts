@@ -168,6 +168,47 @@ describe('R0 bounded PR preflight', () => {
       headIsDescendant: true,
     })).toEqual([])
   })
+
+  it('admits only the bounded production live-verification harness as CI infrastructure', () => {
+    expect(validateR0PullRequest({
+      baseSha: sha('a'),
+      headSha: sha('b'),
+      mainSha: sha('a'),
+      scope: 'r0-infrastructure',
+      changedFiles: [
+        'scripts/deploy/live-verify.mjs',
+        'scripts/deploy/live-verify-classification.mjs',
+        'tests/ci/live-verifier-rsc-abort.test.ts',
+      ],
+      taskId: 'R0-LIVE-VERIFY-ASSET-ABORTS',
+      intendedBaseSha: sha('a'),
+      primaryConcern: 'fail-closed production live verification',
+      expectedCategories: ['ci'],
+      mergeBaseSha: sha('a'),
+      headIsDescendant: true,
+    })).toEqual([])
+  })
+
+  it('continues to reject unrelated deployment scripts from R0 infrastructure', () => {
+    const errors = validateR0PullRequest({
+      baseSha: sha('a'),
+      headSha: sha('b'),
+      mainSha: sha('a'),
+      scope: 'r0-infrastructure',
+      changedFiles: ['scripts/deploy/deploy-release.sh'],
+      taskId: 'R0-LIVE-VERIFY-ASSET-ABORTS',
+      intendedBaseSha: sha('a'),
+      primaryConcern: 'fail-closed production live verification',
+      expectedCategories: ['ci'],
+      mergeBaseSha: sha('a'),
+      headIsDescendant: true,
+    })
+
+    expect(errors).toEqual(expect.arrayContaining([
+      'path is outside the bounded R0 infrastructure allowlist: scripts/deploy/deploy-release.sh',
+      'deployment path category is forbidden in R0 infrastructure PR: scripts/deploy/deploy-release.sh',
+    ]))
+  })
 })
 
 describe('public-experience dependency preflight', () => {
