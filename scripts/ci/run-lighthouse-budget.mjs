@@ -148,10 +148,10 @@ export function shouldRetryLighthouseCollection(error, attemptIndex) {
   return attemptIndex === 0 && /\bNO_NAVSTART\b/.test(message)
 }
 
-async function runLighthouseCollection(args) {
+export async function runLighthouseCollection(args, execute = (commandArgs) => runCommand('pnpm', commandArgs, { env: process.env })) {
   for (let attemptIndex = 0; attemptIndex < 2; attemptIndex += 1) {
     try {
-      await runCommand('pnpm', args, { env: process.env })
+      await execute(args)
       return
     } catch (error) {
       if (!shouldRetryLighthouseCollection(error, attemptIndex)) throw error
