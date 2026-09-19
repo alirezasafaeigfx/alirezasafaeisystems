@@ -146,6 +146,28 @@ describe('R0 bounded PR preflight', () => {
       headIsDescendant: true,
     })).toEqual([])
   })
+
+  it('admits the bounded protected-main semantic release configuration', () => {
+    expect(validateR0PullRequest({
+      baseSha: sha('a'),
+      headSha: sha('b'),
+      mainSha: sha('a'),
+      scope: 'r0-infrastructure',
+      changedFiles: [
+        '.github/workflows/release.yml',
+        '.releaserc.json',
+        'scripts/ci/validate-r0-pr.mjs',
+        'tests/ci/validate-r0-pr.test.ts',
+        'tests/ci/semantic-release-protected-main.test.ts',
+      ],
+      taskId: 'RELEASE-PROTECTED-MAIN',
+      intendedBaseSha: sha('a'),
+      primaryConcern: 'protected-main semantic release compatibility',
+      expectedCategories: ['workflow', 'ci'],
+      mergeBaseSha: sha('a'),
+      headIsDescendant: true,
+    })).toEqual([])
+  })
 })
 
 describe('public-experience dependency preflight', () => {
